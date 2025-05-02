@@ -1,0 +1,49 @@
+services:
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+    ports:
+      - "5173:5173"
+    depends_on:
+      - server
+    volumes:
+      - ./client:/app
+      - /app/node_modules
+    environment:
+      - VITE_API_URL=http://localhost:3000
+    command: npm run dev
+
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    depends_on:
+      - mongodb
+    volumes:
+      - ./server:/app
+      - /app/node_modules
+    environment:
+      - MONGO_URI=mongodb://crossclip_app:clip123secure@mongodb:27017/cross_clipboard?authSource=cross_clipboard
+    command: npm run dev
+
+  mongodb:
+    image: mongo:6
+    container_name: crossclip-mongo
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: secret
+      MONGO_INITDB_DATABASE: cross_clipboard
+    volumes:
+      - ./mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
+      - ./mongo/mongod.conf:/etc/mongod.conf:ro
+      - crossclip_mongo_data:/data/db
+    command: ["mongod", "--config", "/etc/mongod.conf"]
+
+volumes:
+  crossclip_mongo_data:

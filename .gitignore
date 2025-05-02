@@ -1,0 +1,36 @@
+# Node modules
+node_modules/
+
+# Logs
+logs
+*.log
+npm-debug.log*
+
+# Environment variables
+.env
+
+# Vite build output
+dist/
+
+# MacOS
+.DS_Store
+
+# Docker
+docker-compose.override.yml
+
+# Misc
+*.swp
+*.swo
+*.swn
+
+# IDEs
+.idea/
+.vscode/
+*.sublime-project
+*.sublime-workspace
+
+# Coverage
+coverage/
+
+# MongoDB
+db/ 
