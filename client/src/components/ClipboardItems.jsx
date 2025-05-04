@@ -2,10 +2,13 @@ import { useState } from 'react';
 import { useSession } from '../contexts/SessionContext';
 import { copyToClipboard } from '../utils/clipboard';
 import { ConflictModal } from './ConflictModal';
+import { useTranslation } from 'react-i18next';
+import { formatDate } from '../utils/dateFormat';
 import toast from 'react-hot-toast';
 
 const ClipboardItem = ({ item }) => {
   const { deviceId, deleteItem, editItem } = useSession();
+  const { t, i18n } = useTranslation(['common', 'clipboard']);
   const [isEditing, setIsEditing] = useState(false);
   const [editContent, setEditContent] = useState(item.content);
   const [showConflict, setShowConflict] = useState(false);
@@ -17,9 +20,9 @@ const ClipboardItem = ({ item }) => {
     if (item.type === 'text') {
       const success = await copyToClipboard(item.content);
       if (success) {
-        toast.success('Copied to clipboard!');
+        toast.success(t('clipboard:clipboard.copied'));
       } else {
-        toast.error('Failed to copy to clipboard');
+        toast.error(t('clipboard:clipboard.copyFailed'));
       }
     }
   };
@@ -40,6 +43,7 @@ const ClipboardItem = ({ item }) => {
     
     if (result.success) {
       setIsEditing(false);
+      toast.success(t('clipboard:clipboard.updated'));
     } else if (result.conflict) {
       setConflictData({
         currentContent: result.currentItem.content,
@@ -71,8 +75,9 @@ const ClipboardItem = ({ item }) => {
   };
 
   const handleDelete = async () => {
-    if (window.confirm('Are you sure you want to delete this item?')) {
+    if (window.confirm(t('common:confirmations.delete'))) {
       await deleteItem(item.id);
+      toast.success(t('clipboard:clipboard.deleted'));
     }
   };
 
@@ -81,7 +86,7 @@ const ClipboardItem = ({ item }) => {
       <div className="bg-white rounded-lg shadow-sm border p-4 mb-4">
         <div className="flex justify-between items-start mb-2">
           <div className="text-sm text-gray-500">
-            {new Date(item.createdAt).toLocaleString()}
+            {formatDate(item.createdAt, 'PPpp', i18n.language)}
           </div>
           {isOwner && (
             <div className="flex gap-2">
@@ -90,14 +95,14 @@ const ClipboardItem = ({ item }) => {
                   className="text-blue-500 hover:text-blue-600 text-sm"
                   onClick={handleEdit}
                 >
-                  {isEditing ? 'Save' : 'Edit'}
+                  {t(isEditing ? 'common:actions.save' : 'common:actions.edit')}
                 </button>
               )}
               <button
                 className="text-red-500 hover:text-red-600 text-sm"
                 onClick={handleDelete}
               >
-                Delete
+                {t('common:actions.delete')}
               </button>
             </div>
           )}
@@ -115,7 +120,7 @@ const ClipboardItem = ({ item }) => {
             <div 
               className="font-mono text-sm bg-gray-50 p-3 rounded-lg cursor-pointer hover:bg-gray-100"
               onClick={handleCopy}
-              title="Click to copy"
+              title={t('common:actions.copy')}
             >
               {item.content}
             </div>
@@ -124,7 +129,7 @@ const ClipboardItem = ({ item }) => {
           <div className="relative">
             <img 
               src={item.content} 
-              alt="Clipboard content"
+              alt={t('clipboard:image.clipboardContent')}
               className="max-w-full rounded-lg"
             />
             <a 
@@ -132,7 +137,7 @@ const ClipboardItem = ({ item }) => {
               download="clipboard-image"
               className="absolute top-2 right-2 bg-white rounded-lg shadow-sm px-3 py-1 text-sm hover:bg-gray-50"
             >
-              Download
+              {t('common:actions.download')}
             </a>
           </div>
         )}
@@ -156,11 +161,12 @@ const ClipboardItem = ({ item }) => {
 
 export const ClipboardItems = () => {
   const { items, loading, error } = useSession();
+  const { t } = useTranslation('common');
 
   if (error) {
     return (
       <div className="text-center text-red-500 my-8">
-        Error: {error}
+        {t('errors.generic', { message: error })}
       </div>
     );
   }
@@ -168,7 +174,7 @@ export const ClipboardItems = () => {
   if (loading && items.length === 0) {
     return (
       <div className="text-center text-gray-500 my-8">
-        Loading...
+        {t('errors.loading')}
       </div>
     );
   }
@@ -176,7 +182,7 @@ export const ClipboardItems = () => {
   if (items.length === 0) {
     return (
       <div className="text-center text-gray-500 my-8">
-        No items yet. Paste something to get started!
+        {t('empty.items')}
       </div>
     );
   }

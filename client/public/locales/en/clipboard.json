@@ -1,0 +1,31 @@
+{
+  "session": {
+    "title": "Session",
+    "copyLink": "Share Link",
+    "created": "Session created successfully!",
+    "joined": "Joined session successfully!",
+    "invalid": "That session doesn't exist, creating a new one for you"
+  },
+  "clipboard": {
+    "copied": "Copied to clipboard!",
+    "copyFailed": "Failed to copy to clipboard",
+    "added": "Item added successfully!",
+    "deleted": "Item deleted successfully!",
+    "updated": "Item updated successfully!"
+  },
+  "conflict": {
+    "title": "Content Conflict Detected",
+    "description": "This content has been modified by another device. Please review the changes:",
+    "current": "Current Version",
+    "yours": "Your Changes",
+    "keepCurrent": "Keep Current",
+    "useYours": "Use Your Changes"
+  },
+  "addItem": {
+    "pastePrompt": "Paste text or image here",
+    "supportedTypes": "Supports text and images (PNG, JPEG)"
+  },
+  "image": {
+    "clipboardContent": "Clipboard content"
+  }
+} 

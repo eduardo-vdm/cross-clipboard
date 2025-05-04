@@ -1,0 +1,20 @@
+{
+  "actions": {
+    "copy": "Copiar",
+    "edit": "Editar",
+    "save": "Salvar",
+    "delete": "Excluir",
+    "cancel": "Cancelar",
+    "download": "Baixar"
+  },
+  "confirmations": {
+    "delete": "Tem certeza que deseja excluir este item?"
+  },
+  "errors": {
+    "generic": "Erro: {{message}}",
+    "loading": "Carregando..."
+  },
+  "empty": {
+    "items": "Nenhum item ainda. Cole algo para começar!"
+  }
+} 

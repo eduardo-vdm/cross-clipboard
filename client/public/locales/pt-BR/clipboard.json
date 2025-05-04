@@ -1,0 +1,31 @@
+{
+  "session": {
+    "title": "Sessão",
+    "copyLink": "Compartilhar Link",
+    "created": "Sessão criada com sucesso!",
+    "joined": "Conectado à sessão com sucesso!",
+    "invalid": "Essa sessão não existe, criando uma nova para você"
+  },
+  "clipboard": {
+    "copied": "Copiado para a área de transferência!",
+    "copyFailed": "Falha ao copiar para a área de transferência",
+    "added": "Item adicionado com sucesso!",
+    "deleted": "Item excluído com sucesso!",
+    "updated": "Item atualizado com sucesso!"
+  },
+  "conflict": {
+    "title": "Conflito de Conteúdo Detectado",
+    "description": "Este conteúdo foi modificado por outro dispositivo. Por favor, revise as alterações:",
+    "current": "Versão Atual",
+    "yours": "Suas Alterações",
+    "keepCurrent": "Manter Atual",
+    "useYours": "Usar Suas Alterações"
+  },
+  "addItem": {
+    "pastePrompt": "Cole texto ou imagem aqui",
+    "supportedTypes": "Suporta texto e imagens (PNG, JPEG)"
+  },
+  "image": {
+    "clipboardContent": "Conteúdo da área de transferência"
+  }
+} 

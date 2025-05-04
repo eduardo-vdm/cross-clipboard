@@ -1,0 +1,20 @@
+{
+  "actions": {
+    "copy": "Copy",
+    "edit": "Edit",
+    "save": "Save",
+    "delete": "Delete",
+    "cancel": "Cancel",
+    "download": "Download"
+  },
+  "confirmations": {
+    "delete": "Are you sure you want to delete this item?"
+  },
+  "errors": {
+    "generic": "Error: {{message}}",
+    "loading": "Loading..."
+  },
+  "empty": {
+    "items": "No items yet. Paste something to get started!"
+  }
+} 

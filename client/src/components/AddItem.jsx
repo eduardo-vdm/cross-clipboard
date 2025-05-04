@@ -1,70 +1,52 @@
-import { useState } from 'react';
 import { useSession } from '../contexts/SessionContext';
-import { readFromClipboard, readImageFromClipboard } from '../utils/clipboard';
-import toast from 'react-hot-toast';
+import { useTranslation } from 'react-i18next';
 
 export const AddItem = () => {
-  const { addItem, loading } = useSession();
-  const [itemType, setItemType] = useState('text'); // 'text' or 'image'
+  const { addItem } = useSession();
+  const { t } = useTranslation('clipboard');
 
-  const handlePaste = async () => {
-    if (loading) return;
+  const handlePaste = async (e) => {
+    e.preventDefault();
+    const clipboardItems = await navigator.clipboard.read();
 
-    if (itemType === 'text') {
-      const { success, content, error } = await readFromClipboard();
-      if (success && content.trim()) {
-        await addItem(content, 'text');
-      } else {
-        toast.error(error || 'No text found in clipboard');
-      }
-    } else {
-      const { success, content, error } = await readImageFromClipboard();
-      if (success) {
-        // Convert blob to base64
+    for (const clipboardItem of clipboardItems) {
+      // Handle images
+      if (clipboardItem.types.includes('image/png') || 
+          clipboardItem.types.includes('image/jpeg')) {
+        const blob = await clipboardItem.getType(
+          clipboardItem.types.find(type => type.startsWith('image/'))
+        );
         const reader = new FileReader();
-        reader.onloadend = async () => {
-          await addItem(reader.result, 'image');
+        reader.onload = async (e) => {
+          await addItem(e.target.result, 'image');
         };
-        reader.readAsDataURL(content);
-      } else {
-        toast.error(error || 'No image found in clipboard');
+        reader.readAsDataURL(blob);
+        return;
+      }
+
+      // Handle text
+      if (clipboardItem.types.includes('text/plain')) {
+        const blob = await clipboardItem.getType('text/plain');
+        const text = await blob.text();
+        if (text.trim()) {
+          await addItem(text, 'text');
+        }
+        return;
       }
     }
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-sm border p-4 mb-6">
-      <div className="flex items-center gap-4">
-        <div className="flex rounded-lg overflow-hidden border">
-          <button
-            className={`px-4 py-2 ${
-              itemType === 'text'
-                ? 'bg-blue-500 text-white'
-                : 'bg-gray-50 text-gray-700 hover:bg-gray-100'
-            }`}
-            onClick={() => setItemType('text')}
-          >
-            Text
-          </button>
-          <button
-            className={`px-4 py-2 ${
-              itemType === 'image'
-                ? 'bg-blue-500 text-white'
-                : 'bg-gray-50 text-gray-700 hover:bg-gray-100'
-            }`}
-            onClick={() => setItemType('image')}
-          >
-            Image
-          </button>
-        </div>
-        <button
-          onClick={handlePaste}
-          disabled={loading}
-          className={`btn btn-primary flex-1 ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
-        >
-          {loading ? 'Adding...' : `Paste ${itemType === 'text' ? 'Text' : 'Image'}`}
-        </button>
-      </div>
+    <div 
+      onPaste={handlePaste}
+      className="bg-gray-50 border-2 border-dashed border-gray-300 rounded-lg p-8 text-center cursor-pointer mb-8"
+    >
+      <p className="text-gray-500">
+        {t('addItem.pastePrompt')}
+      </p>
+      <p className="text-sm text-gray-400 mt-2">
+        {t('addItem.supportedTypes')}
+      </p>
     </div>
   );
 }; 
