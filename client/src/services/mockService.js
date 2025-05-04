@@ -6,6 +6,7 @@ const delay = (ms = 500) => new Promise(resolve => setTimeout(resolve, ms));
 // In-memory storage
 let items = [...mockItems];
 let currentSession = null;
+let itemVersions = new Map(); // Track item versions for conflict detection
 
 export const mockService = {
   // Create a new session
@@ -13,7 +14,9 @@ export const mockService = {
     await delay();
     const code = Math.floor(100000 + Math.random() * 900000).toString();
     currentSession = { code, deviceId };
-    items = [...mockItems]; // Reset items to initial state
+    items = [...mockItems];
+    // Initialize versions for all items
+    itemVersions = new Map(items.map(item => [item.id, 1]));
     return { code };
   },
 
@@ -48,10 +51,57 @@ export const mockService = {
       type,
       deviceId,
       createdAt: new Date().toISOString(),
+      version: 1,
     };
 
     items = [newItem, ...items];
+    itemVersions.set(newItem.id, 1);
     return newItem;
+  },
+
+  // Edit an item
+  editItem: async (code, itemId, content, deviceId, expectedVersion) => {
+    await delay();
+    if (code !== currentSession?.code) {
+      throw new Error('Invalid session code');
+    }
+
+    const itemIndex = items.findIndex(i => i.id === itemId);
+    if (itemIndex === -1) {
+      throw new Error('Item not found');
+    }
+
+    const item = items[itemIndex];
+    if (item?.deviceId !== deviceId) {
+      throw new Error('Not authorized to edit this item');
+    }
+
+    const currentVersion = itemVersions.get(itemId);
+    if (expectedVersion !== currentVersion) {
+      // Return current item state along with conflict error
+      throw {
+        type: 'CONFLICT',
+        message: 'Item has been modified',
+        currentItem: item,
+        currentVersion,
+      };
+    }
+
+    const updatedItem = {
+      ...item,
+      content,
+      version: currentVersion + 1,
+      updatedAt: new Date().toISOString(),
+    };
+
+    items = [
+      ...items.slice(0, itemIndex),
+      updatedItem,
+      ...items.slice(itemIndex + 1),
+    ];
+    itemVersions.set(itemId, currentVersion + 1);
+
+    return updatedItem;
   },
 
   // Delete an item
@@ -70,6 +120,7 @@ export const mockService = {
     }
 
     items = items.filter(i => i.id !== itemId);
+    itemVersions.delete(itemId);
     return true;
   },
 };

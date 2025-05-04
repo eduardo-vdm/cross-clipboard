@@ -232,6 +232,56 @@ export const SessionProvider = ({ children }) => {
     }
   };
 
+  const editItem = async (itemId, content, version) => {
+    setLoading(true);
+    try {
+      let data;
+      if (service) {
+        data = await service.editItem(sessionCode, itemId, content, deviceId, version);
+      } else {
+        const response = await fetch(
+          `${apiUrl}/api/sessions/${sessionCode}/items/${itemId}`,
+          {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ content, deviceId, version }),
+          }
+        );
+        if (!response.ok) {
+          const errorData = await response.json();
+          if (errorData.type === 'CONFLICT') {
+            throw errorData;
+          }
+          throw new Error('Failed to edit item');
+        }
+        data = await response.json();
+      }
+      
+      setItems(prev => prev.map(item => 
+        item.id === itemId ? data : item
+      ));
+      setError(null);
+      toast.success('Item updated successfully!');
+      return { success: true, data };
+    } catch (err) {
+      setError(err.message);
+      if (err.type === 'CONFLICT') {
+        return { 
+          success: false, 
+          conflict: true, 
+          currentItem: err.currentItem,
+          currentVersion: err.currentVersion 
+        };
+      }
+      toast.error(`Failed to edit item: ${err.message}`);
+      return { success: false, conflict: false };
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const value = {
     sessionCode,
     deviceId,
@@ -242,6 +292,7 @@ export const SessionProvider = ({ children }) => {
     joinSession,
     addItem,
     deleteItem,
+    editItem,
   };
 
   return (
