@@ -4,7 +4,7 @@ const app = express();
 app.use(express.json()); // Needed to parse JSON body
 
 const sessionRoutes = require('./routes/session');
-app.use('/api', sessionRoutes);  // 👈 This must be present
+app.use('/api', sessionRoutes);
 
 // Start the server
 app.listen(3001, () => {

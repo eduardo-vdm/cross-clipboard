@@ -69,7 +69,7 @@ cross-clipboard/
 
 ### 1. **Scaffold client**
 - Use Vite + React + TailwindCSS
-- Apply layout from `wireframe-01.png`
+- Apply layout based on `docs/wireframe-01.png`, `docs/wireframe-02.png`, `docs/wireframe-03.png`
 - Implement core UX for:
   - Session code display & sharing
   - Adding items (text/image toggle)
@@ -86,8 +86,8 @@ cross-clipboard/
 - Avoid monolithic files — modular routes/controllers preferred
 
 ### 3. **Follow PRD logic**
-- All state and behavioral logic should align with `PRD-v2-gpt-4o.md`
-- Use `state-context-diagram.png` to handle edge cases like:
+- All state and behavioral logic should align with `docs/PRD-v2-gpt-4o.md`
+- Use `docs/state-context-diagram.png` to handle edge cases like:
   - Editing while another device is editing
   - Session joining via direct link
   - DeviceID ownership
