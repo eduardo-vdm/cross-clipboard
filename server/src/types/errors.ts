@@ -38,4 +38,14 @@ export class VersionConflictError extends Error {
     super(`Version conflict for item ${itemId}: expected ${expectedVersion}, but got ${actualVersion}`);
     this.name = 'VersionConflictError';
   }
+}
+
+export class DatabaseError extends Error {
+  constructor(operation: string, details?: string) {
+    const message = details 
+      ? `Database error during ${operation}: ${details}`
+      : `Database error during ${operation}`;
+    super(message);
+    this.name = 'DatabaseError';
+  }
 } 

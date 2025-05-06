@@ -2,6 +2,7 @@ import fs from 'fs/promises';
 import path from 'path';
 import { v4 as uuidv4 } from 'uuid';
 import { Session, ClipboardItem, ItemType, DataService, UpdateItemResponse } from '../types';
+import { SessionNotFoundError, SessionArchivedException, SessionCodeGenerationError } from '../types/errors';
 
 const DATA_DIR = path.join(__dirname, '../../data');
 const SESSIONS_FILE = path.join(DATA_DIR, 'sessions.json');
@@ -40,9 +41,24 @@ export class MockDataService implements DataService {
     });
   }
 
+  private generateSessionCode(): string {
+    // Generate a random 6-digit number
+    return Math.floor(100000 + Math.random() * 900000).toString();
+  }
+
+  private deepCopySession(session: Session): Session {
+    return {
+      ...session,
+      items: session.items.map(item => ({ ...item })),
+      createdAt: new Date(session.createdAt),
+      lastModified: new Date(session.lastModified)
+    };
+  }
+
   async createSession(): Promise<Session> {
     const session: Session = {
       id: uuidv4(),
+      code: this.generateSessionCode(),
       items: [],
       version: 1,
       createdAt: new Date(),
@@ -51,12 +67,28 @@ export class MockDataService implements DataService {
 
     this.sessions[session.id] = session;
     await saveSessions(this.sessions);
-    return { ...session };
+    return this.deepCopySession(session);
   }
 
   async getSession(id: string): Promise<Session | null> {
     const session = this.sessions[id];
-    return session ? { ...session } : null;
+    return session ? this.deepCopySession(session) : null;
+  }
+
+  async getSessionById(id: string): Promise<Session> {
+    const session = this.sessions[id];
+    if (!session) {
+      throw new SessionNotFoundError(id, 'id');
+    }
+    return this.deepCopySession(session);
+  }
+
+  async getSessionByCode(code: string): Promise<Session> {
+    const session = Object.values(this.sessions).find(s => s.code === code);
+    if (!session) {
+      throw new SessionNotFoundError(code, 'code');
+    }
+    return this.deepCopySession(session);
   }
 
   async deleteSession(id: string): Promise<boolean> {
@@ -66,9 +98,11 @@ export class MockDataService implements DataService {
     return true;
   }
 
-  async addItem(sessionId: string, type: ItemType, content: string): Promise<ClipboardItem | null> {
+  async addItem(sessionId: string, type: ItemType, content: string): Promise<ClipboardItem> {
     const session = this.sessions[sessionId];
-    if (!session) return null;
+    if (!session) {
+      throw new SessionNotFoundError(sessionId, 'id');
+    }
 
     const item: ClipboardItem = {
       id: uuidv4(),
@@ -95,10 +129,14 @@ export class MockDataService implements DataService {
     version: number
   ): Promise<UpdateItemResponse> {
     const session = this.sessions[sessionId];
-    if (!session) return { success: false };
+    if (!session) {
+      throw new SessionNotFoundError(sessionId, 'id');
+    }
 
     const item = session.items.find(i => i.id === itemId);
-    if (!item) return { success: false };
+    if (!item) {
+      return { success: false };
+    }
 
     if (item.version !== version) {
       return { 

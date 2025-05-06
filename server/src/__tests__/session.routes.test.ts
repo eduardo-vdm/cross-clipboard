@@ -1,8 +1,11 @@
+/// <reference types="jest" />
+
 import request from 'supertest';
 import express from 'express';
 import { createSessionRouter } from '../routes/session';
 import { MockDataService } from '../services/mockDataService';
 import { ItemType } from '../types';
+import { DatabaseError } from '../types/errors';
 
 jest.mock('../services/mockDataService');
 
@@ -24,6 +27,7 @@ describe('Session Routes', () => {
     it('should create a new session', async () => {
       const mockSession = {
         id: 'test-id',
+        code: '123456',
         items: [],
         version: 1,
         createdAt: new Date(),
@@ -43,13 +47,13 @@ describe('Session Routes', () => {
     });
 
     it('should handle errors during session creation', async () => {
-      mockDataService.createSession.mockRejectedValue(new Error('Database error'));
+      mockDataService.createSession.mockRejectedValue(new DatabaseError('session creation', 'Connection failed'));
 
       await request(app)
         .post('/api/sessions')
-        .expect(500)
+        .expect(503)
         .expect((res) => {
-          expect(res.body.error).toBe('Failed to create session');
+          expect(res.body.error).toBe('Database error during session creation: Connection failed');
         });
     });
   });
@@ -58,6 +62,7 @@ describe('Session Routes', () => {
     it('should return session details', async () => {
       const mockSession = {
         id: 'test-id',
+        code: '123456',
         items: [],
         version: 1,
         createdAt: new Date(),
@@ -84,6 +89,17 @@ describe('Session Routes', () => {
         .expect(404)
         .expect((res) => {
           expect(res.body.error).toBe('Session not found');
+        });
+    });
+
+    it('should handle database errors', async () => {
+      mockDataService.getSession.mockRejectedValue(new DatabaseError('session retrieval', 'Connection timeout'));
+
+      await request(app)
+        .get('/api/sessions/test-id')
+        .expect(503)
+        .expect((res) => {
+          expect(res.body.error).toBe('Database error during session retrieval: Connection timeout');
         });
     });
   });
@@ -123,6 +139,21 @@ describe('Session Routes', () => {
         .expect(400)
         .expect((res) => {
           expect(res.body.error).toBe('Type and content are required');
+        });
+    });
+
+    it('should handle database errors when adding items', async () => {
+      mockDataService.addItem.mockRejectedValue(new DatabaseError('item creation', 'Write operation failed'));
+
+      await request(app)
+        .post('/api/sessions/test-id/items')
+        .send({
+          type: 'text',
+          content: 'test content'
+        })
+        .expect(503)
+        .expect((res) => {
+          expect(res.body.error).toBe('Database error during item creation: Write operation failed');
         });
     });
   });
@@ -181,6 +212,21 @@ describe('Session Routes', () => {
           expect(res.body.serverContent).toBe('server content');
         });
     }, 10000); // Increased timeout for this test
+
+    it('should handle database errors when updating items', async () => {
+      mockDataService.updateItem.mockRejectedValue(new DatabaseError('item update', 'Lock acquisition timeout'));
+
+      await request(app)
+        .put('/api/sessions/test-id/items/item-id')
+        .send({
+          content: 'updated content',
+          version: 1
+        })
+        .expect(503)
+        .expect((res) => {
+          expect(res.body.error).toBe('Database error during item update: Lock acquisition timeout');
+        });
+    });
   });
 
   describe('DELETE /api/sessions/:id/items/:itemId', () => {
@@ -200,6 +246,17 @@ describe('Session Routes', () => {
         .expect(404)
         .expect((res) => {
           expect(res.body.error).toBe('Session or item not found');
+        });
+    });
+
+    it('should handle database errors when deleting items', async () => {
+      mockDataService.deleteItem.mockRejectedValue(new DatabaseError('item deletion', 'Transaction failed'));
+
+      await request(app)
+        .delete('/api/sessions/test-id/items/item-id')
+        .expect(503)
+        .expect((res) => {
+          expect(res.body.error).toBe('Database error during item deletion: Transaction failed');
         });
     });
   });

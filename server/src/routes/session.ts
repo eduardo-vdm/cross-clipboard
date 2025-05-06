@@ -1,6 +1,7 @@
 import { Router, Request, Response } from 'express';
 import { DataService } from '../types';
 import { ItemType } from '../types';
+import { DatabaseError } from '../types/errors';
 
 export const createSessionRouter = (dataService: DataService) => {
   const router = Router();
@@ -12,7 +13,11 @@ export const createSessionRouter = (dataService: DataService) => {
       res.status(201).json(session);
     } catch (error) {
       console.error('Failed to create session:', error);
-      res.status(500).json({ error: 'Failed to create session' });
+      if (error instanceof DatabaseError) {
+        res.status(503).json({ error: error.message });
+      } else {
+        res.status(500).json({ error: 'Failed to create session' });
+      }
     }
   });
 
@@ -26,7 +31,11 @@ export const createSessionRouter = (dataService: DataService) => {
       res.json(session);
     } catch (error) {
       console.error('Failed to get session:', error);
-      res.status(500).json({ error: 'Failed to get session' });
+      if (error instanceof DatabaseError) {
+        res.status(503).json({ error: error.message });
+      } else {
+        res.status(500).json({ error: 'Failed to get session' });
+      }
     }
   });
 
@@ -40,7 +49,11 @@ export const createSessionRouter = (dataService: DataService) => {
       res.status(204).send();
     } catch (error) {
       console.error('Failed to delete session:', error);
-      res.status(500).json({ error: 'Failed to delete session' });
+      if (error instanceof DatabaseError) {
+        res.status(503).json({ error: error.message });
+      } else {
+        res.status(500).json({ error: 'Failed to delete session' });
+      }
     }
   });
 
@@ -74,7 +87,11 @@ export const createSessionRouter = (dataService: DataService) => {
       res.status(201).json(item);
     } catch (error) {
       console.error('Failed to add item:', error);
-      res.status(500).json({ error: 'Failed to add item' });
+      if (error instanceof DatabaseError) {
+        res.status(503).json({ error: error.message });
+      } else {
+        res.status(500).json({ error: 'Failed to add item' });
+      }
     }
   });
 
@@ -110,7 +127,11 @@ export const createSessionRouter = (dataService: DataService) => {
       });
     } catch (error) {
       console.error('Failed to update item:', error);
-      res.status(500).json({ error: 'Failed to update item' });
+      if (error instanceof DatabaseError) {
+        res.status(503).json({ error: error.message });
+      } else {
+        res.status(500).json({ error: 'Failed to update item' });
+      }
     }
   });
 
@@ -124,7 +145,11 @@ export const createSessionRouter = (dataService: DataService) => {
       res.status(204).send();
     } catch (error) {
       console.error('Failed to delete item:', error);
-      res.status(500).json({ error: 'Failed to delete item' });
+      if (error instanceof DatabaseError) {
+        res.status(503).json({ error: error.message });
+      } else {
+        res.status(500).json({ error: 'Failed to delete item' });
+      }
     }
   });
 
