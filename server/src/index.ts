@@ -2,7 +2,7 @@ import dotenv from 'dotenv';
 import express, { Request, Response, NextFunction } from 'express';
 import cors from 'cors';
 import { createSessionRouter } from './routes/session';
-import { MockDataService } from './services/mockDataService';
+import { getConfig, getDataService } from './config';
 
 // Load environment variables
 dotenv.config();
@@ -10,7 +10,7 @@ dotenv.config();
 const app = express();
 
 // Initialize services
-const dataService = new MockDataService();
+const dataService = getDataService();
 
 // Middleware
 app.use(cors());
@@ -34,7 +34,9 @@ app.use((req: Request, res: Response) => {
 });
 
 // Start the server
-const PORT = process.env.PORT || 3001;
-app.listen(PORT, () => {
-  console.log(`🚀 Server running on port ${PORT}`);
+const config = getConfig();
+app.listen(config.port, () => {
+  console.log(`🚀 Server running on port ${config.port}`);
+  console.log(`Mode: ${config.serverMode}`);
+  console.log(`Service: ${config.serviceMode}`);
 }); 
