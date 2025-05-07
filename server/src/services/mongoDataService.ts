@@ -156,11 +156,17 @@ export class MongoDataService implements DataService {
 
     const item = session.items.find(i => i.id === itemId);
     if (!item) {
-      throw new ItemNotFoundError(itemId, sessionId);
+      return { success: false };
     }
 
     if (item.version !== version) {
-      throw new VersionConflictError(itemId, version, item.version);
+      return { 
+        success: false, 
+        conflict: {
+          serverVersion: item.version,
+          serverContent: item.content
+        }
+      };
     }
 
     item.content = content;
@@ -189,7 +195,7 @@ export class MongoDataService implements DataService {
 
     const itemIndex = session.items.findIndex(i => i.id === itemId);
     if (itemIndex === -1) {
-      throw new ItemNotFoundError(itemId, sessionId);
+      return false;
     }
 
     session.items.splice(itemIndex, 1);

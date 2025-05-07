@@ -1,14 +1,16 @@
 {
   "name": "cross-clipboard-server",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "Server for Cross Clipboard application",
   "main": "dist/index.js",
   "scripts": {
     "start": "node dist/index.js",
     "dev": "ts-node-dev src/index.ts",
     "build": "tsc",
-    "test": "jest --config jest.config.js",
-    "test:watch": "jest --config jest.config.js --watch"
+    "test": "jest",
+    "test:mock": "TEST_MODE=mock jest",
+    "test:mongo": "TEST_MODE=mongo jest",
+    "test:all": "npm run test:mock && npm run test:mongo"
   },
   "keywords": [],
   "author": "",

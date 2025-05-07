@@ -11,3 +11,14 @@ db.createUser({
     },
   ],
 });
+
+db.createUser({
+  user: 'crossclip_app_test',
+  pwd: 'clip123secure',
+  roles: [
+    {
+      role: 'readWrite',
+      db: 'crossclip_app_test',
+    },
+  ],
+});
