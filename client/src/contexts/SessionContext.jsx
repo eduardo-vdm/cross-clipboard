@@ -5,8 +5,6 @@ import { getServiceConfig } from '../services/config';
 const SessionContext = createContext(null);
 const POLLING_INTERVAL = 5000; // 5 seconds
 
-const { apiUrl, service } = getServiceConfig();
-
 export const useSession = () => {
   const context = useContext(SessionContext);
   if (!context) {
@@ -16,6 +14,11 @@ export const useSession = () => {
 };
 
 export const SessionProvider = ({ children }) => {
+  // Move service config inside the component for better testability
+  const serviceConfig = getServiceConfig();
+  const apiUrl = serviceConfig?.apiUrl;
+  const service = serviceConfig?.service;
+
   const [sessionCode, setSessionCode] = useState(null);
   const [deviceId, setDeviceId] = useState(null);
   const [items, setItems] = useState([]);
@@ -61,7 +64,7 @@ export const SessionProvider = ({ children }) => {
     pollItems(); // Initial poll
 
     return () => clearInterval(interval);
-  }, [sessionCode]);
+  }, [sessionCode, service, apiUrl]);
 
   const createSession = async () => {
     setLoading(true);
