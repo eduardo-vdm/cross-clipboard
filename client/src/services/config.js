@@ -1,18 +1,16 @@
 import { useMockService } from './mockService';
-
-// Use mock service if VITE_USE_MOCK_API is true or if VITE_API_URL is not set
-const shouldUseMock = () => {
-  return import.meta.env.VITE_USE_MOCK_API === 'true' || !import.meta.env.VITE_API_URL;
-};
+import { apiService } from './apiService';
+import { USE_MOCK_API, API_URL } from '../env';
 
 export const getServiceConfig = () => {
-  const mockConfig = useMockService(shouldUseMock());
-  if (mockConfig) {
-    return mockConfig;
+  // Check if we should use the mock service
+  if (USE_MOCK_API) {
+    return useMockService(true);
   }
 
+  // Otherwise use the real API service
   return {
-    apiUrl: import.meta.env.VITE_API_URL,
-    service: null, // null means use real API
+    apiUrl: API_URL,
+    service: apiService,
   };
 }; 
