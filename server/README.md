@@ -36,6 +36,28 @@ npm run test:mock
 npm run test:mongo
 ```
 
+## Architecture
+
+The server follows a dependency injection pattern that allows for swappable data service implementations:
+
+- `MockDataService`: Uses in-memory data structures with JSON file persistence for development
+- `MongoDataService`: Uses MongoDB for data storage in production environments
+
+## MongoDB Schema
+
+When using MongoDB, the following data schema is implemented:
+
+- **Session**: Main document storing session data with an embedded array of clipboard items
+  - `id`: Unique session identifier
+  - `code`: 6-digit unique code for session access
+  - `items`: Array of clipboard items
+  - `version`: Document version for optimistic concurrency control
+  - `createdAt`: Timestamp of creation
+  - `lastModified`: Last update timestamp
+  - `isArchived`: Flag for soft deletion
+
+Sessions have TTL indexes set to expire after 7 days by default, and use the `isArchived` flag for soft deletion.
+
 ## Environment Variables
 
 Create a `.env` file in the server directory with the following variables:
@@ -54,7 +76,9 @@ SERVICE_MODE=mock  # mock or mongo
 TEST_MODE=mock  # mock or mongo
 
 # MongoDB connection (only used when SERVICE_MODE=mongo)
-MONGO_URI=mongodb://crossclip_app:clip123secure@localhost:27017/crossclip_app?authSource=cross_clipboard
+# Note: Both variable names are supported for backward compatibility
+MONGO_URI=mongodb://crossclip_app:*****@localhost:27017/cross_clipboard?authSource=cross_clipboard
+MONGODB_URI=mongodb://crossclip_app:*****@localhost:27017/cross_clipboard?authSource=cross_clipboard
 ```
 
 ### Logging Configuration
