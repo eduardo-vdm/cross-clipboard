@@ -3,6 +3,7 @@ import express, { Request, Response, NextFunction } from 'express';
 import cors from 'cors';
 import { createSessionRouter } from './routes/session';
 import { getConfig, getDataService } from './config';
+import { requestLogger } from './middleware/requestLogger';
 
 // Load environment variables
 dotenv.config();
@@ -11,10 +12,19 @@ const app = express();
 
 // Initialize services
 const dataService = getDataService();
+const config = getConfig();
 
 // Middleware
 app.use(cors());
 app.use(express.json()); // Needed to parse JSON body
+
+// Set up request logging
+if (config.logging.enabled) {
+  console.log(`Request logging enabled at level: ${config.logging.level}`);
+  app.use(requestLogger({ level: config.logging.level }));
+} else {
+  console.log('Request logging is disabled');
+}
 
 // Routes
 app.use('/api', createSessionRouter(dataService));
@@ -34,7 +44,6 @@ app.use((req: Request, res: Response) => {
 });
 
 // Start the server
-const config = getConfig();
 app.listen(config.port, () => {
   console.log(`🚀 Server running on port ${config.port}`);
   console.log(`Mode: ${config.serverMode}`);

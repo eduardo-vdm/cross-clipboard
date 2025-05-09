@@ -1,7 +1,7 @@
 import { Router, Request, Response } from 'express';
 import { DataService } from '../types';
 import { ItemType } from '../types';
-import { DatabaseError } from '../types/errors';
+import { DatabaseError, SessionNotFoundError } from '../types/errors';
 
 export const createSessionRouter = (dataService: DataService) => {
   const router = Router();
@@ -21,17 +21,16 @@ export const createSessionRouter = (dataService: DataService) => {
     }
   });
 
-  // Get session details
-  router.get('/sessions/:id', async (req: Request, res: Response) => {
+  // Get session details by code
+  router.get('/sessions/:code', async (req: Request, res: Response) => {
     try {
-      const session = await dataService.getSession(req.params.id);
-      if (!session) {
-        return res.status(404).json({ error: 'Session not found' });
-      }
+      const session = await dataService.getSessionByCode(req.params.code);
       res.json(session);
     } catch (error) {
       console.error('Failed to get session:', error);
-      if (error instanceof DatabaseError) {
+      if (error instanceof SessionNotFoundError) {
+        res.status(404).json({ error: 'Session not found' });
+      } else if (error instanceof DatabaseError) {
         res.status(503).json({ error: error.message });
       } else {
         res.status(500).json({ error: 'Failed to get session' });
@@ -39,17 +38,18 @@ export const createSessionRouter = (dataService: DataService) => {
     }
   });
 
-  // Delete a session
-  router.delete('/sessions/:id', async (req: Request, res: Response) => {
+  // Delete a session by code
+  router.delete('/sessions/:code', async (req: Request, res: Response) => {
     try {
-      const success = await dataService.deleteSession(req.params.id);
-      if (!success) {
-        return res.status(404).json({ error: 'Session not found' });
-      }
+      // First get the session by code to find its ID
+      const session = await dataService.getSessionByCode(req.params.code);
+      const success = await dataService.deleteSession(session.id);
       res.status(204).send();
     } catch (error) {
       console.error('Failed to delete session:', error);
-      if (error instanceof DatabaseError) {
+      if (error instanceof SessionNotFoundError) {
+        res.status(404).json({ error: 'Session not found' });
+      } else if (error instanceof DatabaseError) {
         res.status(503).json({ error: error.message });
       } else {
         res.status(500).json({ error: 'Failed to delete session' });
@@ -57,37 +57,41 @@ export const createSessionRouter = (dataService: DataService) => {
     }
   });
 
-  // Get all items in a session
-  router.get('/sessions/:id/items', async (req: Request, res: Response) => {
+  // Get all items in a session by code
+  router.get('/sessions/:code/items', async (req: Request, res: Response) => {
     try {
-      const session = await dataService.getSession(req.params.id);
-      if (!session) {
-        return res.status(404).json({ error: 'Session not found' });
-      }
+      const session = await dataService.getSessionByCode(req.params.code);
       res.json(session.items);
     } catch (error) {
       console.error('Failed to get items:', error);
-      res.status(500).json({ error: 'Failed to get items' });
+      if (error instanceof SessionNotFoundError) {
+        res.status(404).json({ error: 'Session not found' });
+      } else if (error instanceof DatabaseError) {
+        res.status(503).json({ error: error.message });
+      } else {
+        res.status(500).json({ error: 'Failed to get items' });
+      }
     }
   });
 
-  // Add a new item to a session
-  router.post('/sessions/:id/items', async (req: Request, res: Response) => {
+  // Add a new item to a session by code
+  router.post('/sessions/:code/items', async (req: Request, res: Response) => {
     try {
       const { type, content } = req.body;
       if (!type || !content) {
         return res.status(400).json({ error: 'Type and content are required' });
       }
 
-      const item = await dataService.addItem(req.params.id, type as ItemType, content);
-      if (!item) {
-        return res.status(404).json({ error: 'Session not found' });
-      }
+      // First get the session by code to find its ID
+      const session = await dataService.getSessionByCode(req.params.code);
+      const item = await dataService.addItem(session.id, type as ItemType, content);
 
       res.status(201).json(item);
     } catch (error) {
       console.error('Failed to add item:', error);
-      if (error instanceof DatabaseError) {
+      if (error instanceof SessionNotFoundError) {
+        res.status(404).json({ error: 'Session not found' });
+      } else if (error instanceof DatabaseError) {
         res.status(503).json({ error: error.message });
       } else {
         res.status(500).json({ error: 'Failed to add item' });
@@ -95,16 +99,18 @@ export const createSessionRouter = (dataService: DataService) => {
     }
   });
 
-  // Update an item in a session
-  router.put('/sessions/:id/items/:itemId', async (req: Request, res: Response) => {
+  // Update an item in a session by code
+  router.put('/sessions/:code/items/:itemId', async (req: Request, res: Response) => {
     try {
       const { content, version } = req.body;
       if (!content || version === undefined) {
         return res.status(400).json({ error: 'Content and version are required' });
       }
 
+      // First get the session by code to find its ID
+      const session = await dataService.getSessionByCode(req.params.code);
       const result = await dataService.updateItem(
-        req.params.id,
+        session.id,
         req.params.itemId,
         content,
         version
@@ -118,7 +124,7 @@ export const createSessionRouter = (dataService: DataService) => {
             serverContent: result.conflict.serverContent
           });
         }
-        return res.status(404).json({ error: 'Session or item not found' });
+        return res.status(404).json({ error: 'Item not found' });
       }
 
       res.json({
@@ -127,7 +133,9 @@ export const createSessionRouter = (dataService: DataService) => {
       });
     } catch (error) {
       console.error('Failed to update item:', error);
-      if (error instanceof DatabaseError) {
+      if (error instanceof SessionNotFoundError) {
+        res.status(404).json({ error: 'Session not found' });
+      } else if (error instanceof DatabaseError) {
         res.status(503).json({ error: error.message });
       } else {
         res.status(500).json({ error: 'Failed to update item' });
@@ -135,17 +143,23 @@ export const createSessionRouter = (dataService: DataService) => {
     }
   });
 
-  // Delete an item from a session
-  router.delete('/sessions/:id/items/:itemId', async (req: Request, res: Response) => {
+  // Delete an item from a session by code
+  router.delete('/sessions/:code/items/:itemId', async (req: Request, res: Response) => {
     try {
-      const success = await dataService.deleteItem(req.params.id, req.params.itemId);
+      // First get the session by code to find its ID
+      const session = await dataService.getSessionByCode(req.params.code);
+      const success = await dataService.deleteItem(session.id, req.params.itemId);
+      
       if (!success) {
-        return res.status(404).json({ error: 'Session or item not found' });
+        return res.status(404).json({ error: 'Item not found' });
       }
+      
       res.status(204).send();
     } catch (error) {
       console.error('Failed to delete item:', error);
-      if (error instanceof DatabaseError) {
+      if (error instanceof SessionNotFoundError) {
+        res.status(404).json({ error: 'Session not found' });
+      } else if (error instanceof DatabaseError) {
         res.status(503).json({ error: error.message });
       } else {
         res.status(500).json({ error: 'Failed to delete item' });
