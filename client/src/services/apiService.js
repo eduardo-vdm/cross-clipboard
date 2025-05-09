@@ -23,6 +23,29 @@ const handleResponse = async (response) => {
       };
     }
     
+    // Handle specific session errors
+    if (response.status === 404 && errorData.name === 'SessionNotFoundError') {
+      throw {
+        type: 'SESSION_NOT_FOUND',
+        message: errorData.error || 'Session not found'
+      };
+    }
+    
+    if (response.status === 410 && errorData.name === 'SessionArchivedException') {
+      throw {
+        type: 'SESSION_ARCHIVED',
+        message: errorData.error || 'Session has expired'
+      };
+    }
+    
+    // Handle specific item errors
+    if (response.status === 404 && errorData.name === 'ItemNotFoundError') {
+      throw {
+        type: 'ITEM_NOT_FOUND',
+        message: errorData.error || 'Item not found'
+      };
+    }
+    
     throw new Error(errorData.error || `HTTP error ${response.status}`);
   }
   
@@ -38,7 +61,7 @@ export const apiService = {
   /**
    * Create a new session
    * @param {string} deviceId - The device ID
-   * @returns {Promise<{code: string}>} Session info
+   * @returns {Promise<{code: string}>} Session info with 6-digit code
    */
   createSession: async (deviceId) => {
     const response = await fetch(`${API_URL}/api/sessions`, {
@@ -54,28 +77,41 @@ export const apiService = {
   
   /**
    * Join an existing session
-   * @param {string} code - Session code
+   * @param {string} code - 6-digit session code
    * @param {string} deviceId - The device ID
-   * @returns {Promise<{items: Array}>} Session items
+   * @returns {Promise<{session: Object, items: Array}>} Session and items
    */
   joinSession: async (code, deviceId) => {
-    // First try to get the session
-    const getResponse = await fetch(`${API_URL}/api/sessions/${code}`);
-    const session = await handleResponse(getResponse);
-    
-    // Then get the items
-    const itemsResponse = await fetch(`${API_URL}/api/sessions/${code}/items`);
-    const items = await handleResponse(itemsResponse);
-    
-    return { 
-      session, 
-      items 
-    };
+    try {
+      // First try to get the session by code
+      const getResponse = await fetch(`${API_URL}/api/sessions/${code}`);
+      const session = await handleResponse(getResponse);
+      
+      // Then get the items
+      const itemsResponse = await fetch(`${API_URL}/api/sessions/${code}/items`);
+      const items = await handleResponse(itemsResponse);
+      
+      return { 
+        session, 
+        items 
+      };
+    } catch (error) {
+      // Improve error handling for session-related errors
+      if (error.type === 'SESSION_NOT_FOUND') {
+        throw error;
+      }
+      
+      if (error.type === 'SESSION_ARCHIVED') {
+        throw error;
+      }
+      
+      throw error;
+    }
   },
   
   /**
    * Get items from a session
-   * @param {string} code - Session code
+   * @param {string} code - 6-digit session code
    * @returns {Promise<Array>} Array of items
    */
   getItems: async (code) => {
@@ -85,13 +121,14 @@ export const apiService = {
   
   /**
    * Add a new item to the session
-   * @param {string} code - Session code
+   * @param {string} code - 6-digit session code
    * @param {string} content - Item content
    * @param {string} type - Item type (text or image)
    * @param {string} deviceId - The device ID
    * @returns {Promise<Object>} Created item
    */
   addItem: async (code, content, type, deviceId) => {
+    // The server expects only type and content for item creation
     const response = await fetch(`${API_URL}/api/sessions/${code}/items`, {
       method: 'POST',
       headers: {
@@ -99,8 +136,7 @@ export const apiService = {
       },
       body: JSON.stringify({ 
         content, 
-        type,
-        deviceId 
+        type
       })
     });
     
@@ -109,22 +145,22 @@ export const apiService = {
   
   /**
    * Edit an existing item
-   * @param {string} code - Session code
+   * @param {string} code - 6-digit session code
    * @param {string} itemId - Item ID
    * @param {string} content - New content
    * @param {string} deviceId - The device ID
    * @param {number} version - Item version for concurrency control
-   * @returns {Promise<Object>} Updated item
+   * @returns {Promise<Object>} Updated item with new version
    */
   editItem: async (code, itemId, content, deviceId, version) => {
+    // The server expects only content and version for item update
     const response = await fetch(`${API_URL}/api/sessions/${code}/items/${itemId}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({ 
-        content, 
-        deviceId,
+        content,
         version 
       })
     });
@@ -134,18 +170,18 @@ export const apiService = {
   
   /**
    * Delete an item
-   * @param {string} code - Session code
+   * @param {string} code - 6-digit session code
    * @param {string} itemId - Item ID
    * @param {string} deviceId - The device ID
    * @returns {Promise<boolean>} Success indicator
    */
   deleteItem: async (code, itemId, deviceId) => {
+    // The server doesn't need deviceId for item deletion
     const response = await fetch(`${API_URL}/api/sessions/${code}/items/${itemId}`, {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ deviceId })
+      }
     });
     
     return handleResponse(response);

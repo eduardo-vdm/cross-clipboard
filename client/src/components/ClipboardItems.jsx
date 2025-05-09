@@ -147,6 +147,7 @@ const ClipboardItem = ({ item }) => {
         show={showConflict}
         currentContent={conflictData?.currentContent}
         yourContent={conflictData?.yourContent}
+        currentVersion={conflictData?.currentVersion}
         onResolve={handleConflictResolve}
         onCancel={() => {
           setShowConflict(false);
