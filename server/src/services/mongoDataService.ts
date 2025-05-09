@@ -230,6 +230,7 @@ export class MongoDataService implements DataService {
         };
       }
 
+      // Update item properties
       item.content = content;
       item.version++;
       item.lastModified = new Date();

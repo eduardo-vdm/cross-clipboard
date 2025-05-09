@@ -5,8 +5,9 @@ import express from 'express';
 import { createSessionRouter } from '../routes/session';
 import { DataService } from '../types';
 import { ItemType } from '../types';
-import { DatabaseError } from '../types/errors';
+import { DatabaseError, SessionNotFoundError } from '../types/errors';
 import { getTestDataService, cleanupTestDataService } from '../test/config';
+import { errorHandler } from '../middleware/errorHandler';
 
 describe('Session Routes', () => {
   let dataService: DataService;
@@ -24,6 +25,9 @@ describe('Session Routes', () => {
     app = express();
     app.use(express.json());
     app.use('/api', createSessionRouter(dataService));
+    
+    // Add error handling middleware
+    app.use(errorHandler);
   });
 
   // We'll keep console.error enabled for debugging
@@ -96,6 +100,11 @@ describe('Session Routes', () => {
     });
 
     it('should return 404 for non-existent session code', async () => {
+      // Mock getSessionByCode to throw SessionNotFoundError
+      jest.spyOn(dataService, 'getSessionByCode').mockRejectedValueOnce(
+        new SessionNotFoundError('123456', 'code')
+      );
+
       await request(app)
         .get('/api/sessions/123456')
         .expect(404)
@@ -292,6 +301,11 @@ describe('Session Routes', () => {
     });
 
     it('should return 404 for non-existent session code', async () => {
+      // Mock getSessionByCode to throw SessionNotFoundError
+      jest.spyOn(dataService, 'getSessionByCode').mockRejectedValueOnce(
+        new SessionNotFoundError('123456', 'code')
+      );
+
       await request(app)
         .delete('/api/sessions/123456')
         .expect(404)

@@ -34,9 +34,19 @@ export class ItemNotFoundError extends Error {
 }
 
 export class VersionConflictError extends Error {
-  constructor(itemId: string, expectedVersion: number, actualVersion: number) {
+  serverVersion: number;
+  serverContent?: string;
+
+  constructor(
+    itemId: string, 
+    expectedVersion: number, 
+    actualVersion: number,
+    serverContent?: string
+  ) {
     super(`Version conflict for item ${itemId}: expected ${expectedVersion}, but got ${actualVersion}`);
     this.name = 'VersionConflictError';
+    this.serverVersion = actualVersion;
+    this.serverContent = serverContent;
   }
 }
 
