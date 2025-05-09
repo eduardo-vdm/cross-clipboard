@@ -45,6 +45,3 @@ docker-compose.override.yml
 
 # Coverage
 coverage/
-
-# MongoDB
-db/ 

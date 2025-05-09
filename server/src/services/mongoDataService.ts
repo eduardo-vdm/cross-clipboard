@@ -11,10 +11,23 @@ import {
   SessionCodeGenerationError,
   SessionArchivedException,
   ItemNotFoundError,
-  VersionConflictError
+  VersionConflictError,
+  DatabaseError
 } from '../types/errors';
+import { mongoConnection } from '../db/connection';
 
 export class MongoDataService implements DataService {
+  /**
+   * Ensures MongoDB connection is established before performing operations
+   */
+  private async ensureConnection(): Promise<void> {
+    try {
+      await mongoConnection.connect();
+    } catch (error: any) {
+      throw new DatabaseError('Failed to connect to MongoDB', error.message);
+    }
+  }
+
   private async generateUniqueCode(): Promise<string> {
     let attempts = 0;
     const maxAttempts = 10;
@@ -36,47 +49,74 @@ export class MongoDataService implements DataService {
   }
 
   async createSession(): Promise<Session> {
-    const code = await this.generateUniqueCode();
-    const session = new SessionModel({
-      id: uuidv4(),
-      code,
-      items: [],
-      version: 1,
-      createdAt: new Date(),
-      lastModified: new Date(),
-      isArchived: false
-    });
+    await this.ensureConnection();
+    
+    try {
+      const code = await this.generateUniqueCode();
+      const session = new SessionModel({
+        id: uuidv4(),
+        code,
+        items: [],
+        version: 1,
+        createdAt: new Date(),
+        lastModified: new Date(),
+        isArchived: false
+      });
 
-    await session.save();
-    return this.mapSessionDocument(session);
+      await session.save();
+      return this.mapSessionDocument(session);
+    } catch (error: any) {
+      if (error instanceof SessionCodeGenerationError) {
+        throw error;
+      }
+      throw new DatabaseError('Failed to create session', error.message);
+    }
   }
 
   async getSessionById(id: string): Promise<Session> {
-    const session = await SessionModel.findOne({ id });
+    await this.ensureConnection();
     
-    if (!session) {
-      throw new SessionNotFoundError(id, 'id');
-    }
-    
-    if (session.isArchived) {
-      throw new SessionArchivedException(id, 'id');
-    }
+    try {
+      const session = await SessionModel.findOne({ id });
+      
+      if (!session) {
+        throw new SessionNotFoundError(id, 'id');
+      }
+      
+      if (session.isArchived) {
+        throw new SessionArchivedException(id, 'id');
+      }
 
-    return this.mapSessionDocument(session);
+      return this.mapSessionDocument(session);
+    } catch (error: any) {
+      if (error instanceof SessionNotFoundError || error instanceof SessionArchivedException) {
+        throw error;
+      }
+      throw new DatabaseError('Failed to get session by ID', error.message);
+    }
   }
 
   async getSessionByCode(code: string): Promise<Session> {
-    const session = await SessionModel.findOne({ code });
+    await this.ensureConnection();
     
-    if (!session) {
-      throw new SessionNotFoundError(code, 'code');
-    }
-    
-    if (session.isArchived) {
-      throw new SessionArchivedException(code, 'code');
-    }
+    try {
+      const session = await SessionModel.findOne({ code });
+      
+      if (!session) {
+        throw new SessionNotFoundError(code, 'code');
+      }
+      
+      if (session.isArchived) {
+        throw new SessionArchivedException(code, 'code');
+      }
 
-    return this.mapSessionDocument(session);
+      return this.mapSessionDocument(session);
+    } catch (error: any) {
+      if (error instanceof SessionNotFoundError || error instanceof SessionArchivedException) {
+        throw error;
+      }
+      throw new DatabaseError('Failed to get session by code', error.message);
+    }
   }
 
   // Implement the interface method to maintain compatibility
@@ -92,50 +132,68 @@ export class MongoDataService implements DataService {
   }
 
   async deleteSession(id: string): Promise<boolean> {
-    const result = await SessionModel.updateOne(
-      { id, isArchived: false },
-      { isArchived: true }
-    );
+    await this.ensureConnection();
     
-    if (result.matchedCount === 0) {
-      const session = await SessionModel.findOne({ id });
-      if (!session) {
-        throw new SessionNotFoundError(id, 'id');
+    try {
+      const result = await SessionModel.updateOne(
+        { id, isArchived: false },
+        { isArchived: true }
+      );
+      
+      if (result.matchedCount === 0) {
+        const session = await SessionModel.findOne({ id });
+        if (!session) {
+          throw new SessionNotFoundError(id, 'id');
+        }
+        if (session.isArchived) {
+          throw new SessionArchivedException(id, 'id');
+        }
       }
-      if (session.isArchived) {
-        throw new SessionArchivedException(id, 'id');
+      
+      return result.modifiedCount > 0;
+    } catch (error: any) {
+      if (error instanceof SessionNotFoundError || error instanceof SessionArchivedException) {
+        throw error;
       }
+      throw new DatabaseError('Failed to delete session', error.message);
     }
-    
-    return result.modifiedCount > 0;
   }
 
   async addItem(sessionId: string, type: ItemType, content: string): Promise<IClipboardItem> {
-    const session = await SessionModel.findOne({ id: sessionId });
+    await this.ensureConnection();
     
-    if (!session) {
-      throw new SessionNotFoundError(sessionId, 'id');
+    try {
+      const session = await SessionModel.findOne({ id: sessionId });
+      
+      if (!session) {
+        throw new SessionNotFoundError(sessionId, 'id');
+      }
+      
+      if (session.isArchived) {
+        throw new SessionArchivedException(sessionId, 'id');
+      }
+
+      const newItem: IClipboardItem = {
+        id: uuidv4(),
+        type,
+        content,
+        version: 1,
+        createdAt: new Date(),
+        lastModified: new Date()
+      };
+
+      session.items.push(newItem as any); // TODO: Fix type casting once we resolve the Document type issue
+      session.version++;
+      session.lastModified = new Date();
+      await session.save();
+
+      return newItem;
+    } catch (error: any) {
+      if (error instanceof SessionNotFoundError || error instanceof SessionArchivedException) {
+        throw error;
+      }
+      throw new DatabaseError('Failed to add item', error.message);
     }
-    
-    if (session.isArchived) {
-      throw new SessionArchivedException(sessionId, 'id');
-    }
-
-    const newItem: IClipboardItem = {
-      id: uuidv4(),
-      type,
-      content,
-      version: 1,
-      createdAt: new Date(),
-      lastModified: new Date()
-    };
-
-    session.items.push(newItem as any); // TODO: Fix type casting once we resolve the Document type issue
-    session.version++;
-    session.lastModified = new Date();
-    await session.save();
-
-    return newItem;
   }
 
   async updateItem(
@@ -144,65 +202,83 @@ export class MongoDataService implements DataService {
     content: string,
     version: number
   ): Promise<UpdateItemResponse> {
-    const session = await SessionModel.findOne({ id: sessionId });
+    await this.ensureConnection();
     
-    if (!session) {
-      throw new SessionNotFoundError(sessionId, 'id');
-    }
-    
-    if (session.isArchived) {
-      throw new SessionArchivedException(sessionId, 'id');
-    }
+    try {
+      const session = await SessionModel.findOne({ id: sessionId });
+      
+      if (!session) {
+        throw new SessionNotFoundError(sessionId, 'id');
+      }
+      
+      if (session.isArchived) {
+        throw new SessionArchivedException(sessionId, 'id');
+      }
 
-    const item = session.items.find(i => i.id === itemId);
-    if (!item) {
-      return { success: false };
-    }
+      const item = session.items.find(i => i.id === itemId);
+      if (!item) {
+        return { success: false };
+      }
 
-    if (item.version !== version) {
-      return { 
-        success: false, 
-        conflict: {
-          serverVersion: item.version,
-          serverContent: item.content
-        }
+      if (item.version !== version) {
+        return { 
+          success: false, 
+          conflict: {
+            serverVersion: item.version,
+            serverContent: item.content
+          }
+        };
+      }
+
+      item.content = content;
+      item.version++;
+      item.lastModified = new Date();
+      session.version++;
+      session.lastModified = new Date();
+      await session.save();
+
+      return {
+        success: true,
+        item: this.mapClipboardItemDocument(item)
       };
+    } catch (error: any) {
+      if (error instanceof SessionNotFoundError || error instanceof SessionArchivedException) {
+        throw error;
+      }
+      throw new DatabaseError('Failed to update item', error.message);
     }
-
-    item.content = content;
-    item.version++;
-    item.lastModified = new Date();
-    session.version++;
-    session.lastModified = new Date();
-    await session.save();
-
-    return {
-      success: true,
-      item: this.mapClipboardItemDocument(item)
-    };
   }
 
   async deleteItem(sessionId: string, itemId: string): Promise<boolean> {
-    const session = await SessionModel.findOne({ id: sessionId });
+    await this.ensureConnection();
     
-    if (!session) {
-      throw new SessionNotFoundError(sessionId, 'id');
-    }
-    
-    if (session.isArchived) {
-      throw new SessionArchivedException(sessionId, 'id');
-    }
+    try {
+      const session = await SessionModel.findOne({ id: sessionId });
+      
+      if (!session) {
+        throw new SessionNotFoundError(sessionId, 'id');
+      }
+      
+      if (session.isArchived) {
+        throw new SessionArchivedException(sessionId, 'id');
+      }
 
-    const itemIndex = session.items.findIndex(i => i.id === itemId);
-    if (itemIndex === -1) {
-      return false;
-    }
+      const itemIndex = session.items.findIndex(i => i.id === itemId);
+      if (itemIndex === -1) {
+        return false;
+      }
 
-    session.items.splice(itemIndex, 1);
-    session.version++;
-    session.lastModified = new Date();
-    await session.save();
-    return true;
+      session.items.splice(itemIndex, 1);
+      session.version++;
+      session.lastModified = new Date();
+      await session.save();
+      return true;
+    } catch (error: any) {
+      if (error instanceof SessionNotFoundError || error instanceof SessionArchivedException) {
+        throw error;
+      }
+      throw new DatabaseError('Failed to delete item', error.message);
+    }
   }
 
   private mapSessionDocument(doc: ISessionDocument): Session {

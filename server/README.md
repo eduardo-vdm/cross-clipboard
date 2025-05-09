@@ -69,4 +69,15 @@ Log levels:
 - `NONE`: No request logging
 - `BASIC`: Log only method and URL for each request
 - `NORMAL`: Log method, URL, status code, and response time
-- `VERBOSE`: Log everything including request and response bodies 
+- `VERBOSE`: Log everything including request and response bodies
+
+### MongoDB Logging
+
+The MongoDB connection uses the same log level as the request logger:
+
+- `NONE`: No MongoDB connection logs
+- `BASIC`: Basic connection status (connected, disconnected)
+- `NORMAL`: Connection status with database details
+- `VERBOSE`: Full debug mode with query logging
+
+When using the `VERBOSE` log level, all MongoDB queries will be logged to the console, which is helpful for debugging but can be very verbose. 
