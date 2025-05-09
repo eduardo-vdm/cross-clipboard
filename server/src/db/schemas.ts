@@ -63,4 +63,5 @@ sessionSchema.index({ code: 1 }, { unique: true });  // Index for the session co
 sessionSchema.index({ isArchived: 1 });
 
 // Models
+// The ClipboardItem model is no longer needed as we store items as embedded documents
 export const Session = mongoose.model<ISessionDocument>('Session', sessionSchema); 

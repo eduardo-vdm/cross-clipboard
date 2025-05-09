@@ -1,7 +1,7 @@
 import { Router, Request, Response } from 'express';
 import { DataService } from '../types';
 import { ItemType } from '../types';
-import { DatabaseError, SessionNotFoundError } from '../types/errors';
+import { DatabaseError, SessionNotFoundError, SessionArchivedException } from '../types/errors';
 
 export const createSessionRouter = (dataService: DataService) => {
   const router = Router();
@@ -28,7 +28,7 @@ export const createSessionRouter = (dataService: DataService) => {
       res.json(session);
     } catch (error) {
       console.error('Failed to get session:', error);
-      if (error instanceof SessionNotFoundError) {
+      if (error instanceof SessionNotFoundError || error instanceof SessionArchivedException) {
         res.status(404).json({ error: 'Session not found' });
       } else if (error instanceof DatabaseError) {
         res.status(503).json({ error: error.message });
@@ -47,7 +47,7 @@ export const createSessionRouter = (dataService: DataService) => {
       res.status(204).send();
     } catch (error) {
       console.error('Failed to delete session:', error);
-      if (error instanceof SessionNotFoundError) {
+      if (error instanceof SessionNotFoundError || error instanceof SessionArchivedException) {
         res.status(404).json({ error: 'Session not found' });
       } else if (error instanceof DatabaseError) {
         res.status(503).json({ error: error.message });
@@ -64,7 +64,7 @@ export const createSessionRouter = (dataService: DataService) => {
       res.json(session.items);
     } catch (error) {
       console.error('Failed to get items:', error);
-      if (error instanceof SessionNotFoundError) {
+      if (error instanceof SessionNotFoundError || error instanceof SessionArchivedException) {
         res.status(404).json({ error: 'Session not found' });
       } else if (error instanceof DatabaseError) {
         res.status(503).json({ error: error.message });
@@ -89,7 +89,7 @@ export const createSessionRouter = (dataService: DataService) => {
       res.status(201).json(item);
     } catch (error) {
       console.error('Failed to add item:', error);
-      if (error instanceof SessionNotFoundError) {
+      if (error instanceof SessionNotFoundError || error instanceof SessionArchivedException) {
         res.status(404).json({ error: 'Session not found' });
       } else if (error instanceof DatabaseError) {
         res.status(503).json({ error: error.message });
@@ -133,7 +133,7 @@ export const createSessionRouter = (dataService: DataService) => {
       });
     } catch (error) {
       console.error('Failed to update item:', error);
-      if (error instanceof SessionNotFoundError) {
+      if (error instanceof SessionNotFoundError || error instanceof SessionArchivedException) {
         res.status(404).json({ error: 'Session not found' });
       } else if (error instanceof DatabaseError) {
         res.status(503).json({ error: error.message });
@@ -157,7 +157,7 @@ export const createSessionRouter = (dataService: DataService) => {
       res.status(204).send();
     } catch (error) {
       console.error('Failed to delete item:', error);
-      if (error instanceof SessionNotFoundError) {
+      if (error instanceof SessionNotFoundError || error instanceof SessionArchivedException) {
         res.status(404).json({ error: 'Session not found' });
       } else if (error instanceof DatabaseError) {
         res.status(503).json({ error: error.message });

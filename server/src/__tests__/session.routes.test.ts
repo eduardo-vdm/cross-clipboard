@@ -54,6 +54,8 @@ describe('Session Routes', () => {
         version: expect.any(Number),
         items: expect.any(Array)
       }));
+      // Verify code is a 6-digit string
+      expect(response.body.code).toMatch(/^\d{6}$/);
     });
 
     it('should handle database errors during session creation', async () => {
@@ -71,30 +73,31 @@ describe('Session Routes', () => {
     });
   });
 
-  describe('GET /api/sessions/:id', () => {
-    it('should return session details', async () => {
+  describe('GET /api/sessions/:code', () => {
+    it('should return session details by code', async () => {
       // First create a session
       const createResponse = await request(app)
         .post('/api/sessions')
         .expect(201);
 
-      const sessionId = createResponse.body.id;
+      const sessionCode = createResponse.body.code;
 
-      // Then get the session details
+      // Then get the session details using code
       const response = await request(app)
-        .get(`/api/sessions/${sessionId}`)
+        .get(`/api/sessions/${sessionCode}`)
         .expect(200);
 
       expect(response.body).toEqual(expect.objectContaining({
-        id: sessionId,
+        id: createResponse.body.id,
+        code: sessionCode,
         version: expect.any(Number),
         items: expect.any(Array)
       }));
     });
 
-    it('should return 404 for non-existent session', async () => {
+    it('should return 404 for non-existent session code', async () => {
       await request(app)
-        .get('/api/sessions/non-existent')
+        .get('/api/sessions/123456')
         .expect(404)
         .expect((res) => {
           expect(res.body.error).toBe('Session not found');
@@ -102,19 +105,19 @@ describe('Session Routes', () => {
     });
   });
 
-  describe('POST /api/sessions/:id/items', () => {
-    let sessionId: string;
+  describe('POST /api/sessions/:code/items', () => {
+    let sessionCode: string;
 
     beforeEach(async () => {
       const response = await request(app)
         .post('/api/sessions')
         .expect(201);
-      sessionId = response.body.id;
+      sessionCode = response.body.code;
     });
 
-    it('should add an item to session', async () => {
+    it('should add an item to session using code', async () => {
       const response = await request(app)
-        .post(`/api/sessions/${sessionId}/items`)
+        .post(`/api/sessions/${sessionCode}/items`)
         .send({
           type: 'text' as ItemType,
           content: 'test content'
@@ -131,7 +134,7 @@ describe('Session Routes', () => {
 
     it('should validate required fields', async () => {
       await request(app)
-        .post(`/api/sessions/${sessionId}/items`)
+        .post(`/api/sessions/${sessionCode}/items`)
         .send({})
         .expect(400)
         .expect((res) => {
@@ -140,8 +143,8 @@ describe('Session Routes', () => {
     });
   });
 
-  describe('PUT /api/sessions/:id/items/:itemId', () => {
-    let sessionId: string;
+  describe('PUT /api/sessions/:code/items/:itemId', () => {
+    let sessionCode: string;
     let itemId: string;
 
     beforeEach(async () => {
@@ -149,11 +152,11 @@ describe('Session Routes', () => {
       const sessionResponse = await request(app)
         .post('/api/sessions')
         .expect(201);
-      sessionId = sessionResponse.body.id;
+      sessionCode = sessionResponse.body.code;
 
       // Add item
       const itemResponse = await request(app)
-        .post(`/api/sessions/${sessionId}/items`)
+        .post(`/api/sessions/${sessionCode}/items`)
         .send({
           type: 'text' as ItemType,
           content: 'initial content'
@@ -162,9 +165,9 @@ describe('Session Routes', () => {
       itemId = itemResponse.body.id;
     });
 
-    it('should update an item', async () => {
+    it('should update an item using session code', async () => {
       const response = await request(app)
-        .put(`/api/sessions/${sessionId}/items/${itemId}`)
+        .put(`/api/sessions/${sessionCode}/items/${itemId}`)
         .send({
           content: 'updated content',
           version: 1
@@ -180,7 +183,7 @@ describe('Session Routes', () => {
     it('should handle version conflicts', async () => {
       // First update
       await request(app)
-        .put(`/api/sessions/${sessionId}/items/${itemId}`)
+        .put(`/api/sessions/${sessionCode}/items/${itemId}`)
         .send({
           content: 'first update',
           version: 1
@@ -189,7 +192,7 @@ describe('Session Routes', () => {
 
       // Second update with old version
       await request(app)
-        .put(`/api/sessions/${sessionId}/items/${itemId}`)
+        .put(`/api/sessions/${sessionCode}/items/${itemId}`)
         .send({
           content: 'second update',
           version: 1
@@ -202,8 +205,8 @@ describe('Session Routes', () => {
     });
   });
 
-  describe('DELETE /api/sessions/:id/items/:itemId', () => {
-    let sessionId: string;
+  describe('DELETE /api/sessions/:code/items/:itemId', () => {
+    let sessionCode: string;
     let itemId: string;
 
     beforeEach(async () => {
@@ -211,11 +214,11 @@ describe('Session Routes', () => {
       const sessionResponse = await request(app)
         .post('/api/sessions')
         .expect(201);
-      sessionId = sessionResponse.body.id;
+      sessionCode = sessionResponse.body.code;
 
       // Add item
       const itemResponse = await request(app)
-        .post(`/api/sessions/${sessionId}/items`)
+        .post(`/api/sessions/${sessionCode}/items`)
         .send({
           type: 'text' as ItemType,
           content: 'test content'
@@ -224,14 +227,14 @@ describe('Session Routes', () => {
       itemId = itemResponse.body.id;
     });
 
-    it('should delete an item', async () => {
+    it('should delete an item using session code', async () => {
       await request(app)
-        .delete(`/api/sessions/${sessionId}/items/${itemId}`)
+        .delete(`/api/sessions/${sessionCode}/items/${itemId}`)
         .expect(204);
 
       // Verify item is deleted
       const response = await request(app)
-        .get(`/api/sessions/${sessionId}`)
+        .get(`/api/sessions/${sessionCode}`)
         .expect(200);
 
       expect(response.body.items).toHaveLength(0);
@@ -239,10 +242,61 @@ describe('Session Routes', () => {
 
     it('should return 404 for non-existent item', async () => {
       await request(app)
-        .delete(`/api/sessions/${sessionId}/items/non-existent`)
+        .delete(`/api/sessions/${sessionCode}/items/non-existent`)
         .expect(404)
         .expect((res) => {
-          expect(res.body.error).toBe('Session or item not found');
+          expect(res.body.error).toBe('Item not found');
+        });
+    });
+  });
+
+  describe('DELETE /api/sessions/:code', () => {
+    it('should delete a session by code', async () => {
+      // Create a session
+      const createResponse = await request(app)
+        .post('/api/sessions')
+        .expect(201);
+      const sessionCode = createResponse.body.code;
+
+      // Add a spy on getSessionByCode
+      const getSessionSpy = jest.spyOn(dataService, 'getSessionByCode');
+
+      // Delete the session
+      await request(app)
+        .delete(`/api/sessions/${sessionCode}`)
+        .expect(204);
+
+      // Spy on error logging
+      console.log('Console errors during delete test:', (console.error as jest.Mock).mock.calls);
+
+      // Check if the session is truly deleted/archived
+      try {
+        // Attempt to verify the session is not accessible - use getSession directly
+        const retrievedSession = await dataService.getSession(createResponse.body.id);
+        console.log('Retrieved session after delete:', retrievedSession);
+      } catch (err) {
+        console.log('Error retrieving deleted session:', err);
+      }
+
+      // Reset spy
+      getSessionSpy.mockRestore();
+
+      // The issue appears to be that our deleteSession implementation marks the session
+      // as archived but doesn't completely remove it. The getSessionByCode method will throw
+      // if the session is archived, but it's still in the database.
+      //
+      // Let's test this theory and expect a 404 for archived sessions
+      await request(app)
+        .get(`/api/sessions/${sessionCode}`)
+        .expect(404);
+    });
+
+    it('should return 404 for non-existent session code', async () => {
+      await request(app)
+        .delete('/api/sessions/123456')
+        .expect(404)
+        .expect((res) => {
+          expect(res.body.error).toBe('Session not found');
         });
     });
   });
