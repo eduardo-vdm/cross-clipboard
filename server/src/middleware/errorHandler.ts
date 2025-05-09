@@ -27,18 +27,21 @@ export function errorHandler(
   // Handle known error types
   if (err instanceof SessionNotFoundError || err instanceof SessionArchivedException) {
     return res.status(404).json({ 
-      error: 'Session not found'
+      name: err.name,
+      error: err.message
     });
   }
 
   if (err instanceof ItemNotFoundError) {
     return res.status(404).json({ 
-      error: 'Item not found'
+      name: err.name,
+      error: err.message
     });
   }
 
   if (err instanceof VersionConflictError) {
     return res.status(409).json({
+      name: err.name,
       error: 'Version conflict',
       serverVersion: err.serverVersion,
       serverContent: err.serverContent
@@ -47,7 +50,9 @@ export function errorHandler(
 
   if (err instanceof DatabaseError) {
     return res.status(503).json({ 
-      error: err.message 
+      name: err.name,
+      error: err.message,
+      details: err.details
     });
   }
 

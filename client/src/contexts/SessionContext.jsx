@@ -57,11 +57,37 @@ export const SessionProvider = ({ children }) => {
             // Handle session errors
             if (response.status === 404 && errorData.name === 'SessionNotFoundError') {
               setError('Session not found');
+              
+              // Clear the URL and session code
+              const url = new URL(window.location);
+              url.searchParams.delete('session');
+              window.history.replaceState({}, '', url);
+              setSessionCode(null);
+              
+              // Wait a bit before showing the creation toast to avoid toast overlap
+              setTimeout(() => {
+                toast.error('Session no longer exists. Starting a new session...');
+                createSession();
+              }, 2000);
+              
               return;
             }
             
             if (response.status === 410 && errorData.name === 'SessionArchivedException') {
               setError('Session has expired');
+              
+              // Clear the URL and session code
+              const url = new URL(window.location);
+              url.searchParams.delete('session');
+              window.history.replaceState({}, '', url);
+              setSessionCode(null);
+              
+              // Wait a bit before showing the creation toast to avoid toast overlap
+              setTimeout(() => {
+                toast.error('Session has expired. Starting a new session...');
+                createSession();
+              }, 2000);
+              
               return;
             }
             
@@ -69,7 +95,24 @@ export const SessionProvider = ({ children }) => {
           }
           data = await response.json();
         }
-        setItems(data);
+        
+        // Process items to handle deviceId
+        const processedItems = data.map(item => {
+          // If the item doesn't have a deviceId but it's your item (from checking against current items)
+          const existingItem = items.find(i => i.id === item.id);
+          if (!item.deviceId && existingItem && existingItem.deviceId === deviceId) {
+            return { ...item, deviceId };
+          }
+          // Otherwise, just ensure deviceId exists (even if null)
+          return { ...item, deviceId: item.deviceId || null };
+        });
+        
+        // Sort items by lastModified in descending order
+        const sortedItems = [...processedItems].sort((a, b) => 
+          new Date(b.lastModified) - new Date(a.lastModified)
+        );
+        
+        setItems(sortedItems);
         setError(null);
       } catch (err) {
         console.error('Polling error:', err);
@@ -81,7 +124,7 @@ export const SessionProvider = ({ children }) => {
     pollItems(); // Initial poll
 
     return () => clearInterval(interval);
-  }, [sessionCode, service, apiUrl]);
+  }, [sessionCode, service, apiUrl, deviceId]);
 
   const createSession = async () => {
     setLoading(true);
@@ -246,7 +289,8 @@ export const SessionProvider = ({ children }) => {
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({ content, type }),
+          // Include deviceId to track ownership
+          body: JSON.stringify({ content, type, deviceId }),
         });
         if (!response.ok) {
           const errorData = await response.json().catch(() => ({
@@ -266,7 +310,14 @@ export const SessionProvider = ({ children }) => {
         }
         data = await response.json();
       }
-      setItems(prev => [data, ...prev]);
+      
+      // Add the new item at the beginning of the list (it's the most recent)
+      // Make sure it has the deviceId for ownership tracking
+      setItems(prev => [{
+        ...data,
+        deviceId: data.deviceId || deviceId  // Use the server's deviceId if available, otherwise use the local one
+      }, ...prev]);
+      
       setError(null);
       toast.success('Item added successfully!');
     } catch (err) {
@@ -302,7 +353,9 @@ export const SessionProvider = ({ children }) => {
             method: 'DELETE',
             headers: {
               'Content-Type': 'application/json',
-            }
+            },
+            // Include deviceId for ownership verification
+            body: JSON.stringify({ deviceId })
           }
         );
         if (!response.ok) {
@@ -322,6 +375,11 @@ export const SessionProvider = ({ children }) => {
           // Handle item not found
           if (response.status === 404 && errorData.name === 'ItemNotFoundError') {
             throw new Error('Item not found');
+          }
+          
+          // Handle permission error
+          if (response.status === 403) {
+            throw new Error('You do not have permission to delete this item');
           }
           
           throw new Error('Failed to delete item');
@@ -363,7 +421,8 @@ export const SessionProvider = ({ children }) => {
             headers: {
               'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ content, version }),
+            // Include deviceId for ownership verification
+            body: JSON.stringify({ content, version, deviceId }),
           }
         );
         if (!response.ok) {
@@ -385,6 +444,11 @@ export const SessionProvider = ({ children }) => {
             throw new Error('Item not found');
           }
           
+          // Handle permission error
+          if (response.status === 403) {
+            throw new Error('You do not have permission to edit this item');
+          }
+          
           if (response.status === 409) {
             throw errorData;
           }
@@ -394,10 +458,24 @@ export const SessionProvider = ({ children }) => {
         data = await response.json();
       }
       
-      // Update the UI with the new version received from server
-      setItems(prev => prev.map(item => 
-        item.id === itemId ? { ...item, version: data.version, lastModified: data.lastModified } : item
-      ));
+      // Update the item in the list and resort to ensure correct order
+      setItems(prev => {
+        const updated = prev.map(item => 
+          item.id === itemId ? { 
+            ...item, 
+            content, 
+            version: data.version, 
+            lastModified: data.lastModified,
+            deviceId: item.deviceId // Keep the deviceId for ownership tracking
+          } : item
+        );
+        
+        // Sort by lastModified in descending order
+        return updated.sort((a, b) => 
+          new Date(b.lastModified) - new Date(a.lastModified)
+        );
+      });
+      
       setError(null);
       toast.success('Item updated successfully!');
       return { success: true, data };

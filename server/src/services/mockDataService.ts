@@ -98,7 +98,7 @@ export class MockDataService implements DataService {
     return true;
   }
 
-  async addItem(sessionId: string, type: ItemType, content: string): Promise<ClipboardItem> {
+  async addItem(sessionId: string, type: ItemType, content: string, deviceId: string): Promise<ClipboardItem> {
     const session = this.sessions[sessionId];
     if (!session) {
       throw new SessionNotFoundError(sessionId, 'id');
@@ -110,7 +110,8 @@ export class MockDataService implements DataService {
       content,
       createdAt: new Date(),
       lastModified: new Date(),
-      version: 1
+      version: 1,
+      deviceId
     };
 
     session.items.push(item);
@@ -126,7 +127,8 @@ export class MockDataService implements DataService {
     sessionId: string, 
     itemId: string, 
     content: string, 
-    version: number
+    version: number,
+    deviceId: string
   ): Promise<UpdateItemResponse> {
     const session = this.sessions[sessionId];
     if (!session) {
@@ -135,6 +137,11 @@ export class MockDataService implements DataService {
 
     const item = session.items.find(i => i.id === itemId);
     if (!item) {
+      return { success: false };
+    }
+
+    // Check if user has permission to edit this item
+    if (item.deviceId && deviceId && item.deviceId !== deviceId) {
       return { success: false };
     }
 
@@ -161,12 +168,19 @@ export class MockDataService implements DataService {
     };
   }
 
-  async deleteItem(sessionId: string, itemId: string): Promise<boolean> {
+  async deleteItem(sessionId: string, itemId: string, deviceId: string): Promise<boolean> {
     const session = this.sessions[sessionId];
     if (!session) return false;
 
     const itemIndex = session.items.findIndex(i => i.id === itemId);
     if (itemIndex === -1) return false;
+
+    const item = session.items[itemIndex];
+    
+    // Check if user has permission to delete this item
+    if (item.deviceId && deviceId && item.deviceId !== deviceId) {
+      return false;
+    }
 
     session.items.splice(itemIndex, 1);
     session.version++;

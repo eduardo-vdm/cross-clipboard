@@ -128,7 +128,7 @@ export const apiService = {
    * @returns {Promise<Object>} Created item
    */
   addItem: async (code, content, type, deviceId) => {
-    // The server expects only type and content for item creation
+    // The server now requires deviceId for ownership tracking
     const response = await fetch(`${API_URL}/api/sessions/${code}/items`, {
       method: 'POST',
       headers: {
@@ -136,7 +136,8 @@ export const apiService = {
       },
       body: JSON.stringify({ 
         content, 
-        type
+        type,
+        deviceId
       })
     });
     
@@ -153,7 +154,7 @@ export const apiService = {
    * @returns {Promise<Object>} Updated item with new version
    */
   editItem: async (code, itemId, content, deviceId, version) => {
-    // The server expects only content and version for item update
+    // The server now requires deviceId for ownership verification
     const response = await fetch(`${API_URL}/api/sessions/${code}/items/${itemId}`, {
       method: 'PUT',
       headers: {
@@ -161,7 +162,8 @@ export const apiService = {
       },
       body: JSON.stringify({ 
         content,
-        version 
+        version,
+        deviceId
       })
     });
     
@@ -176,12 +178,13 @@ export const apiService = {
    * @returns {Promise<boolean>} Success indicator
    */
   deleteItem: async (code, itemId, deviceId) => {
-    // The server doesn't need deviceId for item deletion
+    // The server now requires deviceId for ownership verification
     const response = await fetch(`${API_URL}/api/sessions/${code}/items/${itemId}`, {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json'
-      }
+      },
+      body: JSON.stringify({ deviceId })
     });
     
     return handleResponse(response);

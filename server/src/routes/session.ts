@@ -41,31 +41,43 @@ export const createSessionRouter = (dataService: DataService) => {
 
   // Add a new item to a session by code
   router.post('/sessions/:code/items', asyncHandler(async (req: Request, res: Response) => {
-    const { type, content } = req.body;
+    const { type, content, deviceId } = req.body;
     if (!type || !content) {
       return res.status(400).json({ error: 'Type and content are required' });
+    }
+    
+    if (!deviceId) {
+      return res.status(400).json({ error: 'DeviceId is required' });
     }
 
     // First get the session by code to find its ID
     const session = await dataService.getSessionByCode(req.params.code);
-    const item = await dataService.addItem(session.id, type as ItemType, content);
+    const item = await dataService.addItem(session.id, type as ItemType, content, deviceId);
     res.status(201).json(item);
   }));
 
   // Update an item in a session by code
   router.put('/sessions/:code/items/:itemId', asyncHandler(async (req: Request, res: Response) => {
-    const { content, version } = req.body;
+    const { content, version, deviceId } = req.body;
     if (!content || version === undefined) {
       return res.status(400).json({ error: 'Content and version are required' });
     }
 
     // First get the session by code to find its ID
     const session = await dataService.getSessionByCode(req.params.code);
+    
+    // Check if user has permission to edit this item
+    const item = session.items.find(item => item.id === req.params.itemId);
+    if (item && item.deviceId && deviceId && item.deviceId !== deviceId) {
+      return res.status(403).json({ error: 'You do not have permission to edit this item' });
+    }
+    
     const result = await dataService.updateItem(
       session.id,
       req.params.itemId,
       content,
-      version
+      version,
+      deviceId
     );
 
     if (!result.success) {
@@ -87,9 +99,18 @@ export const createSessionRouter = (dataService: DataService) => {
 
   // Delete an item from a session by code
   router.delete('/sessions/:code/items/:itemId', asyncHandler(async (req: Request, res: Response) => {
+    const { deviceId } = req.body;
+    
     // First get the session by code to find its ID
     const session = await dataService.getSessionByCode(req.params.code);
-    const success = await dataService.deleteItem(session.id, req.params.itemId);
+    
+    // Check if user has permission to delete this item
+    const item = session.items.find(item => item.id === req.params.itemId);
+    if (item && item.deviceId && deviceId && item.deviceId !== deviceId) {
+      return res.status(403).json({ error: 'You do not have permission to delete this item' });
+    }
+    
+    const success = await dataService.deleteItem(session.id, req.params.itemId, deviceId);
     
     if (!success) {
       return res.status(404).json({ error: 'Item not found' });

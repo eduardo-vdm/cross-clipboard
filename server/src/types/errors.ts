@@ -26,36 +26,38 @@ export class SessionArchivedException extends SessionError {
   }
 }
 
-export class ItemNotFoundError extends Error {
+export class ItemError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = 'ItemError';
+  }
+}
+
+export class ItemNotFoundError extends ItemError {
   constructor(itemId: string, sessionId: string) {
-    super(`Item ${itemId} not found in session ${sessionId}`);
+    super(`Item not found with id: ${itemId} in session: ${sessionId}`);
     this.name = 'ItemNotFoundError';
   }
 }
 
-export class VersionConflictError extends Error {
+export class VersionConflictError extends ItemError {
   serverVersion: number;
-  serverContent?: string;
+  serverContent: string;
 
-  constructor(
-    itemId: string, 
-    expectedVersion: number, 
-    actualVersion: number,
-    serverContent?: string
-  ) {
-    super(`Version conflict for item ${itemId}: expected ${expectedVersion}, but got ${actualVersion}`);
+  constructor(itemId: string, clientVersion: number, serverVersion: number, serverContent: string) {
+    super(`Version conflict for item ${itemId}: client version ${clientVersion}, server version ${serverVersion}`);
     this.name = 'VersionConflictError';
-    this.serverVersion = actualVersion;
+    this.serverVersion = serverVersion;
     this.serverContent = serverContent;
   }
 }
 
 export class DatabaseError extends Error {
-  constructor(operation: string, details?: string) {
-    const message = details 
-      ? `Database error during ${operation}: ${details}`
-      : `Database error during ${operation}`;
+  details: string;
+  
+  constructor(message: string, details: string) {
     super(message);
     this.name = 'DatabaseError';
+    this.details = details;
   }
 } 

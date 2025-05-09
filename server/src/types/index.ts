@@ -2,7 +2,7 @@ import { ISession, IClipboardItem } from '../db/schemas';
 
 export type ItemType = 'text' | 'image';
 
-export type ClipboardItem = IClipboardItem;
+export type ClipboardItem = Omit<IClipboardItem, 'isArchived'>;
 export type Session = Omit<ISession, 'isArchived'>;
 
 export interface CreateSessionResponse {
@@ -70,28 +70,40 @@ export interface DataService {
 
   /**
    * Adds a new item to a session
+   * @param {string} sessionId - The session ID
+   * @param {ItemType} type - The type of content (text or image)
+   * @param {string} content - The content of the item
+   * @param {string} deviceId - The device ID that created the item
    * @throws {SessionNotFoundError} If session not found
    * @throws {SessionArchivedException} If session is archived
    * @throws {DatabaseError} If there is an error accessing the database
    */
-  addItem(sessionId: string, type: ItemType, content: string): Promise<ClipboardItem>;
+  addItem(sessionId: string, type: ItemType, content: string, deviceId: string): Promise<ClipboardItem>;
 
   /**
    * Updates an existing item in a session
+   * @param {string} sessionId - The session ID
+   * @param {string} itemId - The item ID
+   * @param {string} content - The new content
+   * @param {number} version - The version of the item
+   * @param {string} deviceId - The device ID that is updating the item
    * @throws {SessionNotFoundError} If session not found
    * @throws {SessionArchivedException} If session is archived
    * @throws {ItemNotFoundError} If item not found in session
    * @throws {VersionConflictError} If item version doesn't match
    * @throws {DatabaseError} If there is an error accessing the database
    */
-  updateItem(sessionId: string, itemId: string, content: string, version: number): Promise<UpdateItemResponse>;
+  updateItem(sessionId: string, itemId: string, content: string, version: number, deviceId: string): Promise<UpdateItemResponse>;
 
   /**
    * Deletes an item from a session
+   * @param {string} sessionId - The session ID
+   * @param {string} itemId - The item ID
+   * @param {string} deviceId - The device ID that is deleting the item
    * @throws {SessionNotFoundError} If session not found
    * @throws {SessionArchivedException} If session is archived
    * @throws {ItemNotFoundError} If item not found in session
    * @throws {DatabaseError} If there is an error accessing the database
    */
-  deleteItem(sessionId: string, itemId: string): Promise<boolean>;
+  deleteItem(sessionId: string, itemId: string, deviceId: string): Promise<boolean>;
 } 
