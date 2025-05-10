@@ -1,12 +1,13 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useSession } from '../contexts/SessionContext';
 import { copyToClipboard } from '../utils/clipboard';
 import { ConflictModal } from './ConflictModal';
 import { useTranslation } from 'react-i18next';
 import { formatDate } from '../utils/dateFormat';
 import toast from 'react-hot-toast';
+import { useHotkeys } from 'react-hotkeys-hook';
 
-const ClipboardItem = ({ item }) => {
+const ClipboardItem = ({ item, index }) => {
   const { deviceId, deleteItem, editItem } = useSession();
   const { t, i18n } = useTranslation(['common', 'clipboard']);
   const [isEditing, setIsEditing] = useState(false);
@@ -86,6 +87,11 @@ const ClipboardItem = ({ item }) => {
       <div className="bg-white rounded-lg shadow-sm border p-4 mb-4">
         <div className="flex justify-between items-start mb-2">
           <div className="text-sm text-gray-500">
+            {index <= 9 && (
+              <span className="inline-block bg-gray-200 text-gray-600 rounded-full w-5 h-5 text-xs leading-5 text-center mr-2">
+                {index}
+              </span>
+            )}
             {formatDate(item.createdAt, 'PPpp', i18n.language)}
           </div>
           {isOwner && (
@@ -163,6 +169,63 @@ const ClipboardItem = ({ item }) => {
 export const ClipboardItems = () => {
   const { items, loading, error } = useSession();
   const { t } = useTranslation('common');
+  const [permissionState, setPermissionState] = useState('unknown');
+
+  // Check clipboard write permission
+  useEffect(() => {
+    const checkPermission = async () => {
+      try {
+        // Try to check clipboard-write permission if supported
+        if (navigator.permissions && navigator.permissions.query) {
+          try {
+            const result = await navigator.permissions.query({ name: 'clipboard-write' });
+            setPermissionState(result.state);
+            
+            result.addEventListener('change', () => {
+              setPermissionState(result.state);
+            });
+            return;
+          } catch (e) {
+            // Some browsers don't support clipboard-write permission query
+            console.log('Clipboard-write permission query not supported');
+          }
+        }
+        
+        // Fallback: Test by writing to clipboard
+        const testWrite = await copyToClipboard('test');
+        if (testWrite) {
+          setPermissionState('granted');
+        } else {
+          setPermissionState('denied');
+        }
+      } catch (error) {
+        console.error('Permission check error:', error);
+        setPermissionState('denied');
+      }
+    };
+    
+    checkPermission();
+  }, []);
+
+  // Setup hotkeys for copying items by number (1-9)
+  useHotkeys('1,2,3,4,5,6,7,8,9', (event) => {
+    const index = parseInt(event.key) - 1;
+    
+    // Only try to copy if permission is granted or unknown (for browsers that don't support permission API)
+    if (permissionState !== 'denied' && items[index] && items[index].type === 'text') {
+      copyToClipboard(items[index].content).then(success => {
+        if (success) {
+          toast.success(t('clipboard:clipboard.copied'));
+        } else {
+          setPermissionState('denied');
+          toast.error(t('clipboard:clipboard.copyFailed'));
+        }
+      });
+    } else if (permissionState === 'denied') {
+      // If permission is denied, show error message
+      toast.error(t('clipboard:clipboard.copyFailed'));
+    }
+  }, { enableOnFormTags: false });
 
   if (error) {
     return (
@@ -190,8 +253,8 @@ export const ClipboardItems = () => {
 
   return (
     <div>
-      {items.map(item => (
-        <ClipboardItem key={item.id} item={item} />
+      {items.map((item, index) => (
+        <ClipboardItem key={item.id} item={item} index={index + 1} />
       ))}
     </div>
   );

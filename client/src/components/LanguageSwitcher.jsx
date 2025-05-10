@@ -1,6 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import { useState, useRef, useEffect } from 'react';
 import { GB, BR } from 'country-flag-icons/react/3x2';
+import { usePasteSuppress } from '../contexts/PasteSuppressContext';
 
 const languages = [
   { 
@@ -21,6 +22,20 @@ export const LanguageSwitcher = () => {
   const { i18n } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef(null);
+  const { suppressPaste, enablePaste } = usePasteSuppress();
+
+  // Suppress paste when dropdown is open
+  useEffect(() => {
+    if (isOpen) {
+      suppressPaste();
+    } else {
+      enablePaste();
+    }
+    
+    return () => {
+      enablePaste();
+    };
+  }, [isOpen, suppressPaste, enablePaste]);
 
   // Close dropdown when clicking outside
   useEffect(() => {

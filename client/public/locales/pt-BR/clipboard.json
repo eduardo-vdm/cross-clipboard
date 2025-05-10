@@ -23,7 +23,8 @@
   },
   "addItem": {
     "pastePrompt": "Cole texto ou imagem aqui",
-    "supportedTypes": "Suporta texto e imagens (PNG, JPEG)"
+    "supportedTypes": "Suporta texto e imagens (PNG, JPEG)",
+    "permissionDenied": "Acesso à área de transferência negado. Atualize as configurações do navegador."
   },
   "image": {
     "clipboardContent": "Conteúdo da área de transferência"

@@ -16,5 +16,17 @@
   },
   "empty": {
     "items": "No items yet. Paste something to get started!"
+  },
+  "permissions": {
+    "clipboard": {
+      "title": "Clipboard Access",
+      "description": "This app needs clipboard access to function properly. Please allow clipboard access.",
+      "allow": "Allow Access",
+      "deniedTitle": "Clipboard Access Denied",
+      "deniedDescription": "You've denied clipboard access. Some features won't work. Please update your browser permissions in settings.",
+      "openSettings": "Browser Settings",
+      "searchHelp": "Search Help",
+      "searchQuery": "how to enable clipboard permissions in browser"
+    }
   }
 } 

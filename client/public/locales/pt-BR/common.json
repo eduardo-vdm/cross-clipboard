@@ -16,5 +16,17 @@
   },
   "empty": {
     "items": "Nenhum item ainda. Cole algo para começar!"
+  },
+  "permissions": {
+    "clipboard": {
+      "title": "Acesso à Área de Transferência",
+      "description": "Este aplicativo precisa de acesso à área de transferência para funcionar corretamente. Por favor, permita o acesso.",
+      "allow": "Permitir Acesso",
+      "deniedTitle": "Acesso à Área de Transferência Negado",
+      "deniedDescription": "Você negou o acesso à área de transferência. Algumas funcionalidades não funcionarão. Atualize suas permissões nas configurações do navegador.",
+      "openSettings": "Configurações do Navegador",
+      "searchHelp": "Buscar Ajuda",
+      "searchQuery": "como habilitar permissões de área de transferência no navegador"
+    }
   }
 } 
