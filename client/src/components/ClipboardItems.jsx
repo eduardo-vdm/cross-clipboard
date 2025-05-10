@@ -88,7 +88,7 @@ const ClipboardItem = ({ item, index }) => {
         <div className="flex justify-between items-start mb-2">
           <div className="text-sm text-gray-500">
             {index <= 9 && (
-              <span className="inline-block bg-gray-200 text-gray-600 rounded-full w-5 h-5 text-xs leading-5 text-center mr-2">
+              <span className="inline-block bg-blue-600 text-white font-semibold rounded-full w-5 h-5 text-xs leading-5 text-center mr-2">
                 {index}
               </span>
             )}

@@ -25,7 +25,7 @@
       "deniedTitle": "Clipboard Access Denied",
       "deniedDescription": "You've denied clipboard access. Some features won't work. Please update your browser permissions in settings.",
       "openSettings": "Browser Settings",
-      "searchHelp": "Search Help",
+      "searchHelp": "Find Help",
       "searchQuery": "how to enable clipboard permissions in browser"
     }
   }

@@ -24,7 +24,8 @@
   "addItem": {
     "pastePrompt": "Paste text or image here",
     "supportedTypes": "Supports text and images (PNG, JPEG)",
-    "permissionDenied": "Clipboard access denied. Update browser settings."
+    "permissionDenied": "Clipboard access denied. Update browser settings.",
+    "keyboardShortcut": "\u2318 or CTRL+V to paste"
   },
   "image": {
     "clipboardContent": "Clipboard content"

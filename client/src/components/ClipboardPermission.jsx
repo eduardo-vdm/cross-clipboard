@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import { ExclamationTriangleIcon } from '@heroicons/react/24/solid';
 
 /**
  * Gets the browser name from user agent
@@ -118,20 +119,31 @@ export const ClipboardPermission = () => {
         </p>
       </div>
       {isDenied ? (
-        <a 
-          href="#" 
-          onClick={(e) => {
-            e.preventDefault();
-            // Open a Google search for how to enable clipboard permissions
-            window.open(`https://www.google.com/search?q=${encodeURIComponent(searchQuery)}`, '_blank');
-          }}
-          className="bg-red-600 hover:bg-red-700 text-white py-2 px-4 rounded-lg flex items-center gap-2"
-        >
-          {t('permissions.clipboard.searchHelp')}
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-          </svg>
-        </a>
+        <div className="fixed bottom-0 left-0 right-0 bg-red-50 border-red-200 p-4 border-t flex justify-between items-center">
+          <div className="flex items-center gap-2">
+            <div className="flex flex-col gap-2">
+              <h3 className="flex flex-row gap-1 items-center font-medium text-red-800">
+                <ExclamationTriangleIcon className="h-5 w-5 text-red-600" /> {t('permissions.clipboard.deniedTitle')}
+              </h3>
+              <p className="text-sm text-red-600 pr-2">
+                {t('permissions.clipboard.deniedDescription')}
+              </p>
+            </div>
+          </div>
+          <a 
+            href="#" 
+            onClick={(e) => {
+              e.preventDefault();
+              window.open(`https://www.google.com/search?q=${encodeURIComponent(searchQuery)}`, '_blank');
+            }}
+            className="bg-red-600 hover:bg-red-700 text-white py-2 px-4 rounded-lg flex items-center gap-2"
+          >
+            {t('permissions.clipboard.searchHelp')}
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+            </svg>
+          </a>
+        </div>
       ) : (
         <button
           onClick={requestPermission}

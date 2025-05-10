@@ -2,13 +2,16 @@ import { useSession } from '../contexts/SessionContext';
 import { usePasteSuppress } from '../contexts/PasteSuppressContext';
 import { useTranslation } from 'react-i18next';
 import { useHotkeys } from 'react-hotkeys-hook';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
+import { ExclamationTriangleIcon } from '@heroicons/react/24/solid';
 
 export const AddItem = () => {
   const { addItem } = useSession();
   const { isPasteSuppressed } = usePasteSuppress();
   const { t } = useTranslation('clipboard');
   const [clipboardState, setClipboardState] = useState('unknown');
+  const [hasKeyboard, setHasKeyboard] = useState(false);
+  const pasteAreaRef = useRef(null);
 
   // Check clipboard permission status on mount
   useEffect(() => {
@@ -37,6 +40,18 @@ export const AddItem = () => {
     };
     
     checkPermission();
+  }, []);
+
+  useEffect(() => {
+    const checkKeyboard = () => {
+      const hasPhysicalKeyboard = /keyboard|keypad|physical/i.test(navigator.userAgent);
+      const isDesktop = !/android|iphone|ipad|ipod|mobile/i.test(navigator.userAgent);
+      setHasKeyboard(hasPhysicalKeyboard || isDesktop);
+    };
+  
+    checkKeyboard();
+    window.addEventListener('resize', checkKeyboard);
+    return () => window.removeEventListener('resize', checkKeyboard);
   }, []);
 
   const handlePaste = async (e) => {
@@ -93,20 +108,36 @@ export const AddItem = () => {
   const isGranted = clipboardState === 'granted';
 
   return (
-    <div 
+    <div
+      ref={pasteAreaRef}
       onPaste={handlePaste}
-      className={`bg-gray-50 border-2 border-dashed ${
+      tabIndex={0}
+      role="button"
+      aria-label={t('addItem.pastePrompt')}
+      className={`relative bg-gray-50 border-2 border-dashed ${
         isDenied ? 'border-red-300' : isGranted ? 'border-green-300' : 'border-gray-300'
-      } rounded-lg p-8 text-center cursor-pointer mb-8 transition-colors`}
+      } ${!isPasteSuppressed ? 'ring-2 ring-blue-500 ring-opacity-100' : ''} rounded-lg p-8 text-center cursor-pointer mb-8 transition-all duration-200 focus:outline-none focus:ring-4 focus:ring-blue-500 focus:ring-opacity-100`}
     >
       <p className={`${isDenied ? 'text-red-500' : 'text-gray-500'}`}>
-        {isDenied 
-          ? t('addItem.permissionDenied') 
+        {isDenied
+          ? t('addItem.permissionDenied')
           : t('addItem.pastePrompt')}
       </p>
       <p className="text-sm text-gray-400 mt-2">
         {t('addItem.supportedTypes')}
       </p>
+      {hasKeyboard && !isPasteSuppressed && (
+        <div className={`absolute bottom-2 right-2 flex items-center gap-1 ${
+          isDenied ? 'opacity-50' : ''
+        }`}>
+          <div className="bg-blue-600 text-white text-xs px-3 py-1 rounded shadow font-semibold flex items-center gap-1">
+            {isDenied && (
+              <ExclamationTriangleIcon className="h-3 w-3 text-white" />
+            )}
+            {t('addItem.keyboardShortcut', 'Press CTRL+V to paste anytime')}
+          </div>
+        </div>
+      )}
     </div>
   );
 }; 

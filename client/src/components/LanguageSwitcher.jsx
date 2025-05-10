@@ -72,7 +72,7 @@ export const LanguageSwitcher = () => {
 
       {/* Dropdown Menu */}
       {isOpen && (
-        <div className="absolute right-0 mt-1 bg-white rounded-lg shadow-lg border py-1 min-w-[160px]">
+        <div className="absolute right-0 mt-1 bg-white rounded-lg shadow-lg border py-1 min-w-[160px] z-10">
           {languages.map((language) => {
             const FlagComponent = language.flag;
             return (
