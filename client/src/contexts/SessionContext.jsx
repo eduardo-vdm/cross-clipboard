@@ -538,6 +538,87 @@ export const SessionProvider = ({ children }) => {
     }
   };
 
+  const wipeSession = async () => {
+    setLoading(true);
+    try {
+      if (service) {
+        await service.wipeSession(sessionCode, deviceId);
+      } else {
+        const response = await fetch(`${apiUrl}/api/sessions/${sessionCode}/wipe`, {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ deviceId }),
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => ({
+            error: `HTTP error ${response.status}`
+          }));
+          
+          if (response.status === 404) {
+            throw new Error('Session not found');
+          }
+          
+          if (response.status === 403) {
+            throw new Error('Only the session creator can wipe all items');
+          }
+          
+          throw new Error('Failed to wipe session');
+        }
+      }
+
+      setItems([]);
+      toast.success('Session wiped successfully!');
+    } catch (err) {
+      setError(err.message);
+      toast.error(err.message);
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const removeMyItems = async () => {
+    setLoading(true);
+    try {
+      if (service) {
+        await service.removeMyItems(sessionCode, deviceId);
+      } else {
+        const response = await fetch(`${apiUrl}/api/sessions/${sessionCode}/remove-my-items`, {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ deviceId }),
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => ({
+            error: `HTTP error ${response.status}`
+          }));
+          
+          if (response.status === 404) {
+            throw new Error('Session not found');
+          }
+          
+          throw new Error('Failed to remove your items');
+        }
+      }
+
+      // Remove items owned by this device
+      setItems(prev => prev.filter(item => item.deviceId !== deviceId));
+      toast.success('Your items have been removed successfully!');
+    } catch (err) {
+      setError(err.message);
+      toast.error(err.message);
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const value = {
     sessionCode,
     deviceId,
@@ -550,6 +631,8 @@ export const SessionProvider = ({ children }) => {
     addItem,
     deleteItem,
     editItem,
+    wipeSession,
+    removeMyItems,
   };
 
   return (

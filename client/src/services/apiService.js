@@ -189,5 +189,59 @@ export const apiService = {
     });
     
     return handleResponse(response);
+  },
+
+  /**
+   * Wipe all items from a session
+   * @param {string} sessionCode - 6-digit session code
+   * @param {string} deviceId - The device ID
+   * @returns {Promise<{success: boolean}>} Success indicator
+   * @throws {Error} If session not found or user is not the creator
+   */
+  wipeSession: async (sessionCode, deviceId) => {
+    const response = await fetch(`${API_URL}/api/sessions/${sessionCode}/wipe`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ deviceId }),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({
+        error: `HTTP error ${response.status}`
+      }));
+      
+      if (response.status === 404) {
+        throw new Error('Session not found');
+      }
+      
+      if (response.status === 403) {
+        throw new Error('Only the session creator can wipe all items');
+      }
+      
+      throw new Error('Failed to wipe session');
+    }
+
+    return handleResponse(response);
+  },
+
+  /**
+   * Remove all items owned by the current device from a session
+   * @param {string} sessionCode - 6-digit session code
+   * @param {string} deviceId - The device ID
+   * @returns {Promise<{success: boolean}>} Success indicator
+   * @throws {Error} If session not found
+   */
+  removeMyItems: async (sessionCode, deviceId) => {
+    const response = await fetch(`${API_URL}/api/sessions/${sessionCode}/remove-my-items`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ deviceId }),
+    });
+
+    return handleResponse(response);
   }
 }; 

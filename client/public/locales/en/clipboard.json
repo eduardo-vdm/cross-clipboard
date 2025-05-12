@@ -8,7 +8,9 @@
     "wipeTitle": "Wipe Session",
     "wipeMessage": "Are you sure you want to wipe this session? This action removes all items from this session and cannot be undone.",
     "removeMyItemsTitle": "Remove My Items",
-    "removeMyItemsMessage": "Are you sure you want to remove your items from this session? This action cannot be undone."
+    "removeMyItemsMessage": "Are you sure you want to remove your items from this session? This action cannot be undone.",
+    "wipeSuccess": "Session wiped successfully!",
+    "removeMyItemsSuccess": "Your items have been removed successfully!"
   },
   "clipboard": {
     "copied": "Copied to clipboard!",

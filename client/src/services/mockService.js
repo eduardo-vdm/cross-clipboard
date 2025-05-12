@@ -123,6 +123,32 @@ export const mockService = {
     itemVersions.delete(itemId);
     return true;
   },
+
+  wipeSession: async (sessionCode, deviceId) => {
+    const session = mockSessions.get(sessionCode);
+    if (!session) {
+      throw new Error('Session not found');
+    }
+
+    if (session.createdBy !== deviceId) {
+      throw new Error('Only the session creator can wipe all items');
+    }
+
+    session.items = [];
+    mockSessions.set(sessionCode, session);
+    return { success: true };
+  },
+
+  removeMyItems: async (sessionCode, deviceId) => {
+    const session = mockSessions.get(sessionCode);
+    if (!session) {
+      throw new Error('Session not found');
+    }
+
+    session.items = session.items.filter(item => item.deviceId !== deviceId);
+    mockSessions.set(sessionCode, session);
+    return { success: true };
+  }
 };
 
 // Helper to enable/disable mock service

@@ -8,7 +8,7 @@ import { useState } from 'react';
 import { ConfirmationDialog } from './ConfirmationDialog';
 
 export const SessionHeader = () => {
-  const { sessionCode, deviceId, items, createdBy } = useSession();
+  const { sessionCode, deviceId, items, createdBy, wipeSession, removeMyItems } = useSession();
   const { t } = useTranslation(['common', 'clipboard']);
   const [showWipeConfirm, setShowWipeConfirm] = useState(false);
   const [showRemoveMyItemsConfirm, setShowRemoveMyItemsConfirm] = useState(false);
@@ -20,14 +20,22 @@ export const SessionHeader = () => {
     toast.success(t('clipboard:clipboard.copied'));
   };
 
-  const handleWipeSession = () => {
-    // TODO: Implement wipe session functionality
-    console.log('Wipe session functionality to be implemented');
-  };
+  const handleWipeSession = async () => {
+    try {
+      await wipeSession();
+      setShowWipeConfirm(false);
+    } catch (err) {
+      // Error is already handled in the context
+    }
+  };  
 
-  const handleRemoveMyItems = () => {
-    // TODO: Implement remove my items functionality
-    console.log('Remove my items functionality to be implemented');
+  const handleRemoveMyItems = async () => {
+    try {
+      await removeMyItems();
+      setShowRemoveMyItemsConfirm(false);
+    } catch (err) {
+      // Error is already handled in the context
+    }
   };
 
   const hasMyItems = items.some(item => item.deviceId === deviceId);

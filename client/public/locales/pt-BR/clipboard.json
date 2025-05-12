@@ -8,7 +8,9 @@
     "wipeTitle": "Limpar Sessão",
     "wipeMessage": "Tem certeza que deseja limpar esta sessão? Esta ação remove todos os itens desta sessão e não pode ser revertida.",
     "removeMyItemsTitle": "Remover Meus Itens",
-    "removeMyItemsMessage": "Tem certeza que deseja remover seus itens desta sessão? Esta ação não pode ser revertida."
+    "removeMyItemsMessage": "Tem certeza que deseja remover seus itens desta sessão? Esta ação não pode ser revertida.",
+    "wipeSuccess": "Sessão limpa com sucesso!",
+    "removeMyItemsSuccess": "Seus itens foram removidos com sucesso!"
   },
   "clipboard": {
     "copied": "Copiado para a área de transferência!",
