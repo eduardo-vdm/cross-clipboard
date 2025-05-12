@@ -11,7 +11,9 @@
     "copyFailed": "Falha ao copiar para a área de transferência",
     "added": "Item adicionado com sucesso!",
     "deleted": "Item excluído com sucesso!",
-    "updated": "Item atualizado com sucesso!"
+    "updated": "Item atualizado com sucesso!",
+    "deleteTitle": "Excluir Item",
+    "deleteMessage": "Tem certeza que deseja excluir este item? Esta ação não pode ser revertida."
   },
   "conflict": {
     "title": "Conflito de Conteúdo Detectado",

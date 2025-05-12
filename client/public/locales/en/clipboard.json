@@ -11,7 +11,9 @@
     "copyFailed": "Failed to copy to clipboard",
     "added": "Item added successfully!",
     "deleted": "Item deleted successfully!",
-    "updated": "Item updated successfully!"
+    "updated": "Item updated successfully!",
+    "deleteTitle": "Delete Item",
+    "deleteMessage": "Are you sure you want to delete this item? This action cannot be undone."
   },
   "conflict": {
     "title": "Content Conflict Detected",

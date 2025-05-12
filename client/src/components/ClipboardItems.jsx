@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useSession } from '../contexts/SessionContext';
 import { copyToClipboard } from '../utils/clipboard';
 import { ConflictModal } from './ConflictModal';
+import { ConfirmationDialog } from './ConfirmationDialog';
 import { useTranslation } from 'react-i18next';
 import { formatDate } from '../utils/dateFormat';
 import toast from 'react-hot-toast';
@@ -15,6 +16,7 @@ const ClipboardItem = ({ item, index }) => {
   const [editContent, setEditContent] = useState(item.content);
   const [showConflict, setShowConflict] = useState(false);
   const [conflictData, setConflictData] = useState(null);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   
   const isOwner = item.deviceId === deviceId;
 
@@ -77,10 +79,12 @@ const ClipboardItem = ({ item, index }) => {
   };
 
   const handleDelete = async () => {
-    if (window.confirm(t('common:confirmations.delete'))) {
-      await deleteItem(item.id);
-      toast.success(t('clipboard:clipboard.deleted'));
-    }
+    setShowDeleteConfirm(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    await deleteItem(item.id);
+    toast.success(t('clipboard:clipboard.deleted'));
   };
 
   return (
@@ -171,6 +175,15 @@ const ClipboardItem = ({ item, index }) => {
           setEditContent(item.content);
           setConflictData(null);
         }}
+      />
+
+      <ConfirmationDialog
+        isOpen={showDeleteConfirm}
+        onClose={() => setShowDeleteConfirm(false)}
+        onConfirm={handleDeleteConfirm}
+        title={t('clipboard:clipboard.deleteTitle')}
+        message={t('clipboard:clipboard.deleteMessage')}
+        type="danger"
       />
     </>
   );

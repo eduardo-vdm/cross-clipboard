@@ -5,7 +5,9 @@
     "save": "Salvar",
     "delete": "Excluir",
     "cancel": "Cancelar",
-    "download": "Baixar"
+    "download": "Baixar",
+    "confirm": "Confirmar",
+    "close": "Fechar"
   },
   "confirmations": {
     "delete": "Tem certeza que deseja excluir este item?"

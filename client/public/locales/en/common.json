@@ -5,7 +5,9 @@
     "save": "Save",
     "delete": "Delete",
     "cancel": "Cancel",
-    "download": "Download"
+    "download": "Download",
+    "confirm": "Confirm",
+    "close": "Close"
   },
   "confirmations": {
     "delete": "Are you sure you want to delete this item?"
