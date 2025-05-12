@@ -13,6 +13,26 @@ export const useSession = () => {
   return context;
 };
 
+const getDeviceName = () => {
+  const userAgent = navigator.userAgent;
+  let deviceName = 'Unknown Device';
+  
+  // Try to get OS name
+  if (userAgent.includes('Windows')) {
+    deviceName = 'Windows';
+  } else if (userAgent.includes('Mac')) {
+    deviceName = 'Mac';
+  } else if (userAgent.includes('Linux')) {
+    deviceName = 'Linux';
+  } else if (userAgent.includes('Android')) {
+    deviceName = 'Android';
+  } else if (userAgent.includes('iOS')) {
+    deviceName = 'iOS';
+  }
+  
+  return deviceName;
+};
+
 export const SessionProvider = ({ children }) => {
   // Move service config inside the component for better testability
   const serviceConfig = getServiceConfig();
@@ -24,7 +44,8 @@ export const SessionProvider = ({ children }) => {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  
+  const [deviceName, setDeviceName] = useState(getDeviceName());
+
   // Refs to track initialization state
   const isInitialized = useRef(false);
   const initializationPromise = useRef(null);
@@ -282,7 +303,7 @@ export const SessionProvider = ({ children }) => {
     try {
       let data;
       if (service) {
-        data = await service.addItem(sessionCode, content, type, deviceId);
+        data = await service.addItem(sessionCode, content, type, deviceId, deviceName);
       } else {
         const response = await fetch(`${apiUrl}/api/sessions/${sessionCode}/items`, {
           method: 'POST',
@@ -290,7 +311,7 @@ export const SessionProvider = ({ children }) => {
             'Content-Type': 'application/json',
           },
           // Include deviceId to track ownership
-          body: JSON.stringify({ content, type, deviceId }),
+          body: JSON.stringify({ content, type, deviceId, deviceName }),
         });
         if (!response.ok) {
           const errorData = await response.json().catch(() => ({

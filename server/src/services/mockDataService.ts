@@ -98,7 +98,7 @@ export class MockDataService implements DataService {
     return true;
   }
 
-  async addItem(sessionId: string, type: ItemType, content: string, deviceId: string): Promise<ClipboardItem> {
+  async addItem(sessionId: string, type: ItemType, content: string, deviceId: string, deviceName: string): Promise<ClipboardItem> {
     const session = this.sessions[sessionId];
     if (!session) {
       throw new SessionNotFoundError(sessionId, 'id');
@@ -111,7 +111,8 @@ export class MockDataService implements DataService {
       createdAt: new Date(),
       lastModified: new Date(),
       version: 1,
-      deviceId
+      deviceId,
+      deviceName
     };
 
     session.items.push(item);

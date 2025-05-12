@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next';
 import { formatDate } from '../utils/dateFormat';
 import toast from 'react-hot-toast';
 import { useHotkeys } from 'react-hotkeys-hook';
+import { UserIcon } from '@heroicons/react/24/solid';
 
 const ClipboardItem = ({ item, index }) => {
   const { deviceId, deleteItem, editItem } = useSession();
@@ -93,6 +94,15 @@ const ClipboardItem = ({ item, index }) => {
               </span>
             )}
             {formatDate(item.createdAt, 'PPpp', i18n.language)}
+            <span className="ml-2 text-gray-400 flex items-center gap-1">
+              from{' '}
+              {isOwner && (
+                <UserIcon className="h-4 w-4 text-blue-600" />
+              )}
+              <span className={isOwner ? 'font-semibold text-blue-600' : ''}>
+                {item.deviceName}
+              </span>
+            </span>
           </div>
           {isOwner && (
             <div className="flex gap-2">

@@ -10,6 +10,7 @@ export interface IClipboardItem {
   createdAt: Date;
   lastModified: Date;
   deviceId: string;  // Add deviceId to track item ownership
+  deviceName: string;  // Unique name throughout the sessions' items
 }
 
 export interface ISession {
@@ -44,7 +45,8 @@ const clipboardItemSchema = new Schema({
   version: { type: Number, required: true, default: 1 },
   createdAt: { type: Date, required: true, default: Date.now },
   lastModified: { type: Date, required: true, default: Date.now },
-  deviceId: { type: String, required: true }  // Add deviceId field to the schema
+  deviceId: { type: String, required: true },  // Add deviceId field to the schema
+  deviceName: { type: String, required: true }  // Add deviceName field to the schema
 }, { _id: false });  // Disable auto _id for subdocuments
 
 // Session Schema

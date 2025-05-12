@@ -142,13 +142,42 @@ export class MongoDataService implements DataService {
     }
   }
 
-  async addItem(sessionId: string, type: ItemType, content: string, deviceId: string): Promise<ClipboardItem> {
+  async addItem(sessionId: string, type: ItemType, content: string, deviceId: string, deviceName: string): Promise<ClipboardItem> {
     await this.ensureConnection();
     
     try {
       const session = await SessionModel.findOne({ id: sessionId, isArchived: false });
       if (!session) {
         throw new SessionNotFoundError(sessionId, 'id');
+      }
+      
+      // Get all existing device names and their assigned letters in the session
+      const deviceNameMap = new Map<string, string>();
+      session.items.forEach(item => {
+        if (item.deviceId && item.deviceName) {
+          deviceNameMap.set(item.deviceId, item.deviceName);
+        }
+      });
+      
+      // If this deviceId already has a name, use it
+      let finalDeviceName = deviceNameMap.get(deviceId);
+      
+      // If not, assign a new letter
+      if (!finalDeviceName) {
+        // Get all existing letters for this base device name
+        const existingLetters = new Set(
+          Array.from(deviceNameMap.values())
+            .filter(name => name.startsWith(deviceName))
+            .map(name => name.split(' ').pop())
+        );
+        
+        // Find the first available letter
+        let letterIndex = 0;
+        while (existingLetters.has(String.fromCharCode(65 + letterIndex))) {
+          letterIndex++;
+        }
+        
+        finalDeviceName = `${deviceName} ${String.fromCharCode(65 + letterIndex)}`;
       }
       
       const newItem = {
@@ -158,16 +187,15 @@ export class MongoDataService implements DataService {
         version: 1,
         createdAt: new Date(),
         lastModified: new Date(),
-        deviceId
+        deviceId,
+        deviceName: finalDeviceName
       };
       
-      // Cast mongoose subdocument to avoid TypeScript error
       session.items.push(newItem as unknown as IClipboardItemDocument);
       session.version += 1;
       session.lastModified = new Date();
       await session.save();
       
-      // Return as ClipboardItem
       return newItem;
     } catch (error: any) {
       if (error instanceof SessionNotFoundError) {
@@ -285,7 +313,8 @@ export class MongoDataService implements DataService {
       version: doc.version,
       createdAt: doc.createdAt,
       lastModified: doc.lastModified,
-      deviceId: doc.deviceId
+      deviceId: doc.deviceId,
+      deviceName: doc.deviceName
     };
   }
 } 

@@ -41,7 +41,7 @@ export const createSessionRouter = (dataService: DataService) => {
 
   // Add a new item to a session by code
   router.post('/sessions/:code/items', asyncHandler(async (req: Request, res: Response) => {
-    const { type, content, deviceId } = req.body;
+    const { type, content, deviceId, deviceName } = req.body;
     if (!type || !content) {
       return res.status(400).json({ error: 'Type and content are required' });
     }
@@ -52,7 +52,7 @@ export const createSessionRouter = (dataService: DataService) => {
 
     // First get the session by code to find its ID
     const session = await dataService.getSessionByCode(req.params.code);
-    const item = await dataService.addItem(session.id, type as ItemType, content, deviceId);
+    const item = await dataService.addItem(session.id, type as ItemType, content, deviceId, deviceName);
     res.status(201).json(item);
   }));
 

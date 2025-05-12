@@ -127,7 +127,7 @@ export const apiService = {
    * @param {string} deviceId - The device ID
    * @returns {Promise<Object>} Created item
    */
-  addItem: async (code, content, type, deviceId) => {
+  addItem: async (code, content, type, deviceId, deviceName) => {
     // The server now requires deviceId for ownership tracking
     const response = await fetch(`${API_URL}/api/sessions/${code}/items`, {
       method: 'POST',
@@ -137,7 +137,8 @@ export const apiService = {
       body: JSON.stringify({ 
         content, 
         type,
-        deviceId
+        deviceId,
+        deviceName
       })
     });
     
