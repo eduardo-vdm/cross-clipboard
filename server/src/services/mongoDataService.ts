@@ -49,7 +49,7 @@ export class MongoDataService implements DataService {
     throw new SessionCodeGenerationError(maxAttempts);
   }
 
-  async createSession(): Promise<Session> {
+  async createSession(deviceId: string): Promise<Session> {
     await this.ensureConnection();
     
     try {
@@ -61,7 +61,8 @@ export class MongoDataService implements DataService {
         version: 1,
         createdAt: new Date(),
         lastModified: new Date(),
-        isArchived: false
+        isArchived: false,
+        createdBy: deviceId
       });
 
       await session.save();
@@ -296,6 +297,33 @@ export class MongoDataService implements DataService {
         throw error;
       }
       throw new DatabaseError('Failed to delete item', error.message);
+    }
+  }
+
+  async wipeSession(sessionId: string, deviceId: string): Promise<void> {
+    await this.ensureConnection();
+    
+    try {
+      const session = await SessionModel.findOne({ id: sessionId, isArchived: false });
+      if (!session) {
+        throw new SessionNotFoundError(sessionId, 'id');
+      }
+
+      // Check if the device is the session creator
+      if (session.createdBy !== deviceId) {
+        throw new Error('Only the session creator can wipe all items');
+      }
+      
+      // Clear all items and update session version
+      session.items = [];
+      session.version += 1;
+      session.lastModified = new Date();
+      await session.save();
+    } catch (error: any) {
+      if (error instanceof SessionNotFoundError) {
+        throw error;
+      }
+      throw new DatabaseError('Failed to wipe session', error.message);
     }
   }
 

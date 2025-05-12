@@ -3,6 +3,7 @@ import path from 'path';
 import { v4 as uuidv4 } from 'uuid';
 import { Session, ClipboardItem, ItemType, DataService, UpdateItemResponse } from '../types';
 import { SessionNotFoundError, SessionArchivedException, SessionCodeGenerationError } from '../types/errors';
+import { ISession } from '../db/schemas';
 
 const DATA_DIR = path.join(__dirname, '../../data');
 const SESSIONS_FILE = path.join(DATA_DIR, 'sessions.json');
@@ -17,23 +18,30 @@ async function ensureDataDir() {
   }
 }
 
-async function readSessions(): Promise<Record<string, Session>> {
+async function readSessions(): Promise<Record<string, ISession>> {
   await ensureDataDir();
   try {
     const data = await fs.readFile(SESSIONS_FILE, 'utf-8');
-    return JSON.parse(data);
+    const sessions = JSON.parse(data);
+    // Ensure all sessions have isArchived field
+    Object.values(sessions).forEach((session: any) => {
+      if (!('isArchived' in session)) {
+        session.isArchived = false;
+      }
+    });
+    return sessions;
   } catch {
     return {};
   }
 }
 
-async function saveSessions(sessions: Record<string, Session>): Promise<void> {
+async function saveSessions(sessions: Record<string, ISession>): Promise<void> {
   await ensureDataDir();
   await fs.writeFile(SESSIONS_FILE, JSON.stringify(sessions, null, 2));
 }
 
 export class MockDataService implements DataService {
-  private sessions: Record<string, Session> = {};
+  private sessions: Record<string, ISession> = {};
 
   constructor() {
     readSessions().then(sessions => {
@@ -46,23 +54,26 @@ export class MockDataService implements DataService {
     return Math.floor(100000 + Math.random() * 900000).toString();
   }
 
-  private deepCopySession(session: Session): Session {
+  private deepCopySession(session: ISession): Session {
+    const { isArchived, ...sessionWithoutArchived } = session;
     return {
-      ...session,
+      ...sessionWithoutArchived,
       items: session.items.map(item => ({ ...item })),
       createdAt: new Date(session.createdAt),
       lastModified: new Date(session.lastModified)
     };
   }
 
-  async createSession(): Promise<Session> {
-    const session: Session = {
+  async createSession(deviceId: string): Promise<Session> {
+    const session: ISession = {
       id: uuidv4(),
       code: this.generateSessionCode(),
       items: [],
       version: 1,
       createdAt: new Date(),
-      lastModified: new Date()
+      lastModified: new Date(),
+      isArchived: false,
+      createdBy: deviceId
     };
 
     this.sessions[session.id] = session;
@@ -93,7 +104,7 @@ export class MockDataService implements DataService {
 
   async deleteSession(id: string): Promise<boolean> {
     if (!this.sessions[id]) return false;
-    delete this.sessions[id];
+    this.sessions[id].isArchived = true;
     await saveSessions(this.sessions);
     return true;
   }
@@ -188,5 +199,27 @@ export class MockDataService implements DataService {
     session.lastModified = new Date();
     await saveSessions(this.sessions);
     return true;
+  }
+
+  async wipeSession(sessionId: string, deviceId: string): Promise<void> {
+    const session = this.sessions[sessionId];
+    if (!session) {
+      throw new SessionNotFoundError(sessionId, 'id');
+    }
+
+    if (session.isArchived) {
+      throw new SessionArchivedException(sessionId, 'id');
+    }
+
+    // Check if the device is the session creator
+    if (session.createdBy !== deviceId) {
+      throw new Error('Only the session creator can wipe all items');
+    }
+
+    // Clear all items and update session version
+    session.items = [];
+    session.version += 1;
+    session.lastModified = new Date();
+    await saveSessions(this.sessions);
   }
 } 

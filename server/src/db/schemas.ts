@@ -21,6 +21,7 @@ export interface ISession {
   createdAt: Date;
   lastModified: Date;
   isArchived: boolean;
+  createdBy: string;  // Device ID of the session creator
 }
 
 // Define interfaces for the Mongoose documents
@@ -57,7 +58,8 @@ const sessionSchema = new Schema({
   version: { type: Number, required: true, default: 1 },
   createdAt: { type: Date, required: true, default: Date.now },
   lastModified: { type: Date, required: true, default: Date.now },
-  isArchived: { type: Boolean, default: false }
+  isArchived: { type: Boolean, default: false },
+  createdBy: { type: String, required: true }  // Add createdBy field
 });
 
 // Indexes

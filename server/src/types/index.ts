@@ -34,10 +34,11 @@ export interface VersionConflict {
 export interface DataService {
   /**
    * Creates a new session with a unique code
+   * @param {string} deviceId - The device ID of the session creator
    * @throws {SessionCodeGenerationError} If unable to generate a unique code
    * @throws {DatabaseError} If there is an error accessing the database
    */
-  createSession(): Promise<Session>;
+  createSession(deviceId: string): Promise<Session>;
 
   /**
    * Gets a session by ID (backward compatibility method)
@@ -109,4 +110,15 @@ export interface DataService {
    * @throws {DatabaseError} If there is an error accessing the database
    */
   deleteItem(sessionId: string, itemId: string, deviceId: string): Promise<boolean>;
+
+  /**
+   * Wipes all items from a session
+   * @param {string} sessionId - The session ID
+   * @param {string} deviceId - The device ID requesting the wipe
+   * @throws {SessionNotFoundError} If session not found
+   * @throws {SessionArchivedException} If session is archived
+   * @throws {Error} If device is not the session creator
+   * @throws {DatabaseError} If there is an error accessing the database
+   */
+  wipeSession(sessionId: string, deviceId: string): Promise<void>;
 } 

@@ -4,7 +4,9 @@
     "copyLink": "Share Link",
     "created": "Session created successfully!",
     "joined": "Joined session successfully!",
-    "invalid": "That session doesn't exist, creating a new one for you"
+    "invalid": "That session doesn't exist, creating a new one for you",
+    "wipeTitle": "Wipe Session",
+    "wipeMessage": "Are you sure you want to wipe this session? This action cannot be undone."
   },
   "clipboard": {
     "copied": "Copied to clipboard!",

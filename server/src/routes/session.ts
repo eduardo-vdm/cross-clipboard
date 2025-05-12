@@ -15,7 +15,11 @@ export const createSessionRouter = (dataService: DataService) => {
 
   // Create a new session
   router.post('/sessions', asyncHandler(async (req: Request, res: Response) => {
-    const session = await dataService.createSession();
+    const { deviceId } = req.body;
+    if (!deviceId) {
+      return res.status(400).json({ error: 'DeviceId is required' });
+    }
+    const session = await dataService.createSession(deviceId);
     res.status(201).json(session);
   }));
 
@@ -116,6 +120,19 @@ export const createSessionRouter = (dataService: DataService) => {
       return res.status(404).json({ error: 'Item not found' });
     }
     
+    res.status(204).send();
+  }));
+
+  // Wipe all items from a session by code
+  router.delete('/sessions/:code/wipe', asyncHandler(async (req: Request, res: Response) => {
+    const { deviceId } = req.body;
+    if (!deviceId) {
+      return res.status(400).json({ error: 'DeviceId is required' });
+    }
+
+    // First get the session by code to find its ID
+    const session = await dataService.getSessionByCode(req.params.code);
+    await dataService.wipeSession(session.id, deviceId);
     res.status(204).send();
   }));
 

@@ -45,6 +45,7 @@ export const SessionProvider = ({ children }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [deviceName, setDeviceName] = useState(getDeviceName());
+  const [createdBy, setCreatedBy] = useState(null);
 
   // Refs to track initialization state
   const isInitialized = useRef(false);
@@ -147,19 +148,19 @@ export const SessionProvider = ({ children }) => {
     return () => clearInterval(interval);
   }, [sessionCode, service, apiUrl, deviceId]);
 
-  const createSession = async () => {
+  const createSession = async (explicitDeviceId = deviceId) => {
     setLoading(true);
     try {
       let data;
       if (service) {
-        data = await service.createSession(deviceId);
+        data = await service.createSession(explicitDeviceId);
       } else {
         const response = await fetch(`${apiUrl}/api/sessions`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({ deviceId }),
+          body: JSON.stringify({ explicitDeviceId }),
         });
         if (!response.ok) throw new Error('Failed to create session');
         data = await response.json();
@@ -171,6 +172,7 @@ export const SessionProvider = ({ children }) => {
       }
       
       setSessionCode(data.code);
+      setCreatedBy(data.createdBy);
       setError(null);
       toast.success('Session created successfully!');
       return data;
@@ -220,6 +222,7 @@ export const SessionProvider = ({ children }) => {
       
       setSessionCode(code);
       setItems(itemsData);
+      setCreatedBy(sessionData.createdBy);
       setError(null);
       toast.success('Joined session successfully!');
       return {
@@ -277,10 +280,10 @@ export const SessionProvider = ({ children }) => {
               url.searchParams.delete('session');
               window.history.replaceState({}, '', url);
               // Create new session
-              await createSession();
+              await createSession(newDeviceId);
             }
           } else {
-            await createSession();
+            await createSession(newDeviceId);
           }
           
           isInitialized.current = true;
@@ -296,7 +299,7 @@ export const SessionProvider = ({ children }) => {
     };
 
     initializeSession();
-  }, []); // Empty dependency array as this should only run once
+  }, [service, apiUrl, deviceId]); // Empty dependency array as this should only run once
 
   const addItem = async (content, type) => {
     setLoading(true);
@@ -541,6 +544,7 @@ export const SessionProvider = ({ children }) => {
     items,
     loading,
     error,
+    createdBy,
     createSession,
     joinSession,
     addItem,
