@@ -6,7 +6,9 @@
     "joined": "Joined session successfully!",
     "invalid": "That session doesn't exist, creating a new one for you",
     "wipeTitle": "Wipe Session",
-    "wipeMessage": "Are you sure you want to wipe this session? This action cannot be undone."
+    "wipeMessage": "Are you sure you want to wipe this session? This action removes all items from this session and cannot be undone.",
+    "removeMyItemsTitle": "Remove My Items",
+    "removeMyItemsMessage": "Are you sure you want to remove your items from this session? This action cannot be undone."
   },
   "clipboard": {
     "copied": "Copied to clipboard!",

@@ -6,7 +6,9 @@
     "joined": "Conectado à sessão com sucesso!",
     "invalid": "Essa sessão não existe, criando uma nova para você",
     "wipeTitle": "Limpar Sessão",
-    "wipeMessage": "Tem certeza que deseja limpar esta sessão? Esta ação não pode ser revertida."
+    "wipeMessage": "Tem certeza que deseja limpar esta sessão? Esta ação remove todos os itens desta sessão e não pode ser revertida.",
+    "removeMyItemsTitle": "Remover Meus Itens",
+    "removeMyItemsMessage": "Tem certeza que deseja remover seus itens desta sessão? Esta ação não pode ser revertida."
   },
   "clipboard": {
     "copied": "Copiado para a área de transferência!",
