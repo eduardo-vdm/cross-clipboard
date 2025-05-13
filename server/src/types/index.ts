@@ -121,4 +121,14 @@ export interface DataService {
    * @throws {DatabaseError} If there is an error accessing the database
    */
   wipeSession(sessionId: string, deviceId: string): Promise<void>;
+
+  /**
+   * Removes all items from a deviceId from a session
+   * @param {string} sessionId - The session ID
+   * @param {string} deviceId - The device ID requesting the removal
+   * @throws {SessionNotFoundError} If session not found
+   * @throws {SessionArchivedException} If session is archived
+   * @throws {DatabaseError} If there is an error accessing the database
+   */
+  removeMyItems(sessionId: string, deviceId: string): Promise<boolean>;
 } 

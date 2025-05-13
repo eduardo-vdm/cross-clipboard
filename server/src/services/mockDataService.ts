@@ -222,4 +222,27 @@ export class MockDataService implements DataService {
     session.lastModified = new Date();
     await saveSessions(this.sessions);
   }
+
+  /**
+   * Removes all items from a deviceId from a session
+   * @param {string} sessionId - The session ID
+   * @param {string} deviceId - The device ID requesting the removal
+   * @throws {SessionNotFoundError} If session not found
+   * @throws {SessionArchivedException} If session is archived
+   */
+  async removeMyItems(sessionId: string, deviceId: string): Promise<boolean> {
+    const session = this.sessions[sessionId];
+    if (!session) return false;
+
+    // Filter out items that match the deviceId
+    const items = session.items.filter(i => i.deviceId !== deviceId);
+    if (items.length === session.items.length) return false;
+
+    // Update the session with the filtered items
+    session.items = items;
+    session.version += 1;
+    session.lastModified = new Date();
+    await saveSessions(this.sessions);
+    return true;
+  }
 } 

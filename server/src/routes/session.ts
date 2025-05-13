@@ -132,7 +132,27 @@ export const createSessionRouter = (dataService: DataService) => {
 
     // First get the session by code to find its ID
     const session = await dataService.getSessionByCode(req.params.code);
+
+    // Check if user has permission to wipe this session
+    if (session.createdBy && deviceId && session.createdBy !== deviceId) {
+      return res.status(403).json({ error: 'You do not have permission to wipe this session' });
+    }
+
     await dataService.wipeSession(session.id, deviceId);
+    res.status(204).send();
+  }));
+
+  // Remove all items from a deviceId from one session
+  router.delete('/sessions/:code/remove-my-items', asyncHandler(async (req: Request, res: Response) => {
+    const { deviceId } = req.body;
+    if (!deviceId) {
+      return res.status(400).json({ error: 'DeviceId is required' });
+    }
+
+    // First get the session by code to find its ID
+    const session = await dataService.getSessionByCode(req.params.code);
+
+    await dataService.removeMyItems(session.id, deviceId);  
     res.status(204).send();
   }));
 

@@ -327,6 +327,34 @@ export class MongoDataService implements DataService {
     }
   }
 
+  async removeMyItems(sessionId: string, deviceId: string): Promise<boolean> {
+    await this.ensureConnection();
+
+    try {
+      const session = await SessionModel.findOne({ id: sessionId, isArchived: false });
+      if (!session) {
+        throw new SessionNotFoundError(sessionId, 'id');
+      }
+
+      // Filter out items that match the deviceId
+      const items = session.items.filter(i => i.deviceId !== deviceId); 
+      if (items.length === session.items.length) return false;
+
+      // Update the session with the filtered items
+      session.items = items;
+      session.version += 1;
+      session.lastModified = new Date();
+      await session.save();
+
+      return true;
+    } catch (error: any) {
+      if (error instanceof SessionNotFoundError) {
+        throw error;
+      }
+      throw new DatabaseError('Failed to remove my items', error.message);
+    }
+  }
+
   private mapSessionDocument(sessionDoc: ISessionDocument): Session {
     // Remove isArchived from the session
     const { isArchived, ...session } = sessionDoc.toObject();
