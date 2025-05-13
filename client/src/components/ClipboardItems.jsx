@@ -89,9 +89,9 @@ const ClipboardItem = ({ item, index }) => {
 
   return (
     <>
-      <div className="bg-white rounded-lg shadow-sm border p-4 mb-4">
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border dark:border-gray-700 p-4 mb-4">
         <div className="flex justify-between items-start mb-2">
-          <div className="text-sm text-gray-500">
+          <div className="text-sm text-gray-500 dark:text-gray-400">
             {index <= 9 && (
               <span className="inline-block bg-blue-600 text-white font-semibold rounded-full w-5 h-5 text-xs leading-5 text-center mr-2">
                 {index}
@@ -133,12 +133,12 @@ const ClipboardItem = ({ item, index }) => {
             <textarea
               value={editContent}
               onChange={(e) => setEditContent(e.target.value)}
-              className="w-full font-mono text-sm bg-gray-50 p-3 rounded-lg border focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full font-mono text-sm bg-gray-50 dark:bg-gray-700 p-3 rounded-lg border dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-white"
               rows={3}
             />
           ) : (
             <div 
-              className="font-mono text-sm bg-gray-50 p-3 rounded-lg cursor-pointer hover:bg-gray-100"
+              className="font-mono text-sm bg-gray-50 dark:bg-gray-700 p-3 rounded-lg cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 text-gray-900 dark:text-white"
               onClick={handleCopy}
               title={t('common:actions.copy')}
             >

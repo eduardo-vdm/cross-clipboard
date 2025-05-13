@@ -39,10 +39,10 @@ beforeAll(() => {
   global.Blob = MockBlob;
   
   // Use defineProperty to mock the clipboard API
-  Object.defineProperty(navigator, 'clipboard', {
-    value: {
+Object.defineProperty(navigator, 'clipboard', {
+  value: {
       read: vi.fn()
-    },
+  },
     configurable: true
   });
 });
@@ -59,7 +59,7 @@ describe('AddItem', () => {
     addItemMock = vi.fn().mockResolvedValue({});
     // Update the mock directly through the imported function
     useSession.mockReturnValue({ addItem: addItemMock });
-    
+
     // Reset mocks
     vi.clearAllMocks();
   });
@@ -94,7 +94,7 @@ describe('AddItem', () => {
     
     // Check if addItem was called with the right parameters
     await vi.waitFor(() => {
-      expect(addItemMock).toHaveBeenCalledWith(textData, 'text');
+    expect(addItemMock).toHaveBeenCalledWith(textData, 'text');
     });
   });
 
@@ -161,7 +161,7 @@ describe('AddItem', () => {
     
     // Check if addItem was not called for empty text
     await vi.waitFor(() => {
-      expect(addItemMock).not.toHaveBeenCalled();
+    expect(addItemMock).not.toHaveBeenCalled();
     });
   });
 }); 

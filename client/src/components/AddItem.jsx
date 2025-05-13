@@ -114,16 +114,16 @@ export const AddItem = () => {
       tabIndex={0}
       role="button"
       aria-label={t('addItem.pastePrompt')}
-      className={`relative bg-gray-50 border-2 border-dashed ${
-        isDenied ? 'border-red-300' : isGranted ? 'border-green-300' : 'border-gray-300'
+      className={`relative bg-gray-50 dark:bg-gray-800 border-2 border-dashed ${
+        isDenied ? 'border-red-300 dark:border-red-500' : isGranted ? 'border-green-300 dark:border-green-500' : 'border-gray-300 dark:border-gray-600'
       } ${!isPasteSuppressed ? 'ring-2 ring-blue-500 ring-opacity-100' : ''} rounded-lg p-8 text-center cursor-pointer mb-8 transition-all duration-200 focus:outline-none focus:ring-4 focus:ring-blue-500 focus:ring-opacity-100`}
     >
-      <p className={`${isDenied ? 'text-red-500' : 'text-gray-500'}`}>
+      <p className={`${isDenied ? 'text-red-500 dark:text-red-400' : 'text-gray-500 dark:text-gray-400'}`}>
         {isDenied
           ? t('addItem.permissionDenied')
           : t('addItem.pastePrompt')}
       </p>
-      <p className="text-sm text-gray-400 mt-2">
+      <p className="text-sm text-gray-400 dark:text-gray-500 mt-2">
         {t('addItem.supportedTypes')}
       </p>
       {hasKeyboard && !isPasteSuppressed && (

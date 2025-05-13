@@ -5,12 +5,14 @@ import { AddItem } from './components/AddItem';
 import { ClipboardItems } from './components/ClipboardItems';
 import { ClipboardPermission } from './components/ClipboardPermission';
 import { Toaster } from 'react-hot-toast';
+import { ThemeProvider } from './contexts/ThemeContext';
 
 function App() {
   return (
-    <SessionProvider>
-      <PasteSuppressProvider>
-        <div className="min-h-screen bg-gray-50">
+    <ThemeProvider>
+      <SessionProvider>
+        <PasteSuppressProvider>
+          <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
           <SessionHeader />
           <main className="max-w-4xl mx-auto px-4 py-8">
             <AddItem />
@@ -21,29 +23,28 @@ function App() {
             position="bottom-right"
             toastOptions={{
               duration: 3000,
-              style: {
-                background: '#363636',
-                color: '#fff',
-              },
+              className: 'bg-white dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700 shadow-lg',
               success: {
                 duration: 2000,
+                className: 'bg-white dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700 shadow-lg',
                 iconTheme: {
-                  primary: '#4ade80',
-                  secondary: '#fff',
+                  primary: '#059669',
+                  secondary: '#ffffff',
                 },
               },
               error: {
                 duration: 4000,
+                className: 'bg-white dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700 shadow-lg',
                 iconTheme: {
-                  primary: '#ef4444',
-                  secondary: '#fff',
+                  primary: '#dc2626',
+                  secondary: '#ffffff',
                 },
               },
-            }}
-          />
-        </div>
-      </PasteSuppressProvider>
-    </SessionProvider>
+            }}          />
+          </div>
+        </PasteSuppressProvider>
+      </SessionProvider>
+    </ThemeProvider>
   );
 }
 

@@ -1,0 +1,163 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Base colors */
+    --color-primary: theme('colors.primary.500');
+    --color-primary-light: theme('colors.primary.400');
+    --color-primary-dark: theme('colors.primary.600');
+    
+    --color-secondary: theme('colors.secondary.500');
+    --color-secondary-light: theme('colors.secondary.400');
+    --color-secondary-dark: theme('colors.secondary.600');
+    
+    --color-neutral: theme('colors.neutral.500');
+    --color-neutral-light: theme('colors.neutral.400');
+    --color-neutral-dark: theme('colors.neutral.600');
+    
+    --color-success: theme('colors.success.500');
+    --color-success-light: theme('colors.success.400');
+    --color-success-dark: theme('colors.success.600');
+    
+    --color-error: theme('colors.error.500');
+    --color-error-light: theme('colors.error.400');
+    --color-error-dark: theme('colors.error.600');
+
+    /* Theme-specific colors */
+    --color-background-primary: theme('colors.background.primary');
+    --color-background-secondary: theme('colors.background.secondary');
+    --color-background-tertiary: theme('colors.background.tertiary');
+    
+    --color-text-primary: theme('colors.text.primary');
+    --color-text-secondary: theme('colors.text.secondary');
+    --color-text-tertiary: theme('colors.text.tertiary');
+    
+    --color-border-primary: theme('colors.border.primary');
+    --color-border-secondary: theme('colors.border.secondary');
+
+    /* Spacing */
+    --spacing-xs: theme('spacing.xs');
+    --spacing-sm: theme('spacing.sm');
+    --spacing-md: theme('spacing.md');
+    --spacing-lg: theme('spacing.lg');
+    --spacing-xl: theme('spacing.xl');
+    --spacing-2xl: theme('spacing.2xl');
+    --spacing-3xl: theme('spacing.3xl');
+
+    /* Border radius */
+    --radius-none: theme('borderRadius.none');
+    --radius-sm: theme('borderRadius.sm');
+    --radius-md: theme('borderRadius.md');
+    --radius-lg: theme('borderRadius.lg');
+    --radius-xl: theme('borderRadius.xl');
+    --radius-2xl: theme('borderRadius.2xl');
+    --radius-full: theme('borderRadius.full');
+
+    /* Shadows */
+    --shadow-sm: theme('boxShadow.sm');
+    --shadow-md: theme('boxShadow.md');
+    --shadow-lg: theme('boxShadow.lg');
+    --shadow-xl: theme('boxShadow.xl');
+    --shadow-2xl: theme('boxShadow.2xl');
+    --shadow-inner: theme('boxShadow.inner');
+    --shadow-none: theme('boxShadow.none');
+
+    /* Transitions */
+    --transition-fast: theme('transition.fast');
+    --transition-normal: theme('transition.DEFAULT');
+    --transition-slow: theme('transition.slow');
+  }
+
+  /* Base styles */
+  html {
+    @apply antialiased;
+  }
+
+  body {
+    @apply font-sans;
+    background-color: var(--color-background-primary);
+    color: var(--color-text-primary);
+  }
+
+  /* Typography */
+  h1 {
+    @apply text-4xl font-bold;
+    color: var(--color-text-primary);
+  }
+
+  h2 {
+    @apply text-3xl font-semibold;
+    color: var(--color-text-primary);
+  }
+
+  h3 {
+    @apply text-2xl font-semibold;
+    color: var(--color-text-primary);
+  }
+
+  h4 {
+    @apply text-xl font-medium;
+    color: var(--color-text-primary);
+  }
+
+  h5 {
+    @apply text-lg font-medium;
+    color: var(--color-text-primary);
+  }
+
+  h6 {
+    @apply text-base font-medium;
+    color: var(--color-text-primary);
+  }
+
+  /* Links */
+  a {
+    @apply text-primary-600 hover:text-primary-700 transition-colors;
+  }
+
+  /* Focus styles */
+  *:focus-visible {
+    @apply outline-none ring-2 ring-primary-500 ring-offset-2;
+  }
+
+  /* Selection */
+  ::selection {
+    @apply bg-primary-100 text-primary-900;
+  }
+}
+
+@layer components {
+  /* Button base styles */
+  .btn {
+    @apply inline-flex items-center justify-center px-4 py-2 rounded-md font-medium transition-colors;
+  }
+
+  .btn-primary {
+    @apply bg-primary-600 text-white hover:bg-primary-700 focus:ring-primary-500;
+  }
+
+  .btn-secondary {
+    @apply bg-secondary-600 text-white hover:bg-secondary-700 focus:ring-secondary-500;
+  }
+
+  .btn-neutral {
+    @apply bg-neutral-600 text-white hover:bg-neutral-700 focus:ring-neutral-500;
+  }
+
+  /* Input base styles */
+  .input {
+    @apply block w-full rounded-md shadow-sm focus:ring-primary-500;
+    background-color: var(--color-background-secondary);
+    border: 1px solid var(--color-border-primary);
+    color: var(--color-text-primary);
+  }
+
+  /* Card base styles */
+  .card {
+    @apply rounded-lg shadow-md p-6;
+    background-color: var(--color-background-secondary);
+    border: 1px solid var(--color-border-primary);
+  }
+} 

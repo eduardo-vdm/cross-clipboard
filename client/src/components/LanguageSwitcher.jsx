@@ -57,7 +57,7 @@ export const LanguageSwitcher = () => {
       {/* Current Language Button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-2 px-2 py-1 rounded hover:bg-gray-100"
+        className="flex items-center gap-2 px-2 py-1 rounded hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300"
       >
         <Flag className="w-4 h-4" />
         <span className="text-sm font-medium">{currentLanguage.shortName}</span>
@@ -72,7 +72,7 @@ export const LanguageSwitcher = () => {
 
       {/* Dropdown Menu */}
       {isOpen && (
-        <div className="absolute right-0 mt-1 bg-white rounded-lg shadow-lg border py-1 min-w-[160px] z-10">
+        <div className="absolute right-0 mt-1 bg-white dark:bg-gray-800 rounded-lg shadow-lg border dark:border-gray-700 py-1 min-w-[160px] z-10">
           {languages.map((language) => {
             const FlagComponent = language.flag;
             return (
@@ -82,8 +82,8 @@ export const LanguageSwitcher = () => {
                   i18n.changeLanguage(language.code);
                   setIsOpen(false);
                 }}
-                className={`w-full px-4 py-2 text-left flex items-center gap-2 hover:bg-gray-50 ${
-                  i18n.language === language.code ? 'bg-gray-50' : ''
+                className={`w-full px-4 py-2 text-left flex items-center gap-2 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 ${
+                  i18n.language === language.code ? 'bg-gray-50 dark:bg-gray-700' : ''
                 }`}
               >
                 <FlagComponent className="w-4 h-4" />

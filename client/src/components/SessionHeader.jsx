@@ -2,16 +2,18 @@ import { useSession } from '../contexts/SessionContext';
 import { useTranslation } from 'react-i18next';
 import { LanguageSwitcher } from './LanguageSwitcher';
 import { toast } from 'react-hot-toast';
-import { ShareIcon, TrashIcon } from '@heroicons/react/24/outline';
+import { ShareIcon, TrashIcon, SunIcon, MoonIcon } from '@heroicons/react/24/outline';
 import { FireIcon } from '@heroicons/react/24/solid';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { ConfirmationDialog } from './ConfirmationDialog';
+import { useTheme } from '../contexts/ThemeContext';
 
 export const SessionHeader = () => {
   const { sessionCode, deviceId, items, createdBy, wipeSession, removeMyItems } = useSession();
   const { t } = useTranslation(['common', 'clipboard']);
   const [showWipeConfirm, setShowWipeConfirm] = useState(false);
   const [showRemoveMyItemsConfirm, setShowRemoveMyItemsConfirm] = useState(false);
+  const { currentTheme, toggleTheme } = useTheme();
 
   const handleCopyLink = async () => {
     const url = new URL(window.location);
@@ -45,9 +47,9 @@ export const SessionHeader = () => {
   if (!sessionCode) return null;
 
   return (
-    <div className="bg-white border-b p-4 flex justify-between items-center">
+    <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 p-4 flex justify-between items-center">
       <div className="flex items-center gap-4">
-        <h1 className="text-xl font-semibold">
+        <h1 className="text-xl font-semibold text-gray-900 dark:text-white">
           {t('clipboard:session.title')} 
           <span className="font-mono ml-2">{sessionCode}</span>
         </h1>
@@ -84,7 +86,21 @@ export const SessionHeader = () => {
           </button>
         </div>
       </div>
-      <LanguageSwitcher />
+      <div className="flex  items-center gap-2">
+      <button
+        onClick={toggleTheme}
+        className="p-2 text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+        title={currentTheme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+        aria-label={currentTheme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+      >
+        {currentTheme === 'dark' ? (
+          <SunIcon className="h-5 w-5" />
+        ) : (
+          <MoonIcon className="h-5 w-5" />
+        )}
+      </button>
+        <LanguageSwitcher />
+      </div>
 
       <ConfirmationDialog
         isOpen={showWipeConfirm}
