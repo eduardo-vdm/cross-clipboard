@@ -17,7 +17,6 @@ export const SessionHeader = () => {
 
   const handleCopyLink = async () => {
     const url = new URL(window.location);
-    url.searchParams.set('session', sessionCode);
     await navigator.clipboard.writeText(url.toString());
     toast.success(t('clipboard:clipboard.copied'));
   };

@@ -54,9 +54,7 @@ export const SessionProvider = ({ children }) => {
   // Handle URL updates when session changes
   useEffect(() => {
     if (sessionCode) {
-      const url = new URL(window.location);
-      url.searchParams.set('session', sessionCode);
-      window.history.replaceState({}, '', url);
+      window.history.replaceState({}, '', `/${sessionCode}`);
     }
   }, [sessionCode]);
 
@@ -81,9 +79,7 @@ export const SessionProvider = ({ children }) => {
               setError('Session not found');
               
               // Clear the URL and session code
-              const url = new URL(window.location);
-              url.searchParams.delete('session');
-              window.history.replaceState({}, '', url);
+              window.history.replaceState({}, '', '/');
               setSessionCode(null);
               
               // Wait a bit before showing the creation toast to avoid toast overlap
@@ -99,9 +95,7 @@ export const SessionProvider = ({ children }) => {
               setError('Session has expired');
               
               // Clear the URL and session code
-              const url = new URL(window.location);
-              url.searchParams.delete('session');
-              window.history.replaceState({}, '', url);
+              window.history.replaceState({}, '', '/');
               setSessionCode(null);
               
               // Wait a bit before showing the creation toast to avoid toast overlap
@@ -113,40 +107,27 @@ export const SessionProvider = ({ children }) => {
               return;
             }
             
-            throw new Error('Failed to fetch items');
+            throw new Error(errorData.error || `HTTP error ${response.status}`);
           }
           data = await response.json();
         }
         
-        // Process items to handle deviceId
-        const processedItems = data.map(item => {
-          // If the item doesn't have a deviceId but it's your item (from checking against current items)
-          const existingItem = items.find(i => i.id === item.id);
-          if (!item.deviceId && existingItem && existingItem.deviceId === deviceId) {
-            return { ...item, deviceId };
-          }
-          // Otherwise, just ensure deviceId exists (even if null)
-          return { ...item, deviceId: item.deviceId || null };
-        });
-        
-        // Sort items by lastModified in descending order
-        const sortedItems = [...processedItems].sort((a, b) => 
-          new Date(b.lastModified) - new Date(a.lastModified)
-        );
-        
-        setItems(sortedItems);
+        setItems(data);
         setError(null);
       } catch (err) {
-        console.error('Polling error:', err);
         setError(err.message);
+        console.error('Error polling items:', err);
       }
     };
 
-    const interval = setInterval(pollItems, POLLING_INTERVAL);
-    pollItems(); // Initial poll
+    // Initial poll
+    pollItems();
+
+    // Setup polling interval
+    const interval = setInterval(pollItems, 2000);
 
     return () => clearInterval(interval);
-  }, [sessionCode, service, apiUrl, deviceId]);
+  }, [sessionCode, apiUrl, service]);
 
   const createSession = async (explicitDeviceId = deviceId) => {
     setLoading(true);
@@ -261,8 +242,7 @@ export const SessionProvider = ({ children }) => {
           setDeviceId(newDeviceId);
 
           // Check URL for session code
-          const urlParams = new URLSearchParams(window.location.search);
-          const codeFromUrl = urlParams.get('session');
+          const codeFromUrl = window.location.pathname.substring(1);
 
           if (codeFromUrl) {
             try {
@@ -276,9 +256,7 @@ export const SessionProvider = ({ children }) => {
               // If session doesn't exist or is invalid, show message and create new one
               toast.error(`${err.message}, creating a new session for you`);
               // Clear the URL
-              const url = new URL(window.location);
-              url.searchParams.delete('session');
-              window.history.replaceState({}, '', url);
+              window.history.replaceState({}, '', '/');
               // Create new session
               await createSession(newDeviceId);
             }
@@ -295,26 +273,24 @@ export const SessionProvider = ({ children }) => {
 
       initializationPromise.current = promise;
       await promise;
-      initializationPromise.current = null;
     };
 
     initializeSession();
-  }, [service, apiUrl, deviceId]); // Empty dependency array as this should only run once
+  }, []);
 
-  const addItem = async (content, type) => {
+  const addItem = async (type, content) => {
     setLoading(true);
     try {
       let data;
       if (service) {
-        data = await service.addItem(sessionCode, content, type, deviceId, deviceName);
+        data = await service.addItem(sessionCode, type, content, deviceId, deviceName);
       } else {
         const response = await fetch(`${apiUrl}/api/sessions/${sessionCode}/items`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
-          // Include deviceId to track ownership
-          body: JSON.stringify({ content, type, deviceId, deviceName }),
+          body: JSON.stringify({ type, content, deviceId, deviceName }),
         });
         if (!response.ok) {
           const errorData = await response.json().catch(() => ({
@@ -330,29 +306,21 @@ export const SessionProvider = ({ children }) => {
             throw new Error('Session has expired');
           }
           
-          throw new Error('Failed to add item');
+          throw new Error(errorData.error || `HTTP error ${response.status}`);
         }
         data = await response.json();
       }
       
-      // Add the new item at the beginning of the list (it's the most recent)
-      // Make sure it has the deviceId for ownership tracking
-      setItems(prev => [{
-        ...data,
-        deviceId: data.deviceId || deviceId  // Use the server's deviceId if available, otherwise use the local one
-      }, ...prev]);
-      
+      setItems(prev => [...prev, data]);
       setError(null);
-      toast.success('Item added successfully!');
+      return data;
     } catch (err) {
       setError(err.message);
       toast.error(`Failed to add item: ${err.message}`);
       
       // If session is missing or expired, force user to create a new one
       if (err.message === 'Session not found' || err.message === 'Session has expired') {
-        const url = new URL(window.location);
-        url.searchParams.delete('session');
-        window.history.replaceState({}, '', url);
+        window.history.replaceState({}, '', '/');
         setSessionCode(null);
         
         // Wait a bit before showing the creation toast to avoid toast overlap
@@ -417,9 +385,7 @@ export const SessionProvider = ({ children }) => {
       
       // If session is missing or expired, force user to create a new one
       if (err.message === 'Session not found' || err.message === 'Session has expired') {
-        const url = new URL(window.location);
-        url.searchParams.delete('session');
-        window.history.replaceState({}, '', url);
+        window.history.replaceState({}, '', '/');
         setSessionCode(null);
         
         // Wait a bit before showing the creation toast to avoid toast overlap
@@ -520,9 +486,7 @@ export const SessionProvider = ({ children }) => {
       
       // If session is missing or expired, force user to create a new one
       if (err.message === 'Session not found' || err.message === 'Session has expired') {
-        const url = new URL(window.location);
-        url.searchParams.delete('session');
-        window.history.replaceState({}, '', url);
+        window.history.replaceState({}, '', '/');
         setSessionCode(null);
         
         // Wait a bit before showing the creation toast to avoid toast overlap
