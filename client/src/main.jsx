@@ -4,6 +4,7 @@ import App from './App'
 import './index.css'
 import './i18n/config'
 import { logEnvironment } from './env'
+import { BrowserRouter } from 'react-router-dom';
 
 // Log environment configuration
 if (import.meta.env.DEV) {
@@ -12,6 +13,8 @@ if (import.meta.env.DEV) {
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
-    <App />
+    <BrowserRouter>
+      <App />
+    </BrowserRouter>
   </React.StrictMode>,
 )

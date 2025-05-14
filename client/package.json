@@ -1,7 +1,7 @@
 {
   "name": "client",
   "private": true,
-  "version": "0.0.16",
+  "version": "0.0.17",
   "type": "module",
   "scripts": {
     "dev": "vite --host",
@@ -24,7 +24,8 @@
     "react-dom": "^18.2.0",
     "react-hot-toast": "^2.4.1",
     "react-hotkeys-hook": "^5.0.1",
-    "react-i18next": "^15.5.1"
+    "react-i18next": "^15.5.1",
+    "react-router-dom": "^6.30.0"
   },
   "devDependencies": {
     "@testing-library/jest-dom": "^6.6.3",

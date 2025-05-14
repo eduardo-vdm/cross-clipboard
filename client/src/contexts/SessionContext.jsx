@@ -1,6 +1,7 @@
 import { createContext, useContext, useState, useEffect, useRef } from 'react';
 import toast from 'react-hot-toast';
 import { getServiceConfig } from '../services/config';
+import { useNavigate } from 'react-router-dom';
 
 const SessionContext = createContext(null);
 const POLLING_INTERVAL = 5000; // 5 seconds
@@ -51,10 +52,20 @@ export const SessionProvider = ({ children }) => {
   const isInitialized = useRef(false);
   const initializationPromise = useRef(null);
 
+  const navigate = useNavigate();
+  const goToStart = (replace = true) => {
+    setSessionCode(null);
+    navigate('/start', { replace });
+  }
+
+  const goToSession = (code, replace = false) => {
+    navigate(`/${code}`, { replace });
+  }
+
   // Handle URL updates when session changes
   useEffect(() => {
     if (sessionCode) {
-      window.history.replaceState({}, '', `/${sessionCode}`);
+      goToSession(sessionCode);
     }
   }, [sessionCode]);
 
@@ -79,14 +90,7 @@ export const SessionProvider = ({ children }) => {
               setError('Session not found');
               
               // Clear the URL and session code
-              window.history.replaceState({}, '', '/');
-              setSessionCode(null);
-              
-              // Wait a bit before showing the creation toast to avoid toast overlap
-              setTimeout(() => {
-                toast.error('Session no longer exists. Starting a new session...');
-                createSession();
-              }, 2000);
+              goToStart();
               
               return;
             }
@@ -95,14 +99,7 @@ export const SessionProvider = ({ children }) => {
               setError('Session has expired');
               
               // Clear the URL and session code
-              window.history.replaceState({}, '', '/');
-              setSessionCode(null);
-              
-              // Wait a bit before showing the creation toast to avoid toast overlap
-              setTimeout(() => {
-                toast.error('Session has expired. Starting a new session...');
-                createSession();
-              }, 2000);
+              goToStart();
               
               return;
             }
@@ -242,26 +239,20 @@ export const SessionProvider = ({ children }) => {
           setDeviceId(newDeviceId);
 
           // Check URL for session code
-          const codeFromUrl = window.location.pathname.substring(1);
+          let codeFromUrl = window.location.pathname.substring(1);
+          // Only if the code is a valid 6-digit number string
+          codeFromUrl = /^\d{6}$/.test(codeFromUrl) ? codeFromUrl : null;
 
           if (codeFromUrl) {
             try {
-              // Validate if session code is in the correct format (6 digits)
-              if (!/^\d{6}$/.test(codeFromUrl)) {
-                throw new Error('Invalid session code format');
-              }
-              
               await joinSession(codeFromUrl);
-            } catch (err) {
-              // If session doesn't exist or is invalid, show message and create new one
-              toast.error(`${err.message}, creating a new session for you`);
-              // Clear the URL
-              window.history.replaceState({}, '', '/');
-              // Create new session
-              await createSession(newDeviceId);
+            }  catch (err) {
+              // If session doesn't exist or is invalid, redirect to start page
+              toast.error(`${err.message}, session not found`);
+              goToStart();
             }
           } else {
-            await createSession(newDeviceId);
+            goToStart();
           }
           
           isInitialized.current = true;
@@ -318,16 +309,9 @@ export const SessionProvider = ({ children }) => {
       setError(err.message);
       toast.error(`Failed to add item: ${err.message}`);
       
-      // If session is missing or expired, force user to create a new one
+      // If session doesn't exist or is invalid, redirect to start page
       if (err.message === 'Session not found' || err.message === 'Session has expired') {
-        window.history.replaceState({}, '', '/');
-        setSessionCode(null);
-        
-        // Wait a bit before showing the creation toast to avoid toast overlap
-        setTimeout(() => {
-          toast.error('Starting a new session...');
-          createSession();
-        }, 2000);
+        goToStart();
       }
     } finally {
       setLoading(false);
@@ -383,16 +367,9 @@ export const SessionProvider = ({ children }) => {
       setError(err.message);
       toast.error(`Failed to delete item: ${err.message}`);
       
-      // If session is missing or expired, force user to create a new one
+      // If session doesn't exist or is invalid, redirect to start page
       if (err.message === 'Session not found' || err.message === 'Session has expired') {
-        window.history.replaceState({}, '', '/');
-        setSessionCode(null);
-        
-        // Wait a bit before showing the creation toast to avoid toast overlap
-        setTimeout(() => {
-          toast.error('Starting a new session...');
-          createSession();
-        }, 2000);
+        goToStart();
       }
     }
   };
@@ -484,16 +461,9 @@ export const SessionProvider = ({ children }) => {
       
       toast.error(`Failed to edit item: ${err.message}`);
       
-      // If session is missing or expired, force user to create a new one
+      // If session doesn't exist or is invalid, redirect to start page
       if (err.message === 'Session not found' || err.message === 'Session has expired') {
-        window.history.replaceState({}, '', '/');
-        setSessionCode(null);
-        
-        // Wait a bit before showing the creation toast to avoid toast overlap
-        setTimeout(() => {
-          toast.error('Starting a new session...');
-          createSession();
-        }, 2000);
+        goToStart();
       }
       
       return { success: false, conflict: false };
