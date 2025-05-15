@@ -274,9 +274,16 @@ export const ClipboardItems = () => {
     );
   }
 
+  // Sort items by latest modified (descending)
+  const sortedItems = [...items].sort((a, b) => {
+    const aTime = new Date(a.lastModified || a.createdAt).getTime();
+    const bTime = new Date(b.lastModified || b.createdAt).getTime();
+    return bTime - aTime;
+  });
+
   return (
     <div>
-      {items.map((item, index) => (
+      {sortedItems.map((item, index) => (
         <ClipboardItem key={item.id} item={item} index={index + 1} />
       ))}
     </div>

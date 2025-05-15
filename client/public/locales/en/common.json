@@ -45,7 +45,7 @@
       "message": "Type in the <b>6-digit code</b> to join a clipboard."
     },
     "valid": {
-      "message": "Press <span class='keyTip'><span class='keyTip-symbol'>↵</span>Enter</span> or click the button to join."
+      "message": "Press <span class='keyTip'><span class='keyTip-symbol'>⏎</span>Enter</span> or click the button to join."
     },
     "invalid": {
       "message": "Clipboard <b>{code}</b> does not exist or is expired."

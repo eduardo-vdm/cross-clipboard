@@ -45,7 +45,7 @@
       "message": "Digite o <b>código de 6 dígitos</b> para entrar no clipboard."
     },
     "valid": {
-      "message": "Pressione <span class='keyTip'><span class='keyTip-symbol'>↵</span>Enter</span> ou clique no botão para entrar."
+      "message": "Pressione <span class='keyTip'><span class='keyTip-symbol'>⏎</span>Enter</span> ou clique no botão para entrar."
     },
     "invalid": {
       "message": "Clipboard <b>{code}</b> não existe ou expirou."

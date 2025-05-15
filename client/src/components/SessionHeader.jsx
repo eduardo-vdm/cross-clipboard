@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { LanguageSwitcher } from './LanguageSwitcher';
 import { toast } from 'react-hot-toast';
 import { ShareIcon, TrashIcon, SunIcon, MoonIcon } from '@heroicons/react/24/outline';
-import { FireIcon } from '@heroicons/react/24/solid';
+import { FireIcon, ClipboardDocumentListIcon, ChevronLeftIcon } from '@heroicons/react/24/solid';
 import { useState, useEffect } from 'react';
 import { ConfirmationDialog } from './ConfirmationDialog';
 import { useTheme } from '../contexts/ThemeContext';
@@ -51,13 +51,17 @@ export const SessionHeader = () => {
   if (!sessionCode) return null;
 
   return (
-    <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 p-4 flex justify-between items-center">
-      <div className="flex items-center gap-4">
-        <h1 className="text-xl font-semibold text-gray-500">
-          {t('clipboard:session.title')} 
-          <span className="text-amber-500 hover:text-blue-500 tracking-wider ml-2 font-mono rounded border-2 border-gray-300 dark:border-gray-700 hover:border-blue-500 dark:hover:border-blue-500 border-dashed px-2 py-1" onClick={handleCopySessionCode} onKeyDown={e => { if (e.key === 'Enter') handleCopySessionCode(); }} tabIndex={0} role="button">{sessionCode}</span>
+    <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 p-1 flex justify-between items-center">
+      <div className="flex items-center gap-2 -ml-2">
+        <a href="/" className="flex items-center gap-0 ml-2 -mr-3 text-gray-500 hover:text-amber-500 dark:text-gray-500 dark:hover:text-amber-500 transition-colors">
+          <ChevronLeftIcon className="h-5 w-5 " />
+          <ClipboardDocumentListIcon className="h-10 w-10" />
+        </a>        
+        <h1 className="text-xl font-semibold text-gray-500 flex flex-col items-center justify-center -mt-1 ml-1">
+          <span className="text-gray-500 -mb-1 z-10 pb-1">{t('clipboard:session.title')}</span>
+          <span className="text-amber-500 z-0 hover:text-blue-500 tracking-wider ml-2 -mt-1 font-mono border-2 border-gray-500 dark:border-gray-600 hover:border-blue-500 dark:hover:border-blue-500 border-dashed px-1.5 pt-0.5 leading-none" onClick={handleCopySessionCode} onKeyDown={e => { if (e.key === 'Enter') handleCopySessionCode(); }} tabIndex={0} role="button">{sessionCode}</span>
         </h1>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 ml-4">
           <button
             onClick={handleCopyLink}
             className="p-2 text-gray-500 hover:text-blue-600 rounded-lg hover:bg-gray-100 transition-colors"

@@ -4,18 +4,20 @@ import toast from 'react-hot-toast';
 import clsx from 'clsx';
 import '../styles/custom.css';
 import { useTranslation } from 'react-i18next';
+import { ClipboardDocumentListIcon } from '@heroicons/react/24/outline';
+
 const DEFAULT = {
   STATUS: 'idle',
   STATUS_MESSAGE: {
     code: 'idle',
-    message: '',
+    message: 'Type in the <b>6-digit code</b> to join a clipboard.',
     vars: {}
   },
 }
 
 function StartPage() {
   const { t } = useTranslation('common');
-  const { createSession, joinSession, loading, checkSession } = useSession();
+  const { createSession, joinSession, loading, checkSession, deviceId } = useSession();
   const [code, setCode] = useState(['', '', '', '', '', '']);
   const [error, setError] = useState('');
   const [status, setStatus] = useState(DEFAULT.STATUS); // idle | checking | valid | invalid
@@ -23,7 +25,8 @@ function StartPage() {
   const [currentStatusMessage, setCurrentStatusMessage] = useState('');
   const inputRefs = useRef([]);
   const joinBtnRef = useRef(null);
-  const checkTimeout = useRef(null);
+
+  const lastCheckedCode = useRef('');
 
   // Not great to modify the default status message, but it needs to be translated
   DEFAULT.STATUS_MESSAGE = {
@@ -46,11 +49,10 @@ function StartPage() {
 
   // Focus join button when status becomes valid
   useEffect(() => {
-    console.log('status', status);
     if (status === 'idle') {
       setStatusMessage(DEFAULT.STATUS_MESSAGE);
+      lastCheckedCode.current = '';
     }
-
     if (status === 'valid' && joinBtnRef.current) {
       setTimeout(() => {
         setStatusMessage({ code: status, message: t('startPage.valid.message'), vars: {} });
@@ -68,14 +70,43 @@ function StartPage() {
     }
   }, [status]);
 
-  // Reset error and status on code change
   useEffect(() => {
-    // console.log('code', code);
-    if (status !== 'idle') setStatus('idle');
-    if (error) setError('');
-    // resetStatusMessage();
-    // eslint-disable-next-line
-  }, [code.join('')]);
+    console.log('status', status);
+    console.log('joinBtnRef.current', joinBtnRef.current);
+    console.log('document.activeElement', document.activeElement);
+
+    if (status === 'valid') {
+      const handleGlobalKeyDown = (e) => {
+        if (
+          e.key === 'Backspace' &&
+          document.activeElement === joinBtnRef.current
+        ) {
+          e.preventDefault();
+          const newCode = [...code];
+          newCode[5] = '';
+          setCode(newCode);
+          setStatus('idle');
+          if (inputRefs.current[5]) inputRefs.current[5].focus();
+        }
+      };
+      document.addEventListener('keydown', handleGlobalKeyDown);
+      return () => document.removeEventListener('keydown', handleGlobalKeyDown);
+    }
+  }, [status, code, inputRefs, joinBtnRef]);
+
+  // Watch for code changes to handle status and re-check
+  useEffect(() => {
+    const codeStr = code.join('');
+    if (codeStr.length < 6) {
+      if (status !== 'idle') setStatus('idle');
+      return;
+    }
+    // If code changed and is 6 digits, re-check
+    if (codeStr.length === 6 && codeStr !== lastCheckedCode.current) {
+      lastCheckedCode.current = codeStr;
+      checkSessionCode(codeStr);
+    }
+  }, [code, status]);
 
   // Set current status message when status message changes
   useEffect(() => {
@@ -94,7 +125,6 @@ function StartPage() {
   }, [statusMessage]);
 
   const resetCode = () => {
-    // console.log('resetting code', code);
     setCode(['', '', '', '', '', '']);
     setError('');
     setStatus('idle');
@@ -103,28 +133,32 @@ function StartPage() {
     }
   };
 
-  const resetStatusMessage = () => {
-    setStatusMessage({ code: '', message: '', vars: {} });
-  };
-
   const handleInputChange = (index, value) => {
     if (!/^\d*$/.test(value)) return;
     const newCode = [...code];
     newCode[index] = value;
     setCode(newCode);
-
+    setError('');
     if (value && index < 5) {
       inputRefs.current[index + 1].focus();
-    }
-
-    if (newCode.every(digit => digit) && newCode.join('').length === 6) {
-      checkSessionCode(newCode.join(''));
     }
   };
 
   const handleKeyDown = (index, e) => {
-    if (e.key === 'Backspace' && !code[index] && index > 0) {
-      inputRefs.current[index - 1].focus();
+    // Backspace: if valid, clear last input and go back to idle
+    if (e.key === 'Backspace') {
+      if (status === 'valid') {
+        const newCode = [...code];
+        newCode[5] = '';
+        setCode(newCode);
+        setStatus('idle');
+        if (inputRefs.current[5]) inputRefs.current[5].focus();
+        e.preventDefault();
+        return;
+      }
+      if (!code[index] && index > 0) {
+        inputRefs.current[index - 1].focus();
+      }
     }
     if (e.key === 'ArrowLeft' && index > 0) {
       inputRefs.current[index - 1].focus();
@@ -149,17 +183,13 @@ function StartPage() {
     const digits = pastedData.split('');
     setCode(digits);
     inputRefs.current[5].focus();
-    checkSessionCode(pastedData);
   };
 
-  // Simulate async session code check (replace with real API call if needed)
   const checkSessionCode = async (sessionCode) => {
     // Wait for 100ms to ensure the code is updated
     await new Promise(res => setTimeout(res, 100));
     setStatus('checking');
     setError('');
-    // Disable all inputs/buttons
-    if (checkTimeout.current) clearTimeout(checkTimeout.current);
     try {
       // Simulate network delay
       await new Promise(res => setTimeout(res, 1500));
@@ -182,14 +212,10 @@ function StartPage() {
     try {
       setStatus('checking');
       await joinSession(code.join(''));
-      // Navigation should happen in joinSession
     } catch (err) {
       setStatus('invalid');
       setError(err.message || 'Invalid or expired session code');
       toast.error(err.message || 'Invalid or expired session code');
-      checkTimeout.current = setTimeout(() => {
-        resetCode();
-      }, 500);
     }
   };
 
@@ -205,13 +231,6 @@ function StartPage() {
       inputRefs.current[0].focus();
     }
   };
-
-  // Clean up timeout on unmount
-  useEffect(() => {
-    return () => {
-      if (checkTimeout.current) clearTimeout(checkTimeout.current);
-    };
-  }, []);
 
   return (
     <div 
@@ -259,19 +278,20 @@ function StartPage() {
                 aria-label={`Digit ${i + 1} of 6`}
                 aria-required="true"
                 aria-invalid={error ? "true" : "false"}
-                disabled={status === 'checking' || status === 'valid'}
+                disabled={status === 'checking'}
               />
             ))}
             {/* Create a wrapper div to avoid flashing when any of the status elements are rendered */}
             <div className="w-14 h-20 flex items-center justify-center ml-2 text-center rounded border-2 border-dashed border-transparent bg-transparent outline-none transition-colors duration-150">
               {
                 status === 'idle' && code.join('').length < 6 && (
-                  <span className="text-8xl font-bold text-primary-900 mb-8 select-none animate-pulse">&#8592;</span>
+                  <ClipboardDocumentListIcon className="h-24 w-24 text-gray-700 select-none" />
+                  // <span className="text-8xl font-bold text-primary-900 mb-8 select-none animate-pulse">&#8592;</span>
                 )
               }
               {status === 'checking' && (
                 <div className="w-12 h-16 md:w-14 md:h-20 flex items-center justify-center ml-2 animate-spin">
-                  <svg className="w-8 h-8 text-blue-400" fill="none" viewBox="0 0 24 24">
+                  <svg className="w-8 h-8 text-amber-500" fill="none" viewBox="0 0 24 24">
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
                   </svg>
@@ -285,14 +305,15 @@ function StartPage() {
               {status === 'valid' && (
                 <button
                   ref={joinBtnRef}
-                  className="w-full h-full flex flex-col items-center justify-center bg-green-600 rounded border-2 border-white focus:outline-none focus:ring-2 focus:ring-green-400"
+                  className="w-full h-full flex flex-col items-center justify-center bg-green-600 rounded border-2 border-white focus:outline-none focus:ring-4 focus:ring-amber-500 animate-pulse"
                   aria-label="Join session"
                   tabIndex={0}
                   onClick={handleJoin}
                   onKeyDown={e => { if (e.key === 'Enter') handleJoin(); }}
                   disabled={status !== 'valid'}
                 >
-                  <span className="text-4xl font-bold text-white select-none text-shadow-sm">↵</span>
+                  {/* <span className="text-4xl font-bold text-white select-none text-shadow-sm">↵</span> */}
+                  <ClipboardDocumentListIcon className="h-10 w-10 text-white shadow-sm select-none" />
                   <span className="text-xxs font-bold text-white select-none mt-1 uppercase text-shadow-sm">{t('actions.join')}</span>
                 </button>
               )}
@@ -321,7 +342,7 @@ function StartPage() {
             {t('startPage.or')}
           </span>
           <button
-            onClick={createSession}
+            onClick={() => createSession(deviceId)}
             disabled={loading || status === 'checking'}
             className="w-full md:w-auto px-8 py-3 text-lg md:text-xl rounded border border-white hover:bg-white hover:text-gray-900 transition-colors font-semibold focus:outline-none focus:ring-2 focus:ring-blue-600 disabled:opacity-50 disabled:cursor-not-allowed"
             aria-label={loading ? "Creating new clipboard..." : "Create a new clipboard"}
