@@ -472,6 +472,25 @@ export const SessionProvider = ({ children }) => {
     }
   };
 
+  const checkSession = async (code) => {
+    setLoading(true);
+    try {
+      let result;
+      if (service) {
+        result = await service.checkSession(code);
+      } else {
+        throw new Error('Service not found');
+      }
+      
+      setError(null);
+      return result;
+    } catch (err) {
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  }
+
   const wipeSession = async () => {
     setLoading(true);
     try {
@@ -567,6 +586,7 @@ export const SessionProvider = ({ children }) => {
     editItem,
     wipeSession,
     removeMyItems,
+    checkSession,
   };
 
   return (

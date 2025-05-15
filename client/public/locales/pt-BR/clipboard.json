@@ -1,6 +1,6 @@
 {
   "session": {
-    "title": "Sessão",
+    "title": "Clipboard",
     "copyLink": "Compartilhar Link",
     "created": "Sessão criada com sucesso!",
     "joined": "Conectado à sessão com sucesso!",
@@ -33,7 +33,7 @@
     "pastePrompt": "Cole texto ou imagem aqui",
     "supportedTypes": "Suporta texto e imagens (PNG, JPEG)",
     "permissionDenied": "Acesso à área de transferência negado. Atualize as configurações do navegador.",
-    "keyboardShortcut": "\u2318 ou CTRL+V para colar"
+    "keyboardShortcutAppend": " para colar"
   },
   "image": {
     "clipboardContent": "Conteúdo da área de transferência"

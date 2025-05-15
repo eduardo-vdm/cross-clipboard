@@ -98,6 +98,7 @@ export default {
         mono: ['JetBrains Mono', 'monospace'],
       },
       fontSize: {
+        xxs: ['0.6rem', { lineHeight: '0.75rem' }],
         xs: ['0.75rem', { lineHeight: '1rem' }],
         sm: ['0.875rem', { lineHeight: '1.25rem' }],
         base: ['1rem', { lineHeight: '1.5rem' }],
@@ -133,8 +134,16 @@ export default {
         fast: '100ms cubic-bezier(0.4, 0, 0.2, 1)',
         slow: '300ms cubic-bezier(0.4, 0, 0.2, 1)',
       },
+      textShadow: {
+        sm: '0 1px 2px rgba(0, 0, 0, .7)',
+        DEFAULT: '0 2px 4px rgba(0, 0, 0, 0.1)',
+        md: '0 4px 8px rgba(0, 0, 0, 0.1)',
+        lg: '0 6px 12px rgba(0, 0, 0, 0.1)',
+      },
     },
   },
-  plugins: [],
+  plugins: [
+    require('tailwindcss-textshadow'),
+  ],
 }
 

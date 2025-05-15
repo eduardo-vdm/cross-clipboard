@@ -7,7 +7,10 @@
     "cancel": "Cancel",
     "download": "Download",
     "confirm": "Confirm",
-    "close": "Close"
+    "close": "Close",
+    "join": "Join",
+    "createNewOne": "Create a new one",
+    "loading": "Loading..."
   },
   "confirmations": {
     "delete": "Are you sure you want to delete this item?"
@@ -29,6 +32,23 @@
       "openSettings": "Browser Settings",
       "searchHelp": "Find Help",
       "searchQuery": "how to enable clipboard permissions in browser"
+    }
+  },
+  "startPage": {
+    "title": "CrossClip",
+    "titleDescription": "Just copy and paste,<br />to and from any device.",
+    "or": "or",
+    "join": {
+      "inputsHeading": "Join a Clipboard"
+    },
+    "idle": {
+      "message": "Type in the <b>6-digit code</b> to join a clipboard."
+    },
+    "valid": {
+      "message": "Press <span class='keyTip'><span class='keyTip-symbol'>↵</span>Enter</span> or click the button to join."
+    },
+    "invalid": {
+      "message": "Clipboard <b>{code}</b> does not exist or is expired."
     }
   }
 } 

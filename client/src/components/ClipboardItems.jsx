@@ -7,7 +7,9 @@ import { useTranslation } from 'react-i18next';
 import { formatDate } from '../utils/dateFormat';
 import toast from 'react-hot-toast';
 import { useHotkeys } from 'react-hotkeys-hook';
+import KeyLabel from '../utils/keyLabel';
 import { UserIcon } from '@heroicons/react/24/solid';
+import '../styles/custom.css';
 
 const ClipboardItem = ({ item, index }) => {
   const { deviceId, deleteItem, editItem } = useSession();
@@ -93,9 +95,7 @@ const ClipboardItem = ({ item, index }) => {
         <div className="flex justify-between items-start mb-2">
           <div className="text-sm text-gray-500 dark:text-gray-400">
             {index <= 9 && (
-              <span className="inline-block bg-blue-600 text-white font-semibold rounded-full w-5 h-5 text-xs leading-5 text-center mr-2">
-                {index}
-              </span>
+              <KeyLabel keyString={`${index}`} />
             )}
             {formatDate(item.createdAt, 'PPpp', i18n.language)}
             <span className="ml-2 text-gray-400 flex items-center gap-1">

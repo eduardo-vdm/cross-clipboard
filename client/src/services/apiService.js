@@ -192,6 +192,38 @@ export const apiService = {
   },
 
   /**
+   * Check if a session exists by code and it's valid
+   * @param {string} sessionCode - 6-digit session code
+   * @returns {Promise<boolean>} True if session is valid, false otherwise
+   * @throws {Error} If session not found or not valid
+   */
+  checkSession: async (sessionCode) => {
+    try {
+      // First try to get the session by code
+      const getResponse = await fetch(`${API_URL}/api/sessions/${sessionCode}`);
+      const session = await handleResponse(getResponse);
+      
+      // Check if the session is valid
+      if (session.isArchived) {
+        throw new Error('SESSION_ARCHIVED');
+      }
+      
+      return true;
+    } catch (error) {
+      // Improve error handling for session-related errors
+      if (error.type === 'SESSION_NOT_FOUND') {
+        throw error;
+      }
+      
+      if (error.type === 'SESSION_ARCHIVED') {
+        throw error;
+      }
+      
+      throw error;
+    }
+  },
+
+  /**
    * Wipe all items from a session
    * @param {string} sessionCode - 6-digit session code
    * @param {string} deviceId - The device ID

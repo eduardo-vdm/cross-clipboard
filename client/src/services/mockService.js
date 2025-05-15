@@ -124,6 +124,17 @@ export const mockService = {
     return true;
   },
 
+  checkSession: async (sessionCode) => {
+    const session = mockSessions.get(sessionCode);
+    if (!session) {
+      throw new Error('Session not found');
+    }
+    if (session.isExpired) {
+      throw new Error('Session expired');
+    }
+    return true;
+  },
+
   wipeSession: async (sessionCode, deviceId) => {
     const session = mockSessions.get(sessionCode);
     if (!session) {

@@ -39,6 +39,11 @@ export const SessionHeader = () => {
     }
   };
 
+  const handleCopySessionCode = async () => {
+    await navigator.clipboard.writeText(sessionCode);
+    toast.success(t('clipboard:clipboard.copied'));
+  };
+
   const hasMyItems = items.some(item => item.deviceId === deviceId);
   const isSessionCreator = deviceId === createdBy;
   const hasItems = items.length > 0;
@@ -48,9 +53,9 @@ export const SessionHeader = () => {
   return (
     <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 p-4 flex justify-between items-center">
       <div className="flex items-center gap-4">
-        <h1 className="text-xl font-semibold text-gray-900 dark:text-white">
+        <h1 className="text-xl font-semibold text-gray-500">
           {t('clipboard:session.title')} 
-          <span className="font-mono ml-2">{sessionCode}</span>
+          <span className="text-amber-500 hover:text-blue-500 tracking-wider ml-2 font-mono rounded border-2 border-gray-300 dark:border-gray-700 hover:border-blue-500 dark:hover:border-blue-500 border-dashed px-2 py-1" onClick={handleCopySessionCode} onKeyDown={e => { if (e.key === 'Enter') handleCopySessionCode(); }} tabIndex={0} role="button">{sessionCode}</span>
         </h1>
         <div className="flex items-center gap-2">
           <button

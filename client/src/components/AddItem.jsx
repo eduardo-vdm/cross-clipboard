@@ -4,6 +4,8 @@ import { useTranslation } from 'react-i18next';
 import { useHotkeys } from 'react-hotkeys-hook';
 import { useState, useEffect, useRef } from 'react';
 import { ExclamationTriangleIcon } from '@heroicons/react/24/solid';
+import '../styles/custom.css';
+import KeyLabel from '../utils/keyLabel';
 
 export const AddItem = () => {
   const { addItem } = useSession();
@@ -130,11 +132,11 @@ export const AddItem = () => {
         <div className={`absolute bottom-2 right-2 flex items-center gap-1 ${
           isDenied ? 'opacity-50' : ''
         }`}>
-          <div className="bg-blue-600 text-white text-xs px-3 py-1 rounded shadow font-semibold flex items-center gap-1">
+          <div className='text-sm text-gray-400 dark:text-gray-500 flex items-center gap-1'>
             {isDenied && (
               <ExclamationTriangleIcon className="h-3 w-3 text-white" />
             )}
-            {t('addItem.keyboardShortcut', 'Press CTRL+V to paste anytime')}
+            <KeyLabel keyString='Ctrl+V' />{t('addItem.keyboardShortcutAppend')}
           </div>
         </div>
       )}
