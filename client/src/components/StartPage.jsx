@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useSession } from '../contexts/SessionContext';
+import { useSessionHistory } from './useSessionHistory';
 import toast from 'react-hot-toast';
 import clsx from 'clsx';
 import '../styles/custom.css';
@@ -18,6 +19,7 @@ const DEFAULT = {
 function StartPage() {
   const { t } = useTranslation('common');
   const { createSession, joinSession, loading, checkSession, deviceId } = useSession();
+  const { allHistoryCodes, refreshHistoryCache, isHistoryCodeValid } = useSessionHistory();
   const [code, setCode] = useState(['', '', '', '', '', '']);
   const [error, setError] = useState('');
   const [status, setStatus] = useState(DEFAULT.STATUS); // idle | checking | valid | invalid
@@ -241,7 +243,7 @@ function StartPage() {
     >
       <div className="flex flex-col items-center w-full max-w-md mb-16">
         <h1 className="w-full text-right text-3xl font-bold mb-2">{t('startPage.title')}</h1>
-        <p className="w-full text-md md:text-large text-gray-500 text-right border-t border-dashed border-t-4 border-gray-700 pt-2" dangerouslySetInnerHTML={{ __html: t('startPage.titleDescription') }} />
+        <p className="w-full text-md md:text-large text-gray-500 text-right border-t border-dashed border-t-4 border-gray-700 pt-2 leading-tight" dangerouslySetInnerHTML={{ __html: t('startPage.titleDescription') }} />
       </div>
       <div className="flex flex-col items-center gap-6 w-full max-w-md">
         <div className="w-full">
@@ -344,11 +346,40 @@ function StartPage() {
           <button
             onClick={() => createSession(deviceId)}
             disabled={loading || status === 'checking'}
-            className="w-full md:w-auto px-8 py-3 text-lg md:text-xl rounded border border-white hover:bg-white hover:text-gray-900 transition-colors font-semibold focus:outline-none focus:ring-2 focus:ring-blue-600 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full px-8 py-3 text-lg md:text-xl rounded border border-white hover:bg-white hover:text-gray-900 transition-colors font-semibold focus:outline-none focus:ring-2 focus:ring-blue-600 disabled:opacity-50 disabled:cursor-not-allowed"
             aria-label={loading ? "Creating new clipboard..." : "Create a new clipboard"}
           >
             {loading ? t('actions.loading') : t('actions.createNewOne')}
           </button>
+        </div>
+        
+        <div className="flex flex-col items-start gap-1 w-full">
+          {allHistoryCodes.length > 0 ? (
+            <>
+              <span className="text-sm text-gray-500">Last visited clipboards:</span>
+              <div className="flex items-center gap-2">
+                {allHistoryCodes.map((code) => (
+                  <a
+                    key={code}
+                    href={`/${code}`}
+                    className={clsx(
+                      "session-code-dashed-box",
+                      !isHistoryCodeValid(code) && "session-code-dashed-box-invalid",
+                    )}
+                    role="button"
+                    onClick={() => {
+                      window.location.href = `/${code}`;
+                    }}
+                    disabled={!isHistoryCodeValid(code)}
+                  >
+                    {code}
+                  </a>
+                ))}
+              </div>
+            </>
+          ) : (
+            <span className="text-sm text-gray-500">No clipboards visited yet</span>
+          )}
         </div>
       </div>
     </div>

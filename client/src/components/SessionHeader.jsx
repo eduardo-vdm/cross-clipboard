@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { LanguageSwitcher } from './LanguageSwitcher';
 import { toast } from 'react-hot-toast';
 import { ShareIcon, TrashIcon, SunIcon, MoonIcon } from '@heroicons/react/24/outline';
-import { FireIcon, ClipboardDocumentListIcon, ChevronLeftIcon } from '@heroicons/react/24/solid';
+import { FireIcon, ClipboardDocumentListIcon, ChevronLeftIcon, UserIcon } from '@heroicons/react/24/solid';
 import { useState, useEffect } from 'react';
 import { ConfirmationDialog } from './ConfirmationDialog';
 import { useTheme } from '../contexts/ThemeContext';
@@ -59,7 +59,7 @@ export const SessionHeader = () => {
         </a>        
         <h1 className="text-xl font-semibold text-gray-500 flex flex-col items-center justify-center -mt-1 ml-1">
           <span className="text-gray-500 -mb-1 z-10 pb-1">{t('clipboard:session.title')}</span>
-          <span className="text-amber-500 z-0 hover:text-blue-500 tracking-wider ml-2 -mt-1 font-mono border-2 border-gray-500 dark:border-gray-600 hover:border-blue-500 dark:hover:border-blue-500 border-dashed px-1.5 pt-0.5 leading-none" onClick={handleCopySessionCode} onKeyDown={e => { if (e.key === 'Enter') handleCopySessionCode(); }} tabIndex={0} role="button">{sessionCode}</span>
+          <span className="session-code-dashed-box ml-2 -mt-1" onClick={handleCopySessionCode} onKeyDown={e => { if (e.key === 'Enter') handleCopySessionCode(); }} tabIndex={0} role="button">{sessionCode}</span>
         </h1>
         <div className="flex items-center gap-2 ml-4">
           <button
@@ -79,12 +79,19 @@ export const SessionHeader = () => {
             title={t('clipboard:session.removeMyItemsTitle')}
             aria-label={t('clipboard:session.removeMyItemsTitle')}
           >
-            <TrashIcon className="h-5 w-5" />
+            <div className="relative w-5 h-5">
+              {/* Base icon: full-size */}
+              <UserIcon className="w-full h-full" />
+
+              {/* Overlay icon: smaller, positioned in corner */}
+              <FireIcon className="w-4 h-4 text-red-500 absolute -bottom-1 -right-1" />
+            </div>
+            {/* <TrashIcon className="h-5 w-5" /> */}
           </button>
           <button
             onClick={() => setShowWipeConfirm(true)}
             disabled={!isSessionCreator || !hasItems}
-            className={`p-2 text-gray-500 hover:text-red-600 rounded-lg hover:bg-gray-100 transition-colors ${
+            className={`p-2 text-red-500 hover:text-red-600 rounded-lg hover:bg-gray-100 transition-colors ${
               (!isSessionCreator || !hasItems) ? 'opacity-50 cursor-not-allowed' : ''
             }`}
             title={t('clipboard:session.wipeTitle')}

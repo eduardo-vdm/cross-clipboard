@@ -2,6 +2,7 @@ import { createContext, useContext, useState, useEffect, useRef } from 'react';
 import toast from 'react-hot-toast';
 import { getServiceConfig } from '../services/config';
 import { useNavigate } from 'react-router-dom';
+import { useSessionHistory } from '../components/useSessionHistory';
 
 const SessionContext = createContext(null);
 const POLLING_INTERVAL = 5000; // 5 seconds
@@ -34,11 +35,17 @@ const getDeviceName = () => {
   return deviceName;
 };
 
+// Check if a session code has the right format
+const isSessionCodeFormatValid = (code) => {
+  return /^\d{6}$/.test(code);
+};
+
 export const SessionProvider = ({ children }) => {
   // Move service config inside the component for better testability
   const serviceConfig = getServiceConfig();
   const apiUrl = serviceConfig?.apiUrl;
   const service = serviceConfig?.service;
+  const { addHistoryCode } = useSessionHistory();
 
   const [sessionCode, setSessionCode] = useState(null);
   const [deviceId, setDeviceId] = useState(null);
@@ -144,11 +151,13 @@ export const SessionProvider = ({ children }) => {
         data = await response.json();
       }
       
-      // Make sure we have the 6-digit code
-      if (!data.code || data.code.length !== 6) {
+      // Make sure code has the right format
+      if (!isSessionCodeFormatValid(data?.code)) {
         throw new Error('Invalid session code received from server');
       }
-      
+      // add the code to the history if it has the right format, regardless of whether the session is valid or not
+      addHistoryCode(data.code);
+
       setSessionCode(data.code);
       setCreatedBy(data.createdBy);
       setError(null);
@@ -167,7 +176,12 @@ export const SessionProvider = ({ children }) => {
     setLoading(true);
     try {
       let sessionData, itemsData;
-      
+
+      // add the code to the history if it has the right format, regardless of whether the session is valid or not
+      if (isSessionCodeFormatValid(code)) {
+        addHistoryCode(code);
+      }
+
       if (service) {
         const result = await service.joinSession(code, deviceId);
         sessionData = result.session;
@@ -241,7 +255,7 @@ export const SessionProvider = ({ children }) => {
           // Check URL for session code
           let codeFromUrl = window.location.pathname.substring(1);
           // Only if the code is a valid 6-digit number string
-          codeFromUrl = /^\d{6}$/.test(codeFromUrl) ? codeFromUrl : null;
+          codeFromUrl = isSessionCodeFormatValid(codeFromUrl) ? codeFromUrl : null;
 
           if (codeFromUrl) {
             try {
@@ -587,6 +601,7 @@ export const SessionProvider = ({ children }) => {
     wipeSession,
     removeMyItems,
     checkSession,
+    isSessionCodeFormatValid,
   };
 
   return (
