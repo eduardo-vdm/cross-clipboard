@@ -1,7 +1,7 @@
 {
   "name": "client",
   "private": true,
-  "version": "0.0.19",
+  "version": "0.0.20",
   "type": "module",
   "scripts": {
     "dev": "vite --host",
@@ -19,6 +19,7 @@
     "clsx": "^2.1.1",
     "country-flag-icons": "^1.5.19",
     "date-fns": "^4.1.0",
+    "embla-carousel-react": "^8.6.0",
     "i18next": "^25.0.2",
     "i18next-browser-languagedetector": "^8.1.0",
     "i18next-http-backend": "^3.0.2",

@@ -42,7 +42,7 @@
       "inputsHeading": "Join a Clipboard"
     },
     "idle": {
-      "message": "Type in the <b>6-digit code</b> to join a clipboard."
+      "message": "Type or paste the <b>6-digit code</b> to join a clipboard."
     },
     "valid": {
       "message": "Press <span class='keyTip'><span class='keyTip-symbol'>⏎</span>Enter</span> or click the button to join."

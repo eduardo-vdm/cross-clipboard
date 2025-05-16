@@ -6,6 +6,7 @@ import clsx from 'clsx';
 import '../styles/custom.css';
 import { useTranslation } from 'react-i18next';
 import { ClipboardDocumentListIcon } from '@heroicons/react/24/outline';
+import useEmblaCarousel from 'embla-carousel-react';
 
 const DEFAULT = {
   STATUS: 'idle',
@@ -25,6 +26,7 @@ function StartPage() {
   const [status, setStatus] = useState(DEFAULT.STATUS); // idle | checking | valid | invalid
   const [statusMessage, setStatusMessage] = useState(DEFAULT.STATUS_MESSAGE);
   const [currentStatusMessage, setCurrentStatusMessage] = useState('');
+  const [emblaRef, emblaApi] = useEmblaCarousel({ axis: 'x', dragFree: true, containScroll: 'trimSnaps' });
   const inputRefs = useRef([]);
   const joinBtnRef = useRef(null);
 
@@ -353,32 +355,67 @@ function StartPage() {
           </button>
         </div>
         
-        <div className="flex flex-col items-start gap-1 w-full">
+        <div className="flex flex-col items-start gap-1 w-full mt-8">
           {allHistoryCodes.length > 0 ? (
             <>
-              <span className="text-sm text-gray-500">Last visited clipboards:</span>
-              <div className="flex items-center gap-2">
-                {allHistoryCodes.map((code) => (
-                  <a
-                    key={code}
-                    href={`/${code}`}
-                    className={clsx(
-                      "session-code-dashed-box",
-                      !isHistoryCodeValid(code) && "session-code-dashed-box-invalid",
-                    )}
-                    role="button"
-                    onClick={() => {
-                      window.location.href = `/${code}`;
-                    }}
-                    disabled={!isHistoryCodeValid(code)}
-                  >
-                    {code}
-                  </a>
-                ))}
+              <span className="text-sm text-gray-500 italic font-semibold">Last visited clipboards:</span>
+              <div className="relative w-full">
+                {/* Left Arrow */}
+                <button
+                type="button"
+                className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-gray-800 bg-opacity-70 rounded-full p-1 shadow hover:bg-opacity-90 transition"
+                onClick={() => emblaApi && emblaApi.scrollPrev()}
+                aria-label="Scroll left"
+                style={{ display: allHistoryCodes.length > 1 ? 'block' : 'none' }}
+              >
+                <span className="sr-only">Scroll left</span>
+                <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" strokeWidth="2" d="M15 19l-7-7 7-7"/></svg>
+              </button>
+              {/* Embla viewport */}
+              <div className={clsx(
+                "overflow-hidden px-8",
+                allHistoryCodes.length <= 4 && "px-0"
+              )} ref={emblaRef}>
+                <div className="flex gap-2">
+                  {allHistoryCodes.map((code) => (
+                    <a
+                      key={code}
+                      href={isHistoryCodeValid(code) ? `/${code}` : undefined}
+                      className={clsx(
+                        "session-code-dashed-box",
+                        !isHistoryCodeValid(code) && "session-code-dashed-box-invalid",
+                        !isHistoryCodeValid(code) && "cursor-not-allowed",
+                        "select-none",
+                        "embla__slide" // Optional: for embla slide styling
+                      )}
+                      role="button"
+                      onClick={() => {
+                        isHistoryCodeValid(code) && (window.location.href = `/${code}`);
+                      }}
+                      disabled={!isHistoryCodeValid(code)}
+                    >
+                      {code}
+                    </a>
+                  ))}
+                </div>
+              </div>
+              {/* Right Arrow */}
+              <button
+                type="button"
+                className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-gray-800 bg-opacity-70 rounded-full p-1 shadow hover:bg-opacity-90 transition"
+                onClick={() => emblaApi && emblaApi.scrollNext()}
+                aria-label="Scroll right"
+                style={{ display: allHistoryCodes.length > 1 ? 'block' : 'none' }}
+              >
+                <span className="sr-only">Scroll right</span>
+                <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" strokeWidth="2" d="M9 5l7 7-7 7"/></svg>
+              </button>
               </div>
             </>
           ) : (
-            <span className="text-sm text-gray-500">No clipboards visited yet</span>
+            <span className="text-sm text-gray-500 italic font-semibold">
+              No clipboards visited yet.
+            </span>
           )}
         </div>
       </div>
