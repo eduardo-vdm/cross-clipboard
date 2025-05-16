@@ -51,7 +51,7 @@ export const SessionHeader = () => {
   if (!sessionCode) return null;
 
   return (
-    <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 p-1 flex justify-between items-center">
+    <div className="sticky top-0 z-30 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 p-1 flex justify-between items-center">
       <div className="flex items-center gap-2 -ml-2">
         <a href="/" className="flex items-center gap-0 ml-2 -mr-3 text-gray-500 hover:text-amber-500 dark:text-gray-500 dark:hover:text-amber-500 transition-colors">
           <ChevronLeftIcon className="h-5 w-5 " />

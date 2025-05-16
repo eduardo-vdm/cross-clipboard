@@ -241,184 +241,186 @@ function StartPage() {
     <>
       <StartPageHeader />
       <div 
-        className="flex flex-col items-center justify-center min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white p-4"
+        className="flex-1 flex items-center justify-center bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white p-4"
         role="main"
         aria-label="CrossClip Start Page"
         onClick={handleContainerClick}
       >
-        <div className="flex flex-col items-center w-full max-w-md mb-16">
-          <h1 className="w-full text-right text-3xl font-bold mb-2 text-gray-900 dark:text-white">{t('startPage.title')}</h1>
-          <p className="w-full text-md md:text-large text-gray-500 dark:text-gray-300 text-right border-t border-dashed border-t-4 border-gray-300 dark:border-gray-700 pt-2 leading-tight" dangerouslySetInnerHTML={{ __html: t('startPage.titleDescription') }} />
-        </div>
-        <div className="flex flex-col items-center gap-6 w-full max-w-md">
-          <div className="w-full">
-            <h2 
-              className="text-xl md:text-2xl font-semibold text-blue-800 dark:text-blue-400 mb-4"
-              id="join-heading"
-            >
-              {t('startPage.join.inputsHeading')}
-            </h2>
-            <div 
-              className="flex gap-2 justify-center mb-4 relative"
-              onPaste={handlePaste}
-              role="group"
-              aria-labelledby="join-heading"
-              aria-describedby={error ? "error-message" : undefined}
-            >
-              {[0,1,2,3,4,5].map((i) => (
-                <input
-                  key={i}
-                  ref={el => inputRefs.current[i] = el}
-                  type="text"
-                  inputMode="numeric"
-                  pattern="[0-9]*"
-                  maxLength={1}
-                  value={code[i]}
-                  onChange={(e) => handleInputChange(i, e.target.value)}
-                  onKeyDown={(e) => handleKeyDown(i, e)}
-                  className={clsx(
-                    'w-14 h-20 font-semibold text-4xl text-center rounded border-2 border-white dark:border-gray-700 focus:border-blue-600 dark:focus:border-blue-400 bg-transparent outline-none transition-colors duration-150',
-                    'text-amber-500 dark:text-amber-400',
-                    status === 'checking' && 'animate-pulse',
-                    status === 'valid' && 'border-green-600 dark:border-green-400',
-                  )}
-                  tabIndex={0}
-                  aria-label={`Digit ${i + 1} of 6`}
-                  aria-required="true"
-                  aria-invalid={error ? "true" : "false"}
-                  disabled={status === 'checking'}
-                />
-              ))}
-              {/* Create a wrapper div to avoid flashing when any of the status elements are rendered */}
-              <div className="w-14 h-20 flex items-center justify-center ml-2 text-center rounded border-2 border-dashed border-transparent bg-transparent outline-none transition-colors duration-150">
-                {
-                  status === 'idle' && code.join('').length < 6 && (
-                    <ClipboardDocumentListIcon className="h-24 w-24 text-gray-700 dark:text-gray-400 select-none" />
-                  )
-                }
-                {status === 'checking' && (
-                  <div className="w-12 h-16 md:w-14 md:h-20 flex items-center justify-center ml-2 animate-spin">
-                    <svg className="w-8 h-8 text-amber-500 dark:text-amber-400" fill="none" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
-                    </svg>
-                  </div>
-                )}
-                {status === 'invalid' && (
-                  <div className="w-full h-full flex items-center justify-center bg-red-600 dark:bg-red-700 rounded border-2 border-white dark:border-gray-700 animate-fade-in-out" aria-label="Invalid code" tabIndex={-1}>
-                    <span className="text-4xl font-bold text-white select-none">X</span>
-                  </div>
-                )}
-                {status === 'valid' && (
-                  <button
-                    ref={joinBtnRef}
-                    className="w-full h-full flex flex-col items-center justify-center bg-green-600 dark:bg-green-700 rounded border-2 border-white dark:border-gray-700 focus:outline-none focus:ring-4 focus:ring-amber-500 animate-pulse"
-                    aria-label="Join session"
+        <div>
+          <div className="flex flex-col items-center w-full max-w-md mb-16">
+            <h1 className="w-full text-right text-3xl font-bold mb-2 text-gray-900 dark:text-white">{t('startPage.title')}</h1>
+            <p className="w-full text-md md:text-large text-gray-500 dark:text-gray-300 text-right border-t border-dashed border-t-4 border-gray-300 dark:border-gray-700 pt-2 leading-tight" dangerouslySetInnerHTML={{ __html: t('startPage.titleDescription') }} />
+          </div>
+          <div className="flex flex-col items-center gap-4 w-full max-w-md">
+            <div className="w-full">
+              <h2 
+                className="text-xl md:text-2xl font-semibold text-blue-800 dark:text-blue-400 mb-2"
+                id="join-heading"
+              >
+                {t('startPage.join.inputsHeading')}
+              </h2>
+              <div 
+                className="flex gap-2 justify-center mb-4 relative"
+                onPaste={handlePaste}
+                role="group"
+                aria-labelledby="join-heading"
+                aria-describedby={error ? "error-message" : undefined}
+              >
+                {[0,1,2,3,4,5].map((i) => (
+                  <input
+                    key={i}
+                    ref={el => inputRefs.current[i] = el}
+                    type="text"
+                    inputMode="numeric"
+                    pattern="[0-9]*"
+                    maxLength={1}
+                    value={code[i]}
+                    onChange={(e) => handleInputChange(i, e.target.value)}
+                    onKeyDown={(e) => handleKeyDown(i, e)}
+                    className={clsx(
+                      'w-14 h-20 font-semibold text-4xl text-center rounded border-2 border-white dark:border-gray-700 focus:border-blue-600 dark:focus:border-blue-400 bg-transparent outline-none transition-colors duration-150',
+                      'text-amber-500 dark:text-amber-400',
+                      status === 'checking' && 'animate-pulse',
+                      status === 'valid' && 'border-green-600 dark:border-green-400',
+                    )}
                     tabIndex={0}
-                    onClick={handleJoin}
-                    onKeyDown={e => { if (e.key === 'Enter') handleJoin(); }}
-                    disabled={status !== 'valid'}
-                  >
-                    <ClipboardDocumentListIcon className="h-10 w-10 text-white shadow-sm select-none" />
-                    <span className="text-xxs font-bold text-white select-none mt-1 uppercase text-shadow-sm">{t('actions.join')}</span>
-                  </button>
-                )}
-              </div>
-            </div>
-            {currentStatusMessage && (
-              <p 
-                id="status-message" 
-                className={clsx(
-                  'text-md text-center mb-4',
-                  statusMessage.code === 'invalid' && 'text-red-500 dark:text-red-400',
-                  statusMessage.code === 'valid' && 'text-green-500 dark:text-green-400',
-                  (statusMessage.code === 'checking' || statusMessage.code === 'idle') && 'text-blue-500 dark:text-blue-400'
-                )}
-                role={status === 'invalid' ? 'alert' : 'status'}
-                aria-live={status === 'invalid' ? 'assertive' : 'polite'}
-                dangerouslySetInnerHTML={{ __html: currentStatusMessage }}
-              />
-            )}
-          </div>
-          <div className="flex flex-col items-center gap-4 w-full">
-            <span 
-              className="text-lg md:text-xl text-blue-600 dark:text-blue-400 italic mb-2"
-              aria-hidden="true"
-            >
-              {t('startPage.or')}
-            </span>
-            <button
-              onClick={() => createSession(deviceId)}
-              disabled={loading || status === 'checking'}
-              className="w-full px-8 py-3 text-lg md:text-xl rounded border border-white dark:border-gray-700 hover:bg-white hover:text-gray-900 dark:hover:bg-gray-800 dark:hover:text-white transition-colors font-semibold focus:outline-none focus:ring-2 focus:ring-blue-600 dark:focus:ring-blue-400 disabled:opacity-50 disabled:cursor-not-allowed"
-              aria-label={loading ? "Creating new clipboard..." : "Create a new clipboard"}
-            >
-              {loading ? t('actions.loading') : t('actions.createNewOne')}
-            </button>
-          </div>
-          
-          <div className="flex flex-col items-start gap-1 w-full mt-8">
-            {allHistoryCodes.length > 0 ? (
-              <>
-                <span className="text-sm text-gray-500 dark:text-gray-300 italic font-semibold">Last visited clipboards:</span>
-                <div className="relative w-full">
-                  {/* Left Arrow */}
-                  <button
-                    type="button"
-                    className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-gray-800 dark:bg-gray-700 bg-opacity-70 rounded-full p-1 shadow hover:bg-opacity-90 transition"
-                    onClick={() => emblaApi && emblaApi.scrollPrev()}
-                    aria-label="Scroll left"
-                    style={{ display: allHistoryCodes.length > 1 ? 'block' : 'none' }}
-                  >
-                    <span className="sr-only">Scroll left</span>
-                    <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" strokeWidth="2" d="M15 19l-7-7 7-7"/></svg>
-                  </button>
-                  {/* Embla viewport */}
-                  <div className={clsx(
-                    "overflow-hidden px-8",
-                    allHistoryCodes.length <= 4 && "px-0"
-                  )} ref={emblaRef}>
-                    <div className="flex gap-2">
-                      {allHistoryCodes.map((code) => (
-                        <a
-                          key={code}
-                          href={isHistoryCodeValid(code) ? `/${code}` : undefined}
-                          className={clsx(
-                            "session-code-dashed-box",
-                            !isHistoryCodeValid(code) && "session-code-dashed-box-invalid",
-                            !isHistoryCodeValid(code) && "cursor-not-allowed",
-                            "select-none",
-                            "embla__slide"
-                          )}
-                          role="button"
-                          onClick={() => {
-                            isHistoryCodeValid(code) && (window.location.href = `/${code}`);
-                          }}
-                          disabled={!isHistoryCodeValid(code)}
-                        >
-                          {code}
-                        </a>
-                      ))}
+                    aria-label={`Digit ${i + 1} of 6`}
+                    aria-required="true"
+                    aria-invalid={error ? "true" : "false"}
+                    disabled={status === 'checking'}
+                  />
+                ))}
+                {/* Create a wrapper div to avoid flashing when any of the status elements are rendered */}
+                <div className="w-14 h-20 flex items-center justify-center ml-2 text-center rounded border-2 border-dashed border-transparent bg-transparent outline-none transition-colors duration-150">
+                  {
+                    status === 'idle' && code.join('').length < 6 && (
+                      <ClipboardDocumentListIcon className="h-24 w-24 text-gray-700 dark:text-gray-400 select-none" />
+                    )
+                  }
+                  {status === 'checking' && (
+                    <div className="w-12 h-16 md:w-14 md:h-20 flex items-center justify-center ml-2 animate-spin">
+                      <svg className="w-8 h-8 text-amber-500 dark:text-amber-400" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
+                      </svg>
                     </div>
-                  </div>
-                  {/* Right Arrow */}
-                  <button
-                    type="button"
-                    className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-gray-800 dark:bg-gray-700 bg-opacity-70 rounded-full p-1 shadow hover:bg-opacity-90 transition"
-                    onClick={() => emblaApi && emblaApi.scrollNext()}
-                    aria-label="Scroll right"
-                    style={{ display: allHistoryCodes.length > 1 ? 'block' : 'none' }}
-                  >
-                    <span className="sr-only">Scroll right</span>
-                    <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" strokeWidth="2" d="M9 5l7 7-7 7"/></svg>
-                  </button>
+                  )}
+                  {status === 'invalid' && (
+                    <div className="w-full h-full flex items-center justify-center bg-red-600 dark:bg-red-700 rounded border-2 border-white dark:border-gray-700 animate-fade-in-out" aria-label="Invalid code" tabIndex={-1}>
+                      <span className="text-4xl font-bold text-white select-none">X</span>
+                    </div>
+                  )}
+                  {status === 'valid' && (
+                    <button
+                      ref={joinBtnRef}
+                      className="w-full h-full flex flex-col items-center justify-center bg-green-600 dark:bg-green-700 rounded border-2 border-white dark:border-gray-700 focus:outline-none focus:ring-4 focus:ring-amber-500 animate-pulse"
+                      aria-label="Join session"
+                      tabIndex={0}
+                      onClick={handleJoin}
+                      onKeyDown={e => { if (e.key === 'Enter') handleJoin(); }}
+                      disabled={status !== 'valid'}
+                    >
+                      <ClipboardDocumentListIcon className="h-10 w-10 text-white shadow-sm select-none" />
+                      <span className="text-xxs font-bold text-white select-none mt-1 uppercase text-shadow-sm">{t('actions.join')}</span>
+                    </button>
+                  )}
                 </div>
-              </>
-            ) : (
-              <span className="text-sm text-gray-500 dark:text-gray-300 italic font-semibold">
-                No clipboards visited yet.
+              </div>
+              {currentStatusMessage && (
+                <p 
+                  id="status-message" 
+                  className={clsx(
+                    'text-md text-center mb-4',
+                    statusMessage.code === 'invalid' && 'text-red-500 dark:text-red-400',
+                    statusMessage.code === 'valid' && 'text-green-500 dark:text-green-400',
+                    (statusMessage.code === 'checking' || statusMessage.code === 'idle') && 'text-blue-500 dark:text-blue-400'
+                  )}
+                  role={status === 'invalid' ? 'alert' : 'status'}
+                  aria-live={status === 'invalid' ? 'assertive' : 'polite'}
+                  dangerouslySetInnerHTML={{ __html: currentStatusMessage }}
+                />
+              )}
+            </div>
+            <div className="flex flex-col items-center gap-4 w-full">
+              <span 
+                className="text-lg md:text-xl text-blue-600 dark:text-blue-400 italic mb-2"
+                aria-hidden="true"
+              >
+                {t('startPage.or')}
               </span>
-            )}
+              <button
+                onClick={() => createSession(deviceId)}
+                disabled={loading || status === 'checking'}
+                className="w-full px-8 py-3 text-lg md:text-xl rounded border border-white dark:border-gray-700 hover:bg-white hover:text-gray-900 dark:hover:bg-gray-800 dark:hover:text-white transition-colors font-semibold focus:outline-none focus:ring-2 focus:ring-blue-600 dark:focus:ring-blue-400 disabled:opacity-50 disabled:cursor-not-allowed"
+                aria-label={loading ? "Creating new clipboard..." : "Create a new clipboard"}
+              >
+                {loading ? t('actions.loading') : t('actions.createNewOne')}
+              </button>
+            </div>
+            
+            <div className="flex flex-col items-start gap-1 w-full mt-8">
+              {allHistoryCodes.length > 0 ? (
+                <>
+                  <span className="text-sm text-gray-500 dark:text-gray-300 italic font-semibold">Last visited clipboards:</span>
+                  <div className="relative w-full">
+                    {/* Left Arrow */}
+                    <button
+                      type="button"
+                      className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-gray-800 dark:bg-gray-700 bg-opacity-70 rounded-full p-1 shadow hover:bg-opacity-90 transition"
+                      onClick={() => emblaApi && emblaApi.scrollPrev()}
+                      aria-label="Scroll left"
+                      style={{ display: allHistoryCodes.length > 1 ? 'block' : 'none' }}
+                    >
+                      <span className="sr-only">Scroll left</span>
+                      <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" strokeWidth="2" d="M15 19l-7-7 7-7"/></svg>
+                    </button>
+                    {/* Embla viewport */}
+                    <div className={clsx(
+                      "overflow-hidden px-8",
+                      allHistoryCodes.length <= 4 && "px-0"
+                    )} ref={emblaRef}>
+                      <div className="flex gap-2">
+                        {allHistoryCodes.map((code) => (
+                          <a
+                            key={code}
+                            href={isHistoryCodeValid(code) ? `/${code}` : undefined}
+                            className={clsx(
+                              "session-code-dashed-box",
+                              !isHistoryCodeValid(code) && "session-code-dashed-box-invalid",
+                              !isHistoryCodeValid(code) && "cursor-not-allowed",
+                              "select-none",
+                              "embla__slide"
+                            )}
+                            role="button"
+                            onClick={() => {
+                              isHistoryCodeValid(code) && (window.location.href = `/${code}`);
+                            }}
+                            disabled={!isHistoryCodeValid(code)}
+                          >
+                            {code}
+                          </a>
+                        ))}
+                      </div>
+                    </div>
+                    {/* Right Arrow */}
+                    <button
+                      type="button"
+                      className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-gray-800 dark:bg-gray-700 bg-opacity-70 rounded-full p-1 shadow hover:bg-opacity-90 transition"
+                      onClick={() => emblaApi && emblaApi.scrollNext()}
+                      aria-label="Scroll right"
+                      style={{ display: allHistoryCodes.length > 1 ? 'block' : 'none' }}
+                    >
+                      <span className="sr-only">Scroll right</span>
+                      <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" strokeWidth="2" d="M9 5l7 7-7 7"/></svg>
+                    </button>
+                  </div>
+                </>
+              ) : (
+                <span className="text-sm text-gray-500 dark:text-gray-300 italic font-semibold">
+                  No clipboards visited yet.
+                </span>
+              )}
+            </div>
           </div>
         </div>
       </div>
