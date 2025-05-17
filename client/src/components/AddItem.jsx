@@ -66,19 +66,7 @@ export const AddItem = () => {
       const clipboardItems = await navigator.clipboard.read();
 
       for (const clipboardItem of clipboardItems) {
-        // Handle images
-        if (clipboardItem.types.includes('image/png') || 
-            clipboardItem.types.includes('image/jpeg')) {
-          const blob = await clipboardItem.getType(
-            clipboardItem.types.find(type => type.startsWith('image/'))
-          );
-          const reader = new FileReader();
-          reader.onload = async (e) => {
-            await addItem(e.target.result, 'image');
-          };
-          reader.readAsDataURL(blob);
-          return;
-        }
+        // TODO: Handle images
 
         // Handle text
         if (clipboardItem.types.includes('text/plain')) {

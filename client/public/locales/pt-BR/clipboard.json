@@ -30,8 +30,8 @@
     "useYours": "Usar Suas Alterações"
   },
   "addItem": {
-    "pastePrompt": "Cole texto ou imagem aqui",
-    "supportedTypes": "Suporta texto e imagens (PNG, JPEG)",
+    "pastePrompt": "Cole texto aqui",
+    "supportedTypes": "Suporta texto (e imagens em breve)",
     "permissionDenied": "Acesso à área de transferência negado. Atualize as configurações do navegador.",
     "keyboardShortcutAppend": " para colar"
   },

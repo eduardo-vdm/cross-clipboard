@@ -145,25 +145,16 @@ const ClipboardContent = ({ content, type, onCopy, isEditing, editContent, onEdi
         )}
       </div>
     );
+  } else {
+    // return a generic "work in progress" generic text block
+    return (
+      <div className="w-full h-full flex items-center justify-center">
+        <div className="text-gray-500 dark:text-gray-400">
+          {t('clipboard:image.workInProgress')}
+        </div>
+      </div>
+    );
   }
-
-  // Image content
-  return (
-    <div className="relative">
-      <img 
-        src={content} 
-        alt={t('clipboard:image.clipboardContent')}
-        className="max-w-full rounded-lg"
-      />
-      <a 
-        href={content}
-        download="clipboard-image"
-        className="absolute top-2 right-2 bg-white rounded-lg shadow-sm px-3 py-1 text-sm hover:bg-gray-50"
-      >
-        {t('common:actions.download')}
-      </a>
-    </div>
-  );
 };
 
 const ClipboardItem = ({ item, index }) => {
