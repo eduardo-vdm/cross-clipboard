@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useSession } from '../contexts/SessionContext';
-import { useSessionHistory } from './useSessionHistory';
+import { useSessionHistory } from '../hooks/useSessionHistory';
 import toast from 'react-hot-toast';
 import clsx from 'clsx';
 import '../styles/custom.css';

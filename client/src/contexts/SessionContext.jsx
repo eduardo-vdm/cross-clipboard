@@ -2,7 +2,7 @@ import { createContext, useContext, useState, useEffect, useRef } from 'react';
 import toast from 'react-hot-toast';
 import { getServiceConfig } from '../services/config';
 import { useNavigate } from 'react-router-dom';
-import { useSessionHistory } from '../components/useSessionHistory';
+import { useSessionHistory } from '../hooks/useSessionHistory';
 
 const SessionContext = createContext(null);
 const POLLING_INTERVAL = 5000; // 5 seconds

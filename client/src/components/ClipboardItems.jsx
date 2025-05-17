@@ -1,15 +1,170 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useSession } from '../contexts/SessionContext';
+import { useHotkeys } from 'react-hotkeys-hook';
+import { useElementHeight } from '../hooks/useElementHeight';
 import { copyToClipboard } from '../utils/clipboard';
 import { ConflictModal } from './ConflictModal';
 import { ConfirmationDialog } from './ConfirmationDialog';
-import { useTranslation } from 'react-i18next';
 import { formatDate } from '../utils/dateFormat';
 import toast from 'react-hot-toast';
-import { useHotkeys } from 'react-hotkeys-hook';
 import KeyLabel from '../utils/keyLabel';
-import { UserIcon } from '@heroicons/react/24/solid';
+import { UserIcon, ChevronDownIcon, ChevronUpIcon } from '@heroicons/react/24/solid';
+import clsx from 'clsx';
 import '../styles/custom.css';
+
+// Constants for content display
+const MAX_HEIGHT = 40; // tailwind's height scale ({units} / 4 * 10)px
+const EXPANDED_HEIGHT = 32; // tailwind's height scale
+const RESIZE_MAX_HEIGHT = 48; // tailwind's height scale
+
+const ClipboardContent = ({ content, type, onCopy, isEditing, editContent, onEditChange }) => {
+  const [isExpanded, setIsExpanded] = useState(false);
+  const [isResizing, setIsResizing] = useState(false);
+  const [startY, setStartY] = useState(0);
+  const [startHeight, setStartHeight] = useState(0);
+  const { t } = useTranslation(['common', 'clipboard']);
+  const [outerRef, outerHeight] = useElementHeight();
+  const [innerRef, innerHeight] = useElementHeight();
+
+  const handleResizeStart = useCallback((e) => {
+    e.stopPropagation();
+    setIsResizing(true);
+    setStartY(e.clientY);
+    setStartHeight(e.target.parentElement.offsetHeight);
+  }, []);
+
+  const handleResizeMove = useCallback((e) => {
+    if (!isResizing) return;
+    e.stopPropagation();
+    const delta = e.clientY - startY;
+    const pxMaxHeight = MAX_HEIGHT / 4 * 10;
+    const pxResizeMaxHeight = RESIZE_MAX_HEIGHT / 4 * 10;
+    const newHeight = Math.min(Math.max(startHeight + delta, pxMaxHeight), pxResizeMaxHeight);
+    e.target.parentElement.style.height = `${newHeight}px`;
+  }, [isResizing, startY, startHeight]);
+
+  const handleResizeEnd = useCallback(() => {
+    setIsResizing(false);
+  }, []);
+
+  // debug
+  useEffect(() => {
+    console.log('outerHeight (measured):', outerHeight);
+  }, [outerHeight]);
+  useEffect(() => {
+    console.log('innerHeight (measured):', innerHeight);
+  }, [innerHeight]);
+  useEffect(() => {
+    console.log('isExpanded:', isExpanded);
+  }, [isExpanded]);
+
+  useEffect(() => {
+    if (isResizing) {
+      window.addEventListener('mousemove', handleResizeMove);
+      window.addEventListener('mouseup', handleResizeEnd);
+      return () => {
+        window.removeEventListener('mousemove', handleResizeMove);
+        window.removeEventListener('mouseup', handleResizeEnd);
+      };
+    }
+  }, [isResizing, handleResizeMove, handleResizeEnd]);
+
+  if (type === 'text') {
+    if (isEditing) {
+      return (
+        <textarea
+          value={editContent}
+          onChange={(e) => onEditChange(e.target.value)}
+          className="w-full font-mono text-sm bg-gray-50 dark:bg-gray-700 p-3 rounded-lg border dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-white"
+          rows={3}
+        />
+      );
+    }
+
+    return (
+      <div className="relative group">
+        <div
+          ref={outerRef}
+          className={clsx(
+            'font-mono text-sm bg-gray-50 dark:bg-gray-700 p-3 rounded-lg cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 text-gray-900 dark:text-white whitespace-pre',
+            isExpanded ? 'h-auto' : 'max-h-[160px]', //`max-h-${MAX_HEIGHT}`,
+            isResizing ? 'resize-y' : '',
+            'transition-all duration-200 overflow-x-auto overflow-y-clip w-full',
+            'scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-600 scrollbar-track-gray-100 dark:scrollbar-track-gray-800'
+          )}
+          onClick={onCopy}
+          title={t('common:actions.copy')}
+        >
+          <div ref={innerRef} className="min-w-0 break-words">
+            {content}
+          </div>
+          
+          {/* Gradient fade when content is clipped */}
+          {/* {!isExpanded && (
+            <div className="absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-t from-gray-50 dark:from-gray-700 to-transparent pointer-events-none" />
+          )} */}
+        </div>
+
+        {/* Controls container */}
+        {innerHeight > outerHeight ? (
+          <div className="absolute -bottom-8 right-0 translate-x-4 flex items-center justify-center gap-2 p-2">
+            <button 
+              className="h-5 w-12 rounded bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 flex items-center justify-center shadow-sm border dark:border-gray-700 opacity-90 group-hover:opacity-100"
+              onClick={(e) => {
+                e.stopPropagation();
+                setIsExpanded(!isExpanded);
+              }}
+              title={t('common:actions.expand')}
+            >
+              <ChevronDownIcon className="w-5 h-5 text-gray-500 dark:text-gray-400 rounded shadow text-md leading-4 font-bold text-shadow-sm" />
+            </button>
+          </div>
+        ) : (isExpanded && (
+          <div className="absolute -bottom-8 right-0 translate-x-4 flex items-center justify-center gap-2 p-2">
+            <button 
+              className="h-5 w-12 rounded bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 flex items-center justify-center shadow-sm border dark:border-gray-700 opacity-90 group-hover:opacity-100"
+              onClick={(e) => {
+                e.stopPropagation();
+                setIsExpanded(!isExpanded);
+              }}
+              title={t('common:actions.collapse')}
+            >
+              <ChevronUpIcon className="w-5 h-5 text-gray-500 dark:text-gray-400 rounded shadow text-md leading-4 font-bold text-shadow-sm" />
+            </button>
+          </div>
+        ))}
+
+        {/* Resize handle (only visible when expanded) */}
+        {isExpanded && (
+          <div 
+            className="absolute bottom-0 left-0 right-0 h-2 cursor-ns-resize"
+            onMouseDown={handleResizeStart}
+            title={t('common:actions.resize')}
+          />
+        )}
+      </div>
+    );
+  }
+
+  // Image content
+  return (
+    <div className="relative">
+      <img 
+        src={content} 
+        alt={t('clipboard:image.clipboardContent')}
+        className="max-w-full rounded-lg"
+      />
+      <a 
+        href={content}
+        download="clipboard-image"
+        className="absolute top-2 right-2 bg-white rounded-lg shadow-sm px-3 py-1 text-sm hover:bg-gray-50"
+      >
+        {t('common:actions.download')}
+      </a>
+    </div>
+  );
+};
 
 const ClipboardItem = ({ item, index }) => {
   const { deviceId, deleteItem, editItem } = useSession();
@@ -128,39 +283,14 @@ const ClipboardItem = ({ item, index }) => {
           )}
         </div>
 
-        {item.type === 'text' ? (
-          isEditing ? (
-            <textarea
-              value={editContent}
-              onChange={(e) => setEditContent(e.target.value)}
-              className="w-full font-mono text-sm bg-gray-50 dark:bg-gray-700 p-3 rounded-lg border dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-white"
-              rows={3}
-            />
-          ) : (
-            <div 
-              className="font-mono text-sm bg-gray-50 dark:bg-gray-700 p-3 rounded-lg cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 text-gray-900 dark:text-white"
-              onClick={handleCopy}
-              title={t('common:actions.copy')}
-            >
-              {item.content}
-            </div>
-          )
-        ) : (
-          <div className="relative">
-            <img 
-              src={item.content} 
-              alt={t('clipboard:image.clipboardContent')}
-              className="max-w-full rounded-lg"
-            />
-            <a 
-              href={item.content}
-              download="clipboard-image"
-              className="absolute top-2 right-2 bg-white rounded-lg shadow-sm px-3 py-1 text-sm hover:bg-gray-50"
-            >
-              {t('common:actions.download')}
-            </a>
-          </div>
-        )}
+        <ClipboardContent
+          content={item.content}
+          type={item.type}
+          onCopy={handleCopy}
+          isEditing={isEditing}
+          editContent={editContent}
+          onEditChange={setEditContent}
+        />
       </div>
 
       <ConflictModal
@@ -282,7 +412,7 @@ export const ClipboardItems = () => {
   });
 
   return (
-    <div>
+    <div className="w-full">
       {sortedItems.map((item, index) => (
         <ClipboardItem key={item.id} item={item} index={index + 1} />
       ))}
