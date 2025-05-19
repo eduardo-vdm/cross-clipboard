@@ -1,13 +1,13 @@
 import fs from 'fs/promises';
 import path from 'path';
 import { v4 as uuidv4 } from 'uuid';
-import { Session, ClipboardItem, ItemType, DataService, UpdateItemResponse } from '../types';
+import { Session, ClipboardItem, ItemType, DataService, UpdateItemResponse, TokenMetadata, TokenResponse } from '../types';
 import { SessionNotFoundError, SessionArchivedException, SessionCodeGenerationError } from '../types/errors';
-import { ISession } from '../db/schemas';
+import { ISession, IToken } from '../db/schemas';
 
 const DATA_DIR = path.join(__dirname, '../../data');
 const SESSIONS_FILE = path.join(DATA_DIR, 'sessions.json');
-
+const TOKENS_FILE = path.join(DATA_DIR, 'tokens.json');
 // Ensure data directory exists
 async function ensureDataDir() {
   try {
@@ -40,8 +40,14 @@ async function saveSessions(sessions: Record<string, ISession>): Promise<void> {
   await fs.writeFile(SESSIONS_FILE, JSON.stringify(sessions, null, 2));
 }
 
+async function saveTokens(tokens: Record<string, IToken>): Promise<void> {
+  await ensureDataDir();
+  await fs.writeFile(TOKENS_FILE, JSON.stringify(tokens, null, 2));
+}
+
 export class MockDataService implements DataService {
   private sessions: Record<string, ISession> = {};
+  private tokens: Record<string, IToken> = {};
 
   constructor() {
     readSessions().then(sessions => {
@@ -79,6 +85,37 @@ export class MockDataService implements DataService {
     this.sessions[session.id] = session;
     await saveSessions(this.sessions);
     return this.deepCopySession(session);
+  }
+
+  async createOrRenewToken(fingerprint: string, metadata: TokenMetadata): Promise<TokenResponse> {
+    const token = {
+      token: uuidv4(),
+      fingerprint,
+      expiresAt: new Date(Date.now() + 60 * 60 * 1000),
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      metadata
+    };
+
+    this.tokens[token.token] = token;
+    await saveTokens(this.tokens);
+    return { token: token.token, expiresAt: token.expiresAt };
+  }
+
+  async validateToken(token: string, fingerprint: string): Promise<{ exists: boolean; expired: boolean; expiresAt: Date | null; metadata?: TokenMetadata }> {  
+    const userToken = this.tokens[token];
+    if (!userToken) return { exists: false, expired: false, expiresAt: null };
+
+    if (userToken.fingerprint !== fingerprint) return { exists: false, expired: false, expiresAt: null };
+
+    const now = new Date();
+    if (now > userToken.expiresAt) return { exists: true, expired: true, expiresAt: userToken.expiresAt };
+
+    return { exists: true,
+      expired: false,
+      metadata: userToken.metadata,
+      expiresAt: userToken.expiresAt
+    };
   }
 
   async getSession(id: string): Promise<Session | null> {

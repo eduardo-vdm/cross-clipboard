@@ -1,8 +1,10 @@
 import dotenv from 'dotenv';
 import express, { Request, Response, NextFunction } from 'express';
 import cors from 'cors';
-import { createSessionRouter } from './routes/session';
 import { getConfig, getDataService } from './config';
+import { createSessionRouter } from './routes/session';
+import { createTokenRouter } from './routes/token';
+import { createAuthMiddleware } from './middleware/auth';
 import { requestLogger } from './middleware/requestLogger';
 import { errorHandler } from './middleware/errorHandler';
 import { mongoConnection } from './db/connection';
@@ -43,7 +45,9 @@ async function initializeServer() {
   const dataService = getDataService();
 
   // Routes
+  app.use('/api', createAuthMiddleware(dataService));
   app.use('/api', createSessionRouter(dataService));
+  app.use('/api', createTokenRouter(dataService));
 
   // Handle 404s
   app.use((req: Request, res: Response) => {

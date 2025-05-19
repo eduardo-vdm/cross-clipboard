@@ -1,4 +1,5 @@
 import { ISession, IClipboardItem } from '../db/schemas';
+import { Request } from 'express';
 
 export type ItemType = 'text' | 'image';
 
@@ -6,6 +7,28 @@ export type ClipboardItem = Omit<IClipboardItem, 'isArchived'> & {
   deviceName: string;
 };
 export type Session = Omit<ISession, 'isArchived'>;
+
+export interface Token {
+  id: string;
+  token: string;
+  expiresAt: Date;
+  createdAt: Date;
+  updatedAt: Date;
+  metadata: TokenMetadata;
+}
+
+export interface TokenMetadata {
+  ip: string;
+  userAgent: string;
+  browserBrand?: string | string[];
+  osPlatform?: string | string[];
+  acceptLanguage?: string | string[];
+}
+
+export interface TokenResponse {
+  token: string;
+  expiresAt: Date | null;
+}
 
 export interface CreateSessionResponse {
   id: string;
@@ -30,8 +53,56 @@ export interface VersionConflict {
   serverContent: string;
 }
 
+export interface TokenNotFound {
+  error: string;
+}
+
+// Extend the Request interface to include fingerprint and tokenMetadata
+export interface ExtendedRequest extends Request {
+  fingerprint: string;
+  tokenMetadata: TokenMetadata;
+}
+
 // Define the interface that all data services must implement
 export interface DataService {
+  /**
+   * Creates a new token or renews an existing one
+   * @param {string} fingerprint - The fingerprint of the client
+   * @param {TokenMetadata} metadata - The metadata of the token
+   * @returns {Promise<TokenResponse>} The token response
+   */
+  createOrRenewToken(fingerprint: string, metadata: TokenMetadata): Promise<TokenResponse>;
+
+  /**
+   * Validates a token
+   * @param {string} token - The token to validate
+   * @returns {Promise<{ valid: boolean; metadata?: TokenMetadata; expiresAt?: Date }>} The token validation result
+   */
+  validateToken(token: string, fingerprint: string): Promise<{ exists: boolean; expired: boolean; expiresAt: Date | null; metadata?: TokenMetadata }>;
+
+  // /**
+  //  * Gets a token by token
+  //  * @param {string} token - The token to get
+  //  * @returns {Promise<Token | null>} The token or null if not found
+  //  */
+  // getTokenByToken(token: string): Promise<Token | null>;  
+
+  // /**
+  //  * Gets a token by fingerprint
+  //  * @param {string} fingerprint - The fingerprint of the token
+  //  * @returns {Promise<Token | null>} The token or null if not found
+  //  */
+  // getTokenByFingerprint(fingerprint: string): Promise<Token | null>;
+
+  // /**
+  //  * Gets a token by ID
+  //  * @param {string} id - The ID of the token
+  //  * @returns {Promise<Token | null>} The token or null if not found
+  //  */
+  // getTokenById(id: string): Promise<Token | null>;  
+
+
+
   /**
    * Creates a new session with a unique code
    * @param {string} deviceId - The device ID of the session creator

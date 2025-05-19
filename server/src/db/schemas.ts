@@ -24,6 +24,18 @@ export interface ISession {
   createdBy: string;  // Device ID of the session creator
 }
 
+export interface IToken {
+  token: string;
+  fingerprint: string;
+  expiresAt: Date;
+  createdAt: Date;
+  updatedAt: Date;
+  metadata: {
+    ip: string;
+    userAgent: string;
+  };
+}
+
 // Define interfaces for the Mongoose documents
 export interface IClipboardItemDocument extends Omit<IClipboardItem, 'id'>, Document {
   id: string;  // Override the _id with our custom id
@@ -32,6 +44,10 @@ export interface IClipboardItemDocument extends Omit<IClipboardItem, 'id'>, Docu
 export interface ISessionDocument extends Omit<ISession, 'id' | 'items'>, Document {
   id: string;  // Override the _id with our custom id
   items: IClipboardItemDocument[];
+}
+
+export interface ITokenDocument extends Omit<IToken, 'token'>, Document {
+  token: string;
 }
 
 // ClipboardItem Schema
@@ -62,12 +78,30 @@ const sessionSchema = new Schema({
   createdBy: { type: String, required: true }  // Add createdBy field
 });
 
+// Token Schema
+const tokenSchema = new Schema<ITokenDocument>({
+  token: { type: String, required: true, unique: true },
+  fingerprint: { type: String, required: true, unique: true },
+  expiresAt: { type: Date, required: true },
+  createdAt: { type: Date, required: true },
+  updatedAt: { type: Date, required: true },
+  metadata: {
+    ip: String,
+    userAgent: String,
+    browserBrand: String,
+    osPlatform: String,
+    acceptLanguage: String
+  },
+});
+
 // Indexes
 sessionSchema.index({ createdAt: 1 }, { expireAfterSeconds: 7 * 24 * 60 * 60 }); // 7 days TTL
 sessionSchema.index({ id: 1 }, { unique: true });
 sessionSchema.index({ code: 1 }, { unique: true });  // Index for the session code
 sessionSchema.index({ isArchived: 1 });
+tokenSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 0 });
 
 // Models
 // The ClipboardItem model is no longer needed as we store items as embedded documents
 export const Session = mongoose.model<ISessionDocument>('Session', sessionSchema); 
+export const Token = mongoose.model<ITokenDocument>('Token', tokenSchema);

@@ -1,14 +1,7 @@
-import { Router, Request, Response, NextFunction } from 'express';
+import { Router, Request, Response } from 'express';
 import { DataService } from '../types';
 import { ItemType } from '../types';
-
-/**
- * Helper function to create an async Express route handler that passes errors to next()
- */
-const asyncHandler = (fn: (req: Request, res: Response, next: NextFunction) => Promise<any>) => 
-  (req: Request, res: Response, next: NextFunction) => {
-    Promise.resolve(fn(req, res, next)).catch(next);
-  };
+import { asyncHandler } from '../helpers/asyncHandler';
 
 export const createSessionRouter = (dataService: DataService) => {
   const router = Router();

@@ -1,12 +1,13 @@
 import { v4 as uuidv4 } from 'uuid';
-import mongoose from 'mongoose';
+import crypto from 'crypto';
 import { 
   Session as SessionModel, 
+  Token as TokenModel,
   ISessionDocument, 
   IClipboardItemDocument,
   IClipboardItem
 } from '../db/schemas';
-import { DataService, Session, ItemType, UpdateItemResponse, ClipboardItem } from '../types';
+import { DataService, Session, ItemType, UpdateItemResponse, ClipboardItem, TokenMetadata, TokenResponse } from '../types';
 import {
   SessionNotFoundError,
   SessionCodeGenerationError,
@@ -75,6 +76,59 @@ export class MongoDataService implements DataService {
     }
   }
 
+  async createOrRenewToken(fingerprint: string, metadata: TokenMetadata): Promise<TokenResponse> {
+    await this.ensureConnection();
+    const now = new Date();
+    const expiresAt = new Date(now.getTime() + 60 * 60 * 1000);
+
+    try {
+      const existingToken = await TokenModel.findOne({ fingerprint });
+      if (existingToken) {
+        existingToken.expiresAt = expiresAt;
+        existingToken.updatedAt = now;
+        existingToken.metadata = metadata;
+        await existingToken.save();
+        return { token: existingToken.token, expiresAt };
+      }
+
+      const newToken = crypto.randomUUID();
+      const token = new TokenModel({
+        token: newToken,
+        fingerprint,
+        expiresAt,
+        createdAt: now,
+        updatedAt: now,
+        metadata
+      });
+
+      await token.save();
+      return { token: newToken, expiresAt };
+    } catch (error: any) {
+      throw new DatabaseError('Failed to create or renew token', error.message);
+    }
+  }
+
+  async validateToken(token: string, fingerprint: string): Promise<{ exists: boolean; expired: boolean; expiresAt: Date | null; metadata?: TokenMetadata }> {
+    await this.ensureConnection();
+    const now = new Date();
+    
+    try {
+      const userToken = await TokenModel.findOne({ token, fingerprint });
+      if (!userToken) return { exists: false, expired: false, expiresAt: null };
+  
+      if (now > userToken.expiresAt) return { exists: true, expired: true, expiresAt: userToken.expiresAt };
+    
+      return {
+        exists: true,
+        expired: false,
+        metadata: userToken.metadata,
+        expiresAt: userToken.expiresAt,
+      };
+    } catch (error: any) {
+      throw new DatabaseError('Failed to validate token', error.message);
+    }
+  }
+  
   async getSessionById(id: string): Promise<Session> {
     await this.ensureConnection();
     
