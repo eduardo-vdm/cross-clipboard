@@ -1,6 +1,9 @@
 import { useState, useEffect, useCallback } from 'react';
 import { getServiceConfig } from '../services/config';
 
+// import { useRequestQueue } from './useRequestQueue';
+// TODO: Refactor to use useRequestQueue
+
 const MAX_HISTORY_LENGTH = 20;
 const MAX_CACHE_LENGTH = 100;
 const USE_LOCAL_STORAGE_CACHE = false;

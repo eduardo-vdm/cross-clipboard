@@ -1,12 +1,13 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useSession } from '../contexts/SessionContext';
 import { useSessionHistory } from '../hooks/useSessionHistory';
-import toast from 'react-hot-toast';
+import { useRequestQueue } from '../hooks/useRequestQueue';
 import clsx from 'clsx';
-import '../styles/custom.css';
-import { useTranslation } from 'react-i18next';
-import { ClipboardDocumentListIcon } from '@heroicons/react/24/outline';
+import toast from 'react-hot-toast';
 import useEmblaCarousel from 'embla-carousel-react';
+import '../styles/custom.css';
+import { ClipboardDocumentListIcon } from '@heroicons/react/24/outline';
 import { StartPageHeader } from './StartPageHeader';
 
 const DEFAULT = {
