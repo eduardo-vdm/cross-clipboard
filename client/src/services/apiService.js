@@ -4,6 +4,51 @@
  */
 import { API_URL } from '../env';
 
+//// TODO: Auth helpers to be refactored in a more modular way
+// Internal token store
+let authToken = null;
+let authTokenExpiresAt = null;
+
+// Validate the token is still fresh
+const getValidToken = () => {
+  if (!authToken || !authTokenExpiresAt) return null;
+  const now = Date.now();
+  const expires = new Date(authTokenExpiresAt).getTime();
+  return now < expires ? authToken : null;
+};
+
+// Pull token and expiration from server response headers
+const updateTokenFromHeaders = (headers) => {
+  const newToken = headers.get('X-Token');
+  const newExpiresAt = headers.get('X-Token-Expires-At');
+  if (newToken && newExpiresAt) {
+    authToken = newToken;
+    authTokenExpiresAt = newExpiresAt;
+  }
+};
+
+const fetchWithAuth = async (url, options = {}) => {
+  const token = getValidToken();
+  const headers = new Headers(options.headers || {});
+  console.log('fetchWithAuth1', url, token);
+
+  if (token) {
+    headers.set('Authorization', `Bearer ${token}`);
+  }
+
+  const response = await fetch(url, {
+    ...options,
+    headers
+  });
+  
+  console.log('fetchWithAuth2', response);
+
+  updateTokenFromHeaders(response.headers);
+  console.log('fetchWithAuth', getValidToken());
+  return response;
+};
+//// -> End of auth helpers (to be refactored)
+
 // Helper function to handle API responses and errors
 const handleResponse = async (response) => {
   if (!response.ok) {
@@ -47,6 +92,9 @@ const handleResponse = async (response) => {
     }
     
     throw new Error(errorData.error || `HTTP error ${response.status}`);
+  } else {
+    // If the response is ok, update the token (this maybe needs revision, also can be done if the response is not ok)
+    updateTokenFromHeaders(response.headers); 
   }
   
   if (response.status === 204) {
@@ -64,7 +112,7 @@ export const apiService = {
    * @returns {Promise<{code: string}>} Session info with 6-digit code
    */
   createSession: async (deviceId) => {
-    const response = await fetch(`${API_URL}/api/sessions`, {
+    const response = await fetchWithAuth(`${API_URL}/api/sessions`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -84,11 +132,11 @@ export const apiService = {
   joinSession: async (code, deviceId) => {
     try {
       // First try to get the session by code
-      const getResponse = await fetch(`${API_URL}/api/sessions/${code}`);
+      const getResponse = await fetchWithAuth(`${API_URL}/api/sessions/${code}`);
       const session = await handleResponse(getResponse);
       
       // Then get the items
-      const itemsResponse = await fetch(`${API_URL}/api/sessions/${code}/items`);
+      const itemsResponse = await fetchWithAuth(`${API_URL}/api/sessions/${code}/items`);
       const items = await handleResponse(itemsResponse);
       
       return { 
@@ -115,7 +163,7 @@ export const apiService = {
    * @returns {Promise<Array>} Array of items
    */
   getItems: async (code) => {
-    const response = await fetch(`${API_URL}/api/sessions/${code}/items`);
+    const response = await fetchWithAuth(`${API_URL}/api/sessions/${code}/items`);
     return handleResponse(response);
   },
   
@@ -129,7 +177,7 @@ export const apiService = {
    */
   addItem: async (code, content, type, deviceId, deviceName) => {
     // The server now requires deviceId for ownership tracking
-    const response = await fetch(`${API_URL}/api/sessions/${code}/items`, {
+    const response = await fetchWithAuth(`${API_URL}/api/sessions/${code}/items`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -156,7 +204,7 @@ export const apiService = {
    */
   editItem: async (code, itemId, content, deviceId, version) => {
     // The server now requires deviceId for ownership verification
-    const response = await fetch(`${API_URL}/api/sessions/${code}/items/${itemId}`, {
+    const response = await fetchWithAuth(`${API_URL}/api/sessions/${code}/items/${itemId}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json'
@@ -180,7 +228,7 @@ export const apiService = {
    */
   deleteItem: async (code, itemId, deviceId) => {
     // The server now requires deviceId for ownership verification
-    const response = await fetch(`${API_URL}/api/sessions/${code}/items/${itemId}`, {
+    const response = await fetchWithAuth(`${API_URL}/api/sessions/${code}/items/${itemId}`, {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json'
@@ -200,7 +248,7 @@ export const apiService = {
   checkSession: async (sessionCode) => {
     try {
       // First try to get the session by code
-      const getResponse = await fetch(`${API_URL}/api/sessions/${sessionCode}`);
+      const getResponse = await fetchWithAuth(`${API_URL}/api/sessions/${sessionCode}`);
       const session = await handleResponse(getResponse);
       
       // Check if the session is valid
@@ -231,7 +279,7 @@ export const apiService = {
    * @throws {Error} If session not found or user is not the creator
    */
   wipeSession: async (sessionCode, deviceId) => {
-    const response = await fetch(`${API_URL}/api/sessions/${sessionCode}/wipe`, {
+    const response = await fetchWithAuth(`${API_URL}/api/sessions/${sessionCode}/wipe`, {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json',
@@ -266,7 +314,7 @@ export const apiService = {
    * @throws {Error} If session not found
    */
   removeMyItems: async (sessionCode, deviceId) => {
-    const response = await fetch(`${API_URL}/api/sessions/${sessionCode}/remove-my-items`, {
+    const response = await fetchWithAuth(`${API_URL}/api/sessions/${sessionCode}/remove-my-items`, {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json',
@@ -276,4 +324,4 @@ export const apiService = {
 
     return handleResponse(response);
   }
-}; 
+};

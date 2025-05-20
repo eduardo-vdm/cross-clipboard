@@ -8,6 +8,7 @@ import { createAuthMiddleware } from './middleware/auth';
 import { requestLogger } from './middleware/requestLogger';
 import { errorHandler } from './middleware/errorHandler';
 import { mongoConnection } from './db/connection';
+import { createCorsMiddleware } from './middleware/cors';
 
 // Load environment variables
 dotenv.config();
@@ -19,7 +20,7 @@ const config = getConfig();
 const app = express();
 
 // Middleware
-app.use(cors());
+app.use(createCorsMiddleware());
 app.use(express.json()); // Needed to parse JSON body
 
 // Set up request logging

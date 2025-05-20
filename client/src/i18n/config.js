@@ -12,7 +12,7 @@ i18n
     supportedLngs: ['en', 'pt-BR'],
     
     // Namespaces for better organization
-    ns: ['common', 'clipboard', 'dates'],
+    ns: ['common', 'clipboard'],
     defaultNS: 'common',
     
     // Backend configuration for loading translations

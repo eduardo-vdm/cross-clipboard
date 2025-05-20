@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { useSessionHistory } from '../hooks/useSessionHistory';
 
 const SessionContext = createContext(null);
-const POLLING_INTERVAL = 5000; // 5 seconds
+const POLLING_INTERVAL = 5000; // milliseconds
 
 export const useSession = () => {
   const context = useContext(SessionContext);

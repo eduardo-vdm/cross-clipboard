@@ -76,9 +76,9 @@ function StartPage() {
   }, [status]);
 
   useEffect(() => {
-    console.log('status', status);
-    console.log('joinBtnRef.current', joinBtnRef.current);
-    console.log('document.activeElement', document.activeElement);
+    // console.log('status', status);
+    // console.log('joinBtnRef.current', joinBtnRef.current);
+    // console.log('document.activeElement', document.activeElement);
 
     if (status === 'valid') {
       const handleGlobalKeyDown = (e) => {
