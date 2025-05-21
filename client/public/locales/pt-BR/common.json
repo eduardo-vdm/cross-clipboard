@@ -10,6 +10,7 @@
     "close": "Fechar",
     "join": "Entrar",
     "createNewOne": "Criar um novo",
+    "oneClick": "1-Click",
     "loading": "Carregando..."
   },
   "confirmations": {
@@ -49,6 +50,24 @@
     },
     "invalid": {
       "message": "Clipboard <b>{code}</b> não existe ou expirou."
+    },
+    "history": {
+      "title": "Últimos clipboards visitados",
+      "empty": "Nenhum clipboard visitado ainda. Crie um novo para começar!",
+      "scrollLeft": "Deslizar para a esquerda",
+      "scrollRight": "Deslizar para a direita"
     }
+  },
+  "footer": {
+    "privacy": "Privacidade e dados"
+  },
+  "privacyInfo": {
+    "title": "Privacidade e uso de dados",
+    "intro": "O Cross Clipboard respeita sua privacidade.",
+    "deviceData": "Algumas informações básicas do seu dispositivo — como endereço IP, navegador, idioma do sistema e sistema operacional — podem ser coletadas automaticamente ao usar o app. Esses dados são usados apenas para gerar um identificador anônimo e pessoal, que garante que seus conteúdos copiados não sejam misturados com os de outras pessoas.",
+    "clipboardStorage": "Todo conteúdo colado no app é armazenado anonimamente, vinculado apenas a esse identificador. Esses dados podem ser apagados a qualquer momento por você, e também são removidos automaticamente após um período de tempo.",
+    "analyticsUse": "O identificador também pode nos ajudar a melhorar o app por meio de análises internas. Nenhuma informação, incluindo os dados colados, será compartilhada com terceiros ou usada para fins comerciais, em nenhuma circunstância.",
+    "deletionOption": "Você pode apagar seu identificador e todo o conteúdo associado sempre que quiser (já disponível na visualização do clipboard).",
+    "contact": "Caso tenha dúvidas ou sugestões sobre privacidade, ficamos à disposição."
   }
 } 

@@ -8,7 +8,9 @@ import toast from 'react-hot-toast';
 import useEmblaCarousel from 'embla-carousel-react';
 import '../styles/custom.css';
 import { ClipboardDocumentListIcon } from '@heroicons/react/24/outline';
+import { XMarkIcon } from '@heroicons/react/24/outline';
 import { StartPageHeader } from './StartPageHeader';
+import KeyLabel from '../utils/keyLabel';
 
 const DEFAULT = {
   STATUS: 'idle',
@@ -66,12 +68,14 @@ function StartPage() {
       }, 200);
     } else if (status === 'invalid') {
       const currentCode = code.join('');
-      setCode(['', '', '', '', '', '']);
+      const newCode = [...code];
+      newCode[5] = '';
+      setCode(newCode);
+      setStatus('idle');
+      // setCode(['', '', '', '', '', '']);
       setTimeout(() => {
         setStatusMessage({ code: status, message: t('startPage.invalid.message'), vars: { code: currentCode } });
-        if (inputRefs.current[0]) {
-          inputRefs.current[0].focus();
-        }
+        if (inputRefs.current[5]) inputRefs.current[5].focus();
       }, 200);
     }
   }, [status]);
@@ -261,7 +265,7 @@ function StartPage() {
                 {t('startPage.join.inputsHeading')}
               </h2>
               <div 
-                className="flex gap-2 justify-center mb-4 relative"
+                className="flex gap-2 justify-center mb-2 relative"
                 onPaste={handlePaste}
                 role="group"
                 aria-labelledby="join-heading"
@@ -279,7 +283,7 @@ function StartPage() {
                     onChange={(e) => handleInputChange(i, e.target.value)}
                     onKeyDown={(e) => handleKeyDown(i, e)}
                     className={clsx(
-                      'w-14 h-20 font-semibold text-4xl text-center rounded border-2 border-white dark:border-gray-700 focus:border-blue-600 dark:focus:border-blue-400 bg-transparent outline-none transition-colors duration-150',
+                      'w-14 h-20 font-semibold text-4xl text-center rounded border-2 border-gray-300 dark:border-gray-700 focus:border-blue-600 dark:focus:border-blue-400 bg-transparent outline-none transition-colors duration-150',
                       'text-amber-500 dark:text-amber-400',
                       status === 'checking' && 'animate-pulse',
                       status === 'valid' && 'border-green-600 dark:border-green-400',
@@ -331,10 +335,10 @@ function StartPage() {
                 <p 
                   id="status-message" 
                   className={clsx(
-                    'text-md text-center mb-4',
+                    'text-md text-left mb-2',
                     statusMessage.code === 'invalid' && 'text-red-500 dark:text-red-400',
                     statusMessage.code === 'valid' && 'text-green-500 dark:text-green-400',
-                    (statusMessage.code === 'checking' || statusMessage.code === 'idle') && 'text-blue-500 dark:text-blue-400'
+                    (statusMessage.code === 'checking' || statusMessage.code === 'idle') && 'text-gray-500 dark:text-gray-400'
                   )}
                   role={status === 'invalid' ? 'alert' : 'status'}
                   aria-live={status === 'invalid' ? 'assertive' : 'polite'}
@@ -352,27 +356,32 @@ function StartPage() {
               <button
                 onClick={() => createSession(deviceId)}
                 disabled={loading || status === 'checking'}
-                className="w-full px-8 py-3 text-lg md:text-xl rounded border border-white dark:border-gray-700 hover:bg-white hover:text-gray-900 dark:hover:bg-gray-800 dark:hover:text-white transition-colors font-semibold focus:outline-none focus:ring-2 focus:ring-blue-600 dark:focus:ring-blue-400 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full px-8 py-3 text-lg md:text-xl rounded border border-gray-300 hover:border-amber-400 dark:border-gray-700 hover:dark:border-amber-400 hover:bg-white hover:text-amber-600 dark:hover:bg-gray-800 dark:hover:text-amber-400 transition-colors font-semibold text-blue-800 dark:text-blue-400 disabled:opacity-50 disabled:cursor-not-allowed border-2 focus:outline-none focus:ring-4 focus:ring-amber-500 focus:text-amber-500 focus:dark:text-amber-500"
                 aria-label={loading ? "Creating new clipboard..." : "Create a new clipboard"}
+                dangerouslySetInnerHTML={{
+                  __html: `${t('actions.createNewOne')} <span class='text-xs text-gray-500 dark:text-gray-300 font-medium'>(${t('actions.oneClick')})</span>`
+                }}
               >
-                {loading ? t('actions.loading') : t('actions.createNewOne')}
               </button>
+              {/* <p className="w-full text-right -mt-2 text-sm text-gray-500 dark:text-gray-300 italic">
+                <KeyLabel keyString='Ctrl+N' />
+              </p> */}
             </div>
             
             <div className="flex flex-col items-start gap-1 w-full mt-8">
               {allHistoryCodes.length > 0 ? (
                 <>
-                  <span className="text-sm text-gray-500 dark:text-gray-300 italic font-semibold">Last visited clipboards:</span>
+                  <span className="text-sm text-gray-400 dark:text-gray-400 italic pb-2">{t('startPage.history.title')}:</span>
                   <div className="relative w-full">
                     {/* Left Arrow */}
                     <button
                       type="button"
-                      className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-gray-800 dark:bg-gray-700 bg-opacity-70 rounded-full p-1 shadow hover:bg-opacity-90 transition"
+                      className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-gray-800 dark:bg-gray-700 bg-opacity-50 rounded p-0 shadow hover:bg-opacity-90 transition"
                       onClick={() => emblaApi && emblaApi.scrollPrev()}
-                      aria-label="Scroll left"
+                      aria-label={t('actions.scrollLeft')}
                       style={{ display: allHistoryCodes.length > 1 ? 'block' : 'none' }}
                     >
-                      <span className="sr-only">Scroll left</span>
+                      <span className="sr-only">{t('actions.scrollLeft')}</span>
                       <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" strokeWidth="2" d="M15 19l-7-7 7-7"/></svg>
                     </button>
                     {/* Embla viewport */}
@@ -406,19 +415,19 @@ function StartPage() {
                     {/* Right Arrow */}
                     <button
                       type="button"
-                      className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-gray-800 dark:bg-gray-700 bg-opacity-70 rounded-full p-1 shadow hover:bg-opacity-90 transition"
+                      className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-gray-800 dark:bg-gray-700 bg-opacity-50 rounded p-0 shadow hover:bg-opacity-90 transition"
                       onClick={() => emblaApi && emblaApi.scrollNext()}
-                      aria-label="Scroll right"
+                      aria-label={t('actions.scrollRight')}
                       style={{ display: allHistoryCodes.length > 1 ? 'block' : 'none' }}
                     >
-                      <span className="sr-only">Scroll right</span>
+                      <span className="sr-only">{t('actions.scrollRight')}</span>
                       <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" strokeWidth="2" d="M9 5l7 7-7 7"/></svg>
                     </button>
                   </div>
                 </>
               ) : (
                 <span className="text-sm text-gray-500 dark:text-gray-300 italic font-semibold">
-                  No clipboards visited yet.
+                  {t('startPage.history.empty')}
                 </span>
               )}
             </div>

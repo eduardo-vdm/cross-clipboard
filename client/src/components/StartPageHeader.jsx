@@ -8,7 +8,7 @@ export const StartPageHeader = () => {
   const { currentTheme, toggleTheme } = useTheme();
 
   return (
-    <div className="sticky top-0 z-30 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 p-1 flex justify-end items-center">
+    <div className="sticky top-0 z-30 bg-white dark:bg-gray-800 border-b border-gray-300 dark:border-gray-700 p-1 flex justify-end items-center">
       <div className="flex items-center gap-2">
         <button
           onClick={toggleTheme}

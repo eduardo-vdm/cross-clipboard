@@ -5,6 +5,7 @@ import { ThemeProvider } from './contexts/ThemeContext';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import StartPage from './components/StartPage';
 import SessionPage from './components/SessionPage';
+import { AppFooter } from './components/AppFooter';
 
 function App() {
   return (
@@ -12,12 +13,13 @@ function App() {
       <SessionProvider>
         <PasteSuppressProvider>
           <div className="flex flex-col min-h-screen bg-gray-50 dark:bg-gray-900">
-          <Routes>
-            <Route path="/" element={<Navigate to="/start" replace />} />
-            <Route path="/start" element={<StartPage />} />
-            <Route path="/:code" element={<SessionPage />} />
-            <Route path="*" element={<Navigate to="/start" replace />} />
-          </Routes>
+            <Routes>
+              <Route path="/" element={<Navigate to="/start" replace />} />
+              <Route path="/start" element={<StartPage />} />
+              <Route path="/:code" element={<SessionPage />} />
+              <Route path="*" element={<Navigate to="/start" replace />} />
+            </Routes>
+            <AppFooter />
             <Toaster 
               position="bottom-right"
               toastOptions={{

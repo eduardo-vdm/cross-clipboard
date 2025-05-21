@@ -31,7 +31,7 @@
   },
   "addItem": {
     "pastePrompt": "Paste text here",
-    "supportedTypes": "Supports text (and soon images)",
+    "supportedTypes": "Supports text (soon™ images)",
     "permissionDenied": "Clipboard access denied. Update browser settings.",
     "keyboardShortcutAppend": " to paste"
   },

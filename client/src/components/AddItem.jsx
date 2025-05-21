@@ -4,8 +4,8 @@ import { useTranslation } from 'react-i18next';
 import { useHotkeys } from 'react-hotkeys-hook';
 import { useState, useEffect, useRef } from 'react';
 import { ExclamationTriangleIcon } from '@heroicons/react/24/solid';
-import '../styles/custom.css';
 import KeyLabel from '../utils/keyLabel';
+import '../styles/custom.css';
 
 export const AddItem = () => {
   const { addItem } = useSession();
