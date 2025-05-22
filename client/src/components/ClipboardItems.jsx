@@ -240,10 +240,14 @@ const ClipboardItem = ({ item, index }) => {
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border dark:border-gray-700 p-4 mb-4">
         <div className="flex justify-between items-start mb-2">
           <div className="text-sm text-gray-500 dark:text-gray-400">
-            {index <= 9 && (
-              <KeyLabel keyString={`${index}`} />
-            )}
-            {formatDate(item.createdAt, 'PPpp', i18n.language)}
+            <span className="mr-1">
+              {index <= 9 && (
+                <KeyLabel keyString={`${index}`} />
+              )}
+            </span>
+            <span>
+              {formatDate(item.createdAt, 'PPpp', i18n.language)}
+            </span>
             <span className="ml-2 text-gray-400 flex items-center gap-1">
               from{' '}
               {isOwner && (

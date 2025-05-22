@@ -33,7 +33,7 @@ function StartPage() {
   const [emblaRef, emblaApi] = useEmblaCarousel({ axis: 'x', dragFree: true, containScroll: 'trimSnaps' });
   const inputRefs = useRef([]);
   const joinBtnRef = useRef(null);
-
+  const createBtnRef = useRef(null);
   const lastCheckedCode = useRef('');
 
   // Not great to modify the default status message, but it needs to be translated
@@ -50,8 +50,8 @@ function StartPage() {
 
   // Auto-focus first input
   useEffect(() => {
-    if (inputRefs.current[0]) {
-      inputRefs.current[0].focus();
+    if (createBtnRef.current) {
+      createBtnRef.current.focus();
     }
   }, []);
 
@@ -138,8 +138,8 @@ function StartPage() {
     setCode(['', '', '', '', '', '']);
     setError('');
     setStatus('idle');
-    if (inputRefs.current[0]) {
-      inputRefs.current[0].focus();
+    if (createBtnRef.current) {
+      createBtnRef.current.focus();
     }
   };
 
@@ -155,6 +155,10 @@ function StartPage() {
   };
 
   const handleKeyDown = (index, e) => {
+    // If Ctrl or Cmd is pressed, handle key combinations
+    const isCtrlOrCmd = e?.ctrlKey || e?.metaKey;
+    if (isCtrlOrCmd) return handleCtrlKeyCombinationDown(e);
+
     // Backspace: if valid, clear last input and go back to idle
     if (e.key === 'Backspace') {
       if (status === 'valid') {
@@ -179,6 +183,21 @@ function StartPage() {
     // Allow Enter to trigger join if join button is visible and focused
     if (e.key === 'Enter' && status === 'valid' && joinBtnRef.current) {
       joinBtnRef.current.click();
+    }
+  };
+
+  const handleCtrlKeyCombinationDown = (e) => {
+    const isCtrlOrCmd = e?.ctrlKey || e?.metaKey;
+    const isSoleCtrlOrCmd = isCtrlOrCmd && ['Control', 'Meta'].includes(e?.key);
+    if (!isCtrlOrCmd || isSoleCtrlOrCmd) return;
+
+    switch (e?.key?.toLowerCase()) {
+      case 'n': // this needs to be reviewed, it's not working as expected and the browser's default behavior always wins
+        e.preventDefault();
+        createSession(deviceId);
+        break;
+      default:
+        return;
     }
   };
 
@@ -235,10 +254,10 @@ function StartPage() {
     const isInteractive = target.tagName === 'INPUT' || 
                          target.tagName === 'BUTTON' || 
                          target.closest('button') !== null;
-    if (!isInteractive && inputRefs.current[0]) {
+    if (!isInteractive && createBtnRef.current) {
       e.preventDefault();
       e.stopPropagation();
-      inputRefs.current[0].focus();
+      createBtnRef.current.focus();
     }
   };
 
@@ -251,22 +270,77 @@ function StartPage() {
         aria-label="CrossClip Start Page"
         onClick={handleContainerClick}
       >
-        <div>
-          <div className="flex flex-col items-center w-full max-w-md mb-16">
-            <h1 className="w-full text-right text-3xl font-bold mb-2 text-gray-900 dark:text-white">{t('startPage.title')}</h1>
+        <div className="-mt-8">
+          <div className="flex flex-col items-end w-full max-w-md mb-16">
+            {/* <h1 className="w-full text-right text-3xl font-bold mb-2 text-gray-900 dark:text-white shadow-sm">{t('startPage.title')}</h1> */}
+            <div className="flex gap-0">
+              <h1 className="text-right text-3xl font-bold mb-2 text-amber-500 dark:text-amber-500 text-shadow-hard-black dark:text-shadow-hard-white">Cross</h1>
+              <h1 className="text-right text-3xl font-bold mb-2 text-blue-500 dark:text-blue-500 text-shadow-hard-black dark:text-shadow-hard-white">Clip</h1>
+            </div>
+
             <p className="w-full text-md md:text-large text-gray-500 dark:text-gray-300 text-right border-t border-dashed border-t-4 border-gray-300 dark:border-gray-700 pt-2 leading-tight" dangerouslySetInnerHTML={{ __html: t('startPage.titleDescription') }} />
           </div>
-          <div className="flex flex-col items-center gap-4 w-full max-w-md">
-            <div className="w-full">
-              <h2 
-                className="text-xl md:text-2xl font-semibold text-blue-800 dark:text-blue-400 mb-2"
-                id="join-heading"
+          <div
+            className="flex flex-col items-center gap-4 w-full max-w-md"
+            onPaste={handlePaste}
+            role="group"
+          >
+
+            <div className="flex flex-col items-center gap-4 w-full relative group">
+              <button
+                ref={createBtnRef}
+                autoFocus
+                tabIndex={1}
+                onClick={() => createSession(deviceId)}
+                disabled={loading || status === 'checking'}
+                className="w-full px-8 py-3 text-lg md:text-xl rounded border border-gray-300 hover:border-amber-400 dark:border-gray-700 hover:dark:border-amber-400 hover:bg-white hover:text-amber-600 dark:hover:bg-gray-800 focus:bg-white dark:focus:bg-gray-800 dark:hover:text-amber-400 transition-colors font-semibold text-blue-800 dark:text-blue-400 disabled:opacity-50 disabled:cursor-not-allowed border-2 focus:outline-none focus:ring-4 focus:ring-amber-500 focus:text-amber-500 focus:dark:text-amber-500"
+                aria-label={loading ? "Creating new clipboard..." : "Create a new clipboard"}
+                dangerouslySetInnerHTML={{
+                  __html: `${t('actions.createNewOne')} <span class='text-xs text-gray-500 dark:text-gray-300 font-medium'>(${t('actions.oneClick')})</span>`
+                }}
               >
-                {t('startPage.join.inputsHeading')}
-              </h2>
+              </button>
+              <p className="w-full text-right -mt-5 text-sm text-gray-500 dark:text-gray-300 relative opacity-0 group-focus-within:opacity-100 transition-opacity duration-200">
+                <span className="absolute right-1 bottom-0 pointer-events-none z-0">
+                  <span className='keyTip'><span className='keyTip-symbol'>⏎</span>Enter</span>
+                </span>
+              </p>
+              <p className="w-full text-right text-sm text-gray-500 dark:text-gray-300 relative opacity-0 group-focus-within:opacity-80 transition-opacity duration-200"></p>
+              {/* <p className="w-full text-right mt-4 text-sm text-gray-500 dark:text-gray-300 relative opacity-0 group-focus-within:opacity-80 transition-opacity duration-200">
+                <span className="absolute right-1 bottom-0 pointer-events-none z-0">
+                  <span className='keyTip'><span className='keyTip-symbol'>⇥</span>Tab</span>
+                </span>
+              </p> */}
+              {/* <p className="w-full text-right -mt-5 text-sm text-gray-500 dark:text-gray-300 relative opacity-80 group-focus-within:opacity-0 transition-opacity duration-200">
+                <span className="absolute right-1 bottom-0 pointer-events-none z-0">
+                  <KeyLabel keyString='Shift+Tab' />
+                </span>
+              </p> */}
+            </div>
+            
+            <div className="flex flex-col items-center gap-4 w-full">
+              <span 
+                className="text-lg md:text-xl text-blue-600 dark:text-blue-400 italic mb-2"
+                aria-hidden="true"
+              >
+                {t('startPage.or')}
+              </span>
+            </div>
+
+            <div className="w-full group">
+              <div className="flex items-end mb-2 gap-2">
+                <h2
+                  className="text-xl md:text-2xl font-semibold text-blue-800 dark:text-blue-400 group-focus-within:text-amber-500 group-focus-within:dark:text-amber-400"
+                  id="join-heading"
+              >
+                <span>{t('startPage.join.inputsHeading')}</span>
+                </h2>
+                <span className="opacity-70">
+                  <KeyLabel keyString='Ctrl+V' />
+                </span>
+              </div>
               <div 
                 className="flex gap-2 justify-center mb-2 relative"
-                onPaste={handlePaste}
                 role="group"
                 aria-labelledby="join-heading"
                 aria-describedby={error ? "error-message" : undefined}
@@ -288,7 +362,7 @@ function StartPage() {
                       status === 'checking' && 'animate-pulse',
                       status === 'valid' && 'border-green-600 dark:border-green-400',
                     )}
-                    tabIndex={0}
+                    tabIndex={i + 1}
                     aria-label={`Digit ${i + 1} of 6`}
                     aria-required="true"
                     aria-invalid={error ? "true" : "false"}
@@ -299,7 +373,7 @@ function StartPage() {
                 <div className="w-14 h-20 flex items-center justify-center ml-2 text-center rounded border-2 border-dashed border-transparent bg-transparent outline-none transition-colors duration-150">
                   {
                     status === 'idle' && code.join('').length < 6 && (
-                      <ClipboardDocumentListIcon className="h-24 w-24 text-gray-700 dark:text-gray-400 select-none" />
+                      <ClipboardDocumentListIcon className="h-24 w-24 text-gray-300 dark:text-gray-700 select-none" />
                     )
                   }
                   {status === 'checking' && (
@@ -346,29 +420,8 @@ function StartPage() {
                 />
               )}
             </div>
-            <div className="flex flex-col items-center gap-4 w-full">
-              <span 
-                className="text-lg md:text-xl text-blue-600 dark:text-blue-400 italic mb-2"
-                aria-hidden="true"
-              >
-                {t('startPage.or')}
-              </span>
-              <button
-                onClick={() => createSession(deviceId)}
-                disabled={loading || status === 'checking'}
-                className="w-full px-8 py-3 text-lg md:text-xl rounded border border-gray-300 hover:border-amber-400 dark:border-gray-700 hover:dark:border-amber-400 hover:bg-white hover:text-amber-600 dark:hover:bg-gray-800 dark:hover:text-amber-400 transition-colors font-semibold text-blue-800 dark:text-blue-400 disabled:opacity-50 disabled:cursor-not-allowed border-2 focus:outline-none focus:ring-4 focus:ring-amber-500 focus:text-amber-500 focus:dark:text-amber-500"
-                aria-label={loading ? "Creating new clipboard..." : "Create a new clipboard"}
-                dangerouslySetInnerHTML={{
-                  __html: `${t('actions.createNewOne')} <span class='text-xs text-gray-500 dark:text-gray-300 font-medium'>(${t('actions.oneClick')})</span>`
-                }}
-              >
-              </button>
-              {/* <p className="w-full text-right -mt-2 text-sm text-gray-500 dark:text-gray-300 italic">
-                <KeyLabel keyString='Ctrl+N' />
-              </p> */}
-            </div>
             
-            <div className="flex flex-col items-start gap-1 w-full mt-8">
+            <div className="flex flex-col items-start gap-1 w-full mt-20">
               {allHistoryCodes.length > 0 ? (
                 <>
                   <span className="text-sm text-gray-400 dark:text-gray-400 italic pb-2">{t('startPage.history.title')}:</span>
@@ -376,6 +429,7 @@ function StartPage() {
                     {/* Left Arrow */}
                     <button
                       type="button"
+                      tabIndex={-1}
                       className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-gray-800 dark:bg-gray-700 bg-opacity-50 rounded p-0 shadow hover:bg-opacity-90 transition"
                       onClick={() => emblaApi && emblaApi.scrollPrev()}
                       aria-label={t('actions.scrollLeft')}
@@ -415,6 +469,7 @@ function StartPage() {
                     {/* Right Arrow */}
                     <button
                       type="button"
+                      tabIndex={-1}
                       className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-gray-800 dark:bg-gray-700 bg-opacity-50 rounded p-0 shadow hover:bg-opacity-90 transition"
                       onClick={() => emblaApi && emblaApi.scrollNext()}
                       aria-label={t('actions.scrollRight')}

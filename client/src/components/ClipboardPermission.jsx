@@ -109,7 +109,7 @@ export const ClipboardPermission = () => {
   if (osName) searchQuery += ` ${osName}`;
 
   return (
-    <div className={`fixed bottom-0 left-0 right-0 ${isDenied ? 'bg-red-50 border-red-200' : 'bg-blue-50 border-blue-200'} p-4 border-t flex justify-between items-center`}>
+    <div className={`fixed bottom-8 left-0 right-0 ${isDenied ? 'bg-red-50 border-red-200' : 'bg-blue-50 border-blue-200'} p-4 border-t flex justify-between items-center`}>
       <div>
         <h3 className={`font-medium ${isDenied ? 'text-red-800' : 'text-blue-800'}`}>
           {t(isDenied ? 'permissions.clipboard.deniedTitle' : 'permissions.clipboard.title')}
@@ -119,7 +119,7 @@ export const ClipboardPermission = () => {
         </p>
       </div>
       {isDenied ? (
-        <div className="fixed bottom-0 left-0 right-0 bg-red-50 border-red-200 p-4 border-t flex justify-between items-center">
+        <div className="fixed bottom-8 left-0 right-0 bg-red-50 border-red-200 p-4 border-t flex justify-between items-center">
           <div className="flex items-center gap-2">
             <div className="flex flex-col gap-2">
               <h3 className="flex flex-row gap-1 items-center font-medium text-red-800">

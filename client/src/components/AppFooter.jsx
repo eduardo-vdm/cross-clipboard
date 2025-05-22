@@ -10,7 +10,7 @@ export const AppFooter = () => {
   const [isPrivacyDialogOpen, setIsPrivacyDialogOpen] = useState(false);
 
   return (
-    <footer className="fixed bottom-0 left-0 right-0 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm border-t border-gray-300 dark:border-gray-700 py-2 px-4 text-sm text-gray-600 dark:text-gray-400 hover:bg-white dark:hover:bg-gray-900 transition-colors">
+    <footer className="h-8 fixed bottom-0 left-0 right-0 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm border-t border-gray-300 dark:border-gray-700 py-2 px-4 text-sm text-gray-600 dark:text-gray-400 hover:bg-white dark:hover:bg-gray-900 transition-colors">
       <div className="max-w-7xl mx-auto flex items-center justify-between">
         <span className="text-gray-500 dark:text-gray-500 italic">Work in progress</span>
         <div className="flex items-center">

@@ -3,16 +3,15 @@
 @tailwind utilities;
 
 .keyTip {
-    @apply text-gray-50 bg-amber-600 px-1.5 py-0.5 rounded shadow inline-block font-mono text-sm leading-4 font-bold text-shadow-sm;
+    @apply text-gray-50 bg-amber-600 px-1 pt-0 pb-0 rounded shadow inline-block font-mono text-sm font-bold text-shadow-sm cursor-default;
     font-size: .7rem;
     line-height: .9rem;
     margin: 0 .2em;
 }
 
 .keyTip-symbol {
-    @apply inline-block font-mono font-bold mr-1 tracking-wide;
+    @apply inline-block font-mono font-bold mr-1 tracking-wide cursor-default;
     font-size: 1.1rem;
-    /* margin: 0 .1em; */
 }
 
 .session-code-dashed-box {

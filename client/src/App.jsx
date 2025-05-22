@@ -25,6 +25,9 @@ function App() {
               toastOptions={{
                 duration: 3000,
                 className: 'bg-white dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700 shadow-lg',
+                style: {
+                  marginBottom: '36px',
+                },
                 success: {
                   duration: 2000,
                   className: 'bg-white dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700 shadow-lg',
@@ -34,7 +37,7 @@ function App() {
                   },
                 },
                 error: {
-                  duration: 4000,
+                  duration: 5000,
                   className: 'bg-white dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700 shadow-lg',
                   iconTheme: {
                     primary: '#dc2626',

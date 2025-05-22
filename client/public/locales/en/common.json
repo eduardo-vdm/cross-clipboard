@@ -9,7 +9,7 @@
     "confirm": "Confirm",
     "close": "Close",
     "join": "Join",
-    "createNewOne": "Create a new one",
+    "createNewOne": "Create new clipboard",
     "oneClick": "1-Click",
     "loading": "Loading..."
   },
@@ -37,7 +37,7 @@
   },
   "startPage": {
     "title": "CrossClip",
-    "titleDescription": "Just copy and paste,<br />to and from any device.",
+    "titleDescription": "Copy and paste,<br />to and from any device.",
     "or": "or",
     "join": {
       "inputsHeading": "Join a Clipboard"

@@ -117,14 +117,12 @@ export const AddItem = () => {
         {t('addItem.supportedTypes')}
       </p>
       {hasKeyboard && !isPasteSuppressed && (
-        <div className={`absolute bottom-2 right-2 flex items-center gap-1 ${
-          isDenied ? 'opacity-50' : ''
-        }`}>
+        <div className={`absolute bottom-2 right-2 flex items-center gap-1`}>
           <div className='text-sm text-gray-400 dark:text-gray-500 flex items-center gap-1'>
-            {isDenied && (
-              <ExclamationTriangleIcon className="h-3 w-3 text-white" />
-            )}
             <KeyLabel keyString='Ctrl+V' />{t('addItem.keyboardShortcutAppend')}
+            {isDenied && (
+              <ExclamationTriangleIcon title={t('addItem.permissionDenied')} className="h-4 w-4 text-red-500 dark:text-red-400" />
+            )}
           </div>
         </div>
       )}

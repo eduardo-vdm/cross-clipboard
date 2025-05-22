@@ -139,6 +139,13 @@ export default {
         DEFAULT: '0 2px 4px rgba(0, 0, 0, 0.1)',
         md: '0 4px 8px rgba(0, 0, 0, 0.1)',
         lg: '0 6px 12px rgba(0, 0, 0, 0.1)',
+        'hard-white': '-2px 2px 0px rgba(255, 255, 255, 0.9)',
+        'hard-black': '-2px 2px 0px rgba(0, 0, 0, 0.9)',
+      },
+      shadowWhite: {
+        DEFAULT: '0 2px 4px rgba(255, 255, 255, 0.5)',
+        md: '0 4px 8px rgba(255, 255, 255, 0.5)',
+        lg: '0 6px 12px rgba(255, 255, 255, 0.5)',
       },
     },
   },
