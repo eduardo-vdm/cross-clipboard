@@ -3,7 +3,7 @@ import { usePasteSuppress } from '../contexts/PasteSuppressContext';
 import { useTranslation } from 'react-i18next';
 import { useHotkeys } from 'react-hotkeys-hook';
 import { useState, useEffect, useRef } from 'react';
-import { ExclamationTriangleIcon } from '@heroicons/react/24/solid';
+import { ExclamationTriangleIcon, UserIcon } from '@heroicons/react/24/solid';
 import KeyLabel from '../utils/keyLabel';
 import '../styles/custom.css';
 
@@ -14,6 +14,7 @@ export const AddItem = () => {
   const [clipboardState, setClipboardState] = useState('unknown');
   const [hasKeyboard, setHasKeyboard] = useState(false);
   const pasteAreaRef = useRef(null);
+  const { deviceName } = useSession();
 
   // Check clipboard permission status on mount
   useEffect(() => {
@@ -102,22 +103,29 @@ export const AddItem = () => {
       ref={pasteAreaRef}
       onPaste={handlePaste}
       tabIndex={0}
+      onClick={handlePaste}
       role="button"
       aria-label={t('addItem.pastePrompt')}
-      className={`relative bg-gray-50 dark:bg-gray-800 border-2 border-dashed ${
+      className={`sticky -top-2 z-10 relative bg-gray-50 dark:bg-gray-800 border-2 border-dashed ${
         isDenied ? 'border-red-300 dark:border-red-500' : isGranted ? 'border-green-300 dark:border-green-500' : 'border-gray-300 dark:border-gray-600'
-      } ${!isPasteSuppressed ? 'ring-2 ring-blue-500 ring-opacity-100' : ''} rounded-lg p-8 text-center cursor-pointer mb-8 transition-all duration-200 focus:outline-none focus:ring-4 focus:ring-blue-500 focus:ring-opacity-100`}
+      } ${!isPasteSuppressed ? 'ring-2 ring-blue-500 ring-opacity-100' : ''} rounded-lg p-4 pb-8 leading-tight text-center cursor-pointer mb-8 transition-all duration-200 focus:outline-none focus:ring-4 focus:ring-blue-500 focus:ring-opacity-100`}
     >
-      <p className={`${isDenied ? 'text-red-500 dark:text-red-400' : 'text-gray-500 dark:text-gray-400'}`}>
+      <span className="absolute bottom-1 left-2  text-gray-400 flex items-center gap-1">
+        <UserIcon className="h-4 w-4 text-blue-600" />
+        <span className='font-semibold text-blue-600'>
+          {deviceName}
+        </span>
+      </span>
+      <p className={`${isDenied ? 'text-red-500 dark:text-red-400' : 'text-gray-500 dark:text-gray-400 pt-2'}`}>
         {isDenied
           ? t('addItem.permissionDenied')
           : t('addItem.pastePrompt')}
       </p>
-      <p className="text-sm text-gray-400 dark:text-gray-500 mt-2">
+      <p className="text-sm text-gray-400 dark:text-gray-500 mt-0">
         {t('addItem.supportedTypes')}
       </p>
       {hasKeyboard && !isPasteSuppressed && (
-        <div className={`absolute bottom-2 right-2 flex items-center gap-1`}>
+        <div className={`absolute bottom-1 right-2 flex items-center gap-1`}>
           <div className='text-sm text-gray-400 dark:text-gray-500 flex items-center gap-1'>
             <KeyLabel keyString='Ctrl+V' />{t('addItem.keyboardShortcutAppend')}
             {isDenied && (

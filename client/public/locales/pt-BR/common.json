@@ -40,20 +40,20 @@
     "titleDescription": "Copie e cole,<br />de e para qualquer lugar.",
     "or": "ou",
     "join": {
-      "inputsHeading": "Entrar em um Clipboard"
+      "inputsHeading": "Entrar no clipboard"
     },
     "idle": {
-      "message": "Digite ou cole os <b>6 dígitos</b> para entrar no clipboard."
+      "message": "Digite ou cole os <b>6 dígitos</b> para entrar."
     },
     "valid": {
-      "message": "Pressione <span class='keyTip'><span class='keyTip-symbol'>⏎</span>Enter</span> ou clique no botão para entrar."
+      "message": "<span class='keyTip'><span class='keyTip-symbol'>⏎</span>Enter</span> ou use o botão para entrar."
     },
     "invalid": {
       "message": "Clipboard <b>{code}</b> não existe ou expirou."
     },
     "history": {
       "title": "Últimos clipboards visitados",
-      "empty": "Nenhum clipboard visitado ainda. Crie um novo para começar!",
+      "empty": "Nenhum clipboard visitado ainda. Crie um novo ou entre em um clipboard para começar!",
       "scrollLeft": "Deslizar para a esquerda",
       "scrollRight": "Deslizar para a direita"
     }

@@ -2,14 +2,13 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSession } from '../contexts/SessionContext';
 import { useSessionHistory } from '../hooks/useSessionHistory';
-import { useRequestQueue } from '../hooks/useRequestQueue';
 import clsx from 'clsx';
 import toast from 'react-hot-toast';
 import useEmblaCarousel from 'embla-carousel-react';
 import '../styles/custom.css';
 import { ClipboardDocumentListIcon } from '@heroicons/react/24/outline';
-import { XMarkIcon } from '@heroicons/react/24/outline';
-import { StartPageHeader } from './StartPageHeader';
+import { ChevronRightIcon } from '@heroicons/react/24/solid';
+import { ArrowRightIcon } from '@heroicons/react/24/outline';
 import KeyLabel from '../utils/keyLabel';
 
 const DEFAULT = {
@@ -263,48 +262,65 @@ function StartPage() {
 
   return (
     <>
-      <StartPageHeader />
       <div 
-        className="flex-1 flex items-center justify-center bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white p-4"
-        role="main"
+        className={clsx(
+          'flex flex-col justify-center items-center w-full h-full mx-auto pt-0 pb-0 transition-width duration-300 overflow-hidden',
+          // 'outline outline-green-500 outline-2 border-4 border-dashed border-green-500', // debug
+        )}
         aria-label="CrossClip Start Page"
         onClick={handleContainerClick}
       >
-        <div className="-mt-8">
-          <div className="flex flex-col items-end w-full max-w-md mb-16">
+
+        {/* <div className='h-max-content w-full outline outline-green-500 outline-2 border-4 border-dashed border-green-500'></div> */}
+
+        <div className={clsx(
+          'w-full max-w-[23rem] sm:max-w-md mx-auto mt-0 h-full px-2 py-4 relative overflow-y-auto overflow-x-clip',
+          'flex flex-col justify-center items-center',
+          // 'outline outline-blue-500 outline-2' // debug
+        )}>
+          <div className="flex flex-col items-end w-full max-w-md mb-12">
             {/* <h1 className="w-full text-right text-3xl font-bold mb-2 text-gray-900 dark:text-white shadow-sm">{t('startPage.title')}</h1> */}
             <div className="flex gap-0">
               <h1 className="text-right text-3xl font-bold mb-2 text-amber-500 dark:text-amber-500 text-shadow-hard-black dark:text-shadow-hard-white">Cross</h1>
               <h1 className="text-right text-3xl font-bold mb-2 text-blue-500 dark:text-blue-500 text-shadow-hard-black dark:text-shadow-hard-white">Clip</h1>
             </div>
-
             <p className="w-full text-md md:text-large text-gray-500 dark:text-gray-300 text-right border-t border-dashed border-t-4 border-gray-300 dark:border-gray-700 pt-2 leading-tight" dangerouslySetInnerHTML={{ __html: t('startPage.titleDescription') }} />
           </div>
           <div
-            className="flex flex-col items-center gap-4 w-full max-w-md"
+            className={clsx(
+              'flex flex-col items-center w-full relative',
+              // 'border-blue-500 border-2' // debug
+            )}
             onPaste={handlePaste}
             role="group"
           >
-
-            <div className="flex flex-col items-center gap-4 w-full relative group">
+            <div className="flex flex-col items-center gap-0 sm:gap-4 w-full max-w-[18rem] sm:max-w-full mx-auto relative group">
               <button
                 ref={createBtnRef}
                 autoFocus
                 tabIndex={1}
                 onClick={() => createSession(deviceId)}
                 disabled={loading || status === 'checking'}
-                className="w-full px-8 py-3 text-lg md:text-xl rounded border border-gray-300 hover:border-amber-400 dark:border-gray-700 hover:dark:border-amber-400 hover:bg-white hover:text-amber-600 dark:hover:bg-gray-800 focus:bg-white dark:focus:bg-gray-800 dark:hover:text-amber-400 transition-colors font-semibold text-blue-800 dark:text-blue-400 disabled:opacity-50 disabled:cursor-not-allowed border-2 focus:outline-none focus:ring-4 focus:ring-amber-500 focus:text-amber-500 focus:dark:text-amber-500"
+                className="w-full px-4 py-5 text-lg md:text-2xl rounded border border-gray-300 hover:border-amber-400 dark:border-gray-700 hover:dark:border-amber-400 hover:bg-white hover:text-amber-600 dark:hover:bg-gray-800 focus:bg-white dark:focus:bg-gray-800 dark:hover:text-amber-400 transition-colors font-semibold text-blue-800 dark:text-blue-400 disabled:opacity-50 disabled:cursor-not-allowed border-2 focus:outline-none focus:ring-4 focus:ring-amber-500 focus:text-amber-500 focus:dark:text-amber-500"
                 aria-label={loading ? "Creating new clipboard..." : "Create a new clipboard"}
                 dangerouslySetInnerHTML={{
-                  __html: `${t('actions.createNewOne')} <span class='text-xs text-gray-500 dark:text-gray-300 font-medium'>(${t('actions.oneClick')})</span>`
+                  __html: `<span class='whitespace-nowrap'>
+                            ${t('actions.createNewOne')}
+                          </span>
+                          <span class='ml-1 whitespace-nowrap text-xs text-gray-500 dark:text-gray-300 font-medium'>
+                            (${t('actions.oneClick')})
+                          </span>`
                 }}
               >
               </button>
-              <p className="w-full text-right -mt-5 text-sm text-gray-500 dark:text-gray-300 relative opacity-0 group-focus-within:opacity-100 transition-opacity duration-200">
+              <p className="hidden sm:block absolute -right-2 -bottom-3 w-full text-right text-sm text-gray-500 dark:text-gray-300 opacity-0 group-focus-within:opacity-100 transition-opacity duration-200">
                 <span className="absolute right-1 bottom-0 pointer-events-none z-0">
                   <span className='keyTip'><span className='keyTip-symbol'>⏎</span>Enter</span>
                 </span>
               </p>
+              <span className="animate-none group-focus-within:animate-pulse absolute right-0 sm:right-2 bottom-9 sm:bottom-7 opacity-0 group-focus-within:opacity-100">
+                <ChevronRightIcon className="ChevronRightIcon h-7 w-7 sm:h-12 sm:w-12 text-amber-500 dark:text-amber-300" />
+              </span>
               <p className="w-full text-right text-sm text-gray-500 dark:text-gray-300 relative opacity-0 group-focus-within:opacity-80 transition-opacity duration-200"></p>
               {/* <p className="w-full text-right mt-4 text-sm text-gray-500 dark:text-gray-300 relative opacity-0 group-focus-within:opacity-80 transition-opacity duration-200">
                 <span className="absolute right-1 bottom-0 pointer-events-none z-0">
@@ -317,58 +333,72 @@ function StartPage() {
                 </span>
               </p> */}
             </div>
-            
-            <div className="flex flex-col items-center gap-4 w-full">
+            <div className="flex flex-col items-center w-full my-2 sm:my-4">
               <span 
-                className="text-lg md:text-xl text-blue-600 dark:text-blue-400 italic mb-2"
+                className="text-lg md:text-xl text-blue-600 dark:text-blue-400 italic"
                 aria-hidden="true"
               >
                 {t('startPage.or')}
               </span>
             </div>
-
             <div className="w-full group">
-              <div className="flex items-end mb-2 gap-2">
+              <div className="flex flex-col sm:flex-row mx-auto items-center justify-end mb-0 gap-2 pr-0 sm:pr-20">
                 <h2
                   className="text-xl md:text-2xl font-semibold text-blue-800 dark:text-blue-400 group-focus-within:text-amber-500 group-focus-within:dark:text-amber-400"
                   id="join-heading"
-              >
-                <span>{t('startPage.join.inputsHeading')}</span>
+                >
+                  <span>{t('startPage.join.inputsHeading')}</span>
                 </h2>
-                <span className="opacity-70">
+                <span className="opacity-70 hidden sm:block">
                   <KeyLabel keyString='Ctrl+V' />
                 </span>
               </div>
+              {currentStatusMessage && (
+                <span 
+                  id="status-message" 
+                  className={clsx(
+                    'w-min whitespace-nowrap mx-auto text-sm sm:text-md text-center mb-4 px-2 py-0 block rounded-md',
+                    statusMessage.code === 'invalid' && 'bg-red-600 dark:bg-red-700 bg-opacity-70 text-white',
+                    statusMessage.code === 'valid' && 'bg-green-600 dark:bg-green-700 bg-opacity-70 text-white',
+                    (statusMessage.code === 'checking' || statusMessage.code === 'idle') && ' bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400'
+                  )}
+                  role={status === 'invalid' ? 'alert' : 'status'}
+                  aria-live={status === 'invalid' ? 'assertive' : 'polite'}
+                  dangerouslySetInnerHTML={{ __html: currentStatusMessage }}
+                />
+              )}
               <div 
-                className="flex gap-2 justify-center mb-2 relative"
+                className="flex gap-4 sm:gap-1 flex-wrap justify-center mb-2 relative max-w-[16rem] sm:max-w-full mx-auto"
                 role="group"
                 aria-labelledby="join-heading"
                 aria-describedby={error ? "error-message" : undefined}
               >
-                {[0,1,2,3,4,5].map((i) => (
-                  <input
-                    key={i}
-                    ref={el => inputRefs.current[i] = el}
-                    type="text"
-                    inputMode="numeric"
-                    pattern="[0-9]*"
-                    maxLength={1}
-                    value={code[i]}
-                    onChange={(e) => handleInputChange(i, e.target.value)}
-                    onKeyDown={(e) => handleKeyDown(i, e)}
-                    className={clsx(
-                      'w-14 h-20 font-semibold text-4xl text-center rounded border-2 border-gray-300 dark:border-gray-700 focus:border-blue-600 dark:focus:border-blue-400 bg-transparent outline-none transition-colors duration-150',
-                      'text-amber-500 dark:text-amber-400',
-                      status === 'checking' && 'animate-pulse',
-                      status === 'valid' && 'border-green-600 dark:border-green-400',
-                    )}
-                    tabIndex={i + 1}
-                    aria-label={`Digit ${i + 1} of 6`}
-                    aria-required="true"
-                    aria-invalid={error ? "true" : "false"}
-                    disabled={status === 'checking'}
-                  />
-                ))}
+                <div className="flex gap-5 sm:gap-1 flex-wrap justify-center mb-2 relative max-w-[16rem] sm:max-w-full mx-auto">
+                  {[0,1,2,3,4,5].map((i) => (
+                    <input
+                      key={i}
+                      ref={el => inputRefs.current[i] = el}
+                      type="text"
+                      inputMode="numeric"
+                      pattern="[0-9]*"
+                      maxLength={1}
+                      value={code[i]}
+                      onChange={(e) => handleInputChange(i, e.target.value)}
+                      onKeyDown={(e) => handleKeyDown(i, e)}
+                      className={clsx(
+                        'w-14 h-20 font-semibold text-4xl text-center rounded border-2 border-gray-300 dark:border-gray-700 focus:border-blue-600 dark:focus:border-blue-400 bg-transparent outline-none transition-colors duration-150',
+                        'text-amber-500 dark:text-amber-400',
+                        status === 'checking' && 'animate-pulse',
+                        status === 'valid' && 'border-green-600 dark:border-green-400',
+                      )}
+                      tabIndex={i + 1}
+                      aria-label={`Digit ${i + 1} of 6`}
+                      aria-required="true"
+                      aria-invalid={error ? "true" : "false"}
+                      disabled={status === 'checking'}
+                    />
+                  ))}
+                </div>
                 {/* Create a wrapper div to avoid flashing when any of the status elements are rendered */}
                 <div className="w-14 h-20 flex items-center justify-center ml-2 text-center rounded border-2 border-dashed border-transparent bg-transparent outline-none transition-colors duration-150">
                   {
@@ -392,7 +422,7 @@ function StartPage() {
                   {status === 'valid' && (
                     <button
                       ref={joinBtnRef}
-                      className="w-full h-full flex flex-col items-center justify-center bg-green-600 dark:bg-green-700 rounded border-2 border-white dark:border-gray-700 focus:outline-none focus:ring-4 focus:ring-amber-500 animate-pulse"
+                      className="w-full h-full flex flex-col items-center justify-center -mt-4 bg-green-600 dark:bg-green-700 rounded border-2 border-white dark:border-gray-700 focus:outline-none focus:ring-4 focus:ring-amber-500 animate-pulse"
                       aria-label="Join session"
                       tabIndex={0}
                       onClick={handleJoin}
@@ -405,89 +435,84 @@ function StartPage() {
                   )}
                 </div>
               </div>
-              {currentStatusMessage && (
-                <p 
-                  id="status-message" 
-                  className={clsx(
-                    'text-md text-left mb-2',
-                    statusMessage.code === 'invalid' && 'text-red-500 dark:text-red-400',
-                    statusMessage.code === 'valid' && 'text-green-500 dark:text-green-400',
-                    (statusMessage.code === 'checking' || statusMessage.code === 'idle') && 'text-gray-500 dark:text-gray-400'
-                  )}
-                  role={status === 'invalid' ? 'alert' : 'status'}
-                  aria-live={status === 'invalid' ? 'assertive' : 'polite'}
-                  dangerouslySetInnerHTML={{ __html: currentStatusMessage }}
-                />
-              )}
-            </div>
-            
-            <div className="flex flex-col items-start gap-1 w-full mt-20">
-              {allHistoryCodes.length > 0 ? (
-                <>
-                  <span className="text-sm text-gray-400 dark:text-gray-400 italic pb-2">{t('startPage.history.title')}:</span>
-                  <div className="relative w-full">
-                    {/* Left Arrow */}
-                    <button
-                      type="button"
-                      tabIndex={-1}
-                      className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-gray-800 dark:bg-gray-700 bg-opacity-50 rounded p-0 shadow hover:bg-opacity-90 transition"
-                      onClick={() => emblaApi && emblaApi.scrollPrev()}
-                      aria-label={t('actions.scrollLeft')}
-                      style={{ display: allHistoryCodes.length > 1 ? 'block' : 'none' }}
-                    >
-                      <span className="sr-only">{t('actions.scrollLeft')}</span>
-                      <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" strokeWidth="2" d="M15 19l-7-7 7-7"/></svg>
-                    </button>
-                    {/* Embla viewport */}
-                    <div className={clsx(
-                      "overflow-hidden px-8",
-                      allHistoryCodes.length <= 4 && "px-0"
-                    )} ref={emblaRef}>
-                      <div className="flex gap-2">
-                        {allHistoryCodes.map((code) => (
-                          <a
-                            key={code}
-                            href={isHistoryCodeValid(code) ? `/${code}` : undefined}
-                            className={clsx(
-                              "session-code-dashed-box",
-                              !isHistoryCodeValid(code) && "session-code-dashed-box-invalid",
-                              !isHistoryCodeValid(code) && "cursor-not-allowed",
-                              "select-none",
-                              "embla__slide"
-                            )}
-                            role="button"
-                            onClick={() => {
-                              isHistoryCodeValid(code) && (window.location.href = `/${code}`);
-                            }}
-                            disabled={!isHistoryCodeValid(code)}
-                          >
-                            {code}
-                          </a>
-                        ))}
-                      </div>
-                    </div>
-                    {/* Right Arrow */}
-                    <button
-                      type="button"
-                      tabIndex={-1}
-                      className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-gray-800 dark:bg-gray-700 bg-opacity-50 rounded p-0 shadow hover:bg-opacity-90 transition"
-                      onClick={() => emblaApi && emblaApi.scrollNext()}
-                      aria-label={t('actions.scrollRight')}
-                      style={{ display: allHistoryCodes.length > 1 ? 'block' : 'none' }}
-                    >
-                      <span className="sr-only">{t('actions.scrollRight')}</span>
-                      <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" strokeWidth="2" d="M9 5l7 7-7 7"/></svg>
-                    </button>
-                  </div>
-                </>
-              ) : (
-                <span className="text-sm text-gray-500 dark:text-gray-300 italic font-semibold">
-                  {t('startPage.history.empty')}
-                </span>
-              )}
-            </div>
+            </div>            
           </div>
         </div>
+        {/* History */}
+        <div className={clsx(
+          'w-full max-w-[23rem] mx-auto h-min-content pb-2 pt-1 px-1 bg-gray-100 dark:bg-gray-900 shadow-sm bg-opacity-50 backdrop-blur-sm',
+          '-mb-2 border-gray-300 dark:border-gray-700 border-2 rounded-t-md',
+          // 'outline outline-red-500 outline-2' // debug
+        )}>
+          <div className="flex flex-col items-start gap-1 w-full">
+          {allHistoryCodes.length > 0 ? (
+            <>
+              <span className="text-sm text-gray-400 dark:text-gray-400 pb-0 font-semibold">{t('startPage.history.title')}:</span>
+              <div className="relative w-full">
+                {/* Left Arrow */}
+                {allHistoryCodes.length > 3 && (<button
+                  type="button"
+                  tabIndex={-1}
+                  className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-gray-800 dark:bg-gray-700 bg-opacity-50 rounded p-0 shadow hover:bg-opacity-90 transition"
+                  onClick={() => emblaApi && emblaApi.scrollPrev()}
+                  aria-label={t('actions.scrollLeft')}
+                  style={{ display: allHistoryCodes.length > 1 ? 'block' : 'none' }}
+                >
+                  <span className="sr-only">{t('actions.scrollLeft')}</span>
+                  <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" strokeWidth="2" d="M15 19l-7-7 7-7"/></svg>
+                </button>)}
+                {/* Embla viewport */}
+                <div className={clsx(
+                  "overflow-hidden",
+                  allHistoryCodes.length > 3 ? "px-8" : "px-0"
+                )} ref={emblaRef}>
+                  <div className="flex gap-2">
+                    {allHistoryCodes.map((code) => (
+                      <a
+                        key={code}
+                        href={isHistoryCodeValid(code) ? `/${code}` : undefined}
+                        className={clsx(
+                          "session-code-dashed-box-history",
+                          !isHistoryCodeValid(code) && "session-code-dashed-box-invalid",
+                          !isHistoryCodeValid(code) && "cursor-not-allowed",
+                          "select-none",
+                          "embla__slide"
+                        )}
+                        role="button"
+                        onClick={() => {
+                          isHistoryCodeValid(code) && (window.location.href = `/${code}`);
+                        }}
+                        disabled={!isHistoryCodeValid(code)}
+                      >
+                        {code}
+                      </a>
+                    ))}
+                  </div>
+                </div>
+                {/* Right Arrow */}
+                {allHistoryCodes.length > 3 && (<button
+                  type="button"
+                  tabIndex={-1}
+                  className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-gray-800 dark:bg-gray-700 bg-opacity-50 rounded p-0 shadow hover:bg-opacity-90 transition"
+                  onClick={() => emblaApi && emblaApi.scrollNext()}
+                  aria-label={t('actions.scrollRight')}
+                  style={{ display: allHistoryCodes.length > 1 ? 'block' : 'none' }}
+                >
+                  <span className="sr-only">{t('actions.scrollRight')}</span>
+                  <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" strokeWidth="2" d="M9 5l7 7-7 7"/></svg>
+                </button>)}
+              </div>
+            </>
+          ) : (
+            <span className="text-sm w-full text-right text-gray-400 dark:text-gray-500 italic">
+              {t('startPage.history.empty')}
+            </span>
+          )}
+          </div>
+        </div>
+          
+        {/* <div className='h-max-content w-full outline outline-green-500 outline-2 border-4 border-dashed border-green-500'></div> */}
+
       </div>
     </>
   );

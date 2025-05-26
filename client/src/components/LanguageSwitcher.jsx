@@ -60,7 +60,7 @@ export const LanguageSwitcher = () => {
         className="flex items-center gap-2 px-2 py-1 rounded hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300"
       >
         <Flag className="w-4 h-4" />
-        <span className="text-sm font-medium">{currentLanguage.shortName}</span>
+        <span className="hidden md:block text-sm font-medium">{currentLanguage.shortName}</span>
         <svg 
           className={`w-4 h-4 transition-transform ${isOpen ? 'rotate-180' : ''}`}
           viewBox="0 0 20 20"

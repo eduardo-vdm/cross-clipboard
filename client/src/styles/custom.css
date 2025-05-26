@@ -15,8 +15,13 @@
 }
 
 .session-code-dashed-box {
-    @apply text-amber-500 z-0 hover:text-blue-500 tracking-wider font-mono font-semibold border-2 border-gray-500 dark:border-gray-600 border-dashed px-1.5 pt-0.5 leading-none;
+    @apply text-amber-500 z-0 hover:text-blue-500 tracking-wider font-mono font-semibold border-2 border-gray-300 dark:border-gray-600 border-dashed px-1.5 pt-0.5 leading-none;
 }
+
+.session-code-dashed-box-history {
+    @apply session-code-dashed-box text-xl pt-3 pb-1;
+}
+
 
 .session-code-dashed-box:hover {
     @apply border-blue-500 dark:border-blue-500;

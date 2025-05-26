@@ -37,5 +37,11 @@
   },
   "image": {
     "clipboardContent": "Conteúdo da área de transferência"
+  },
+  "shareDialog": {
+    "title": "Compartilhar sessão",
+    "description": "O link foi copiado para a área de transferência.",
+    "description2": "O QR acima também funciona.",
+    "close": "Fechar"
   }
 } 

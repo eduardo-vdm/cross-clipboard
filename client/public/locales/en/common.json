@@ -40,20 +40,20 @@
     "titleDescription": "Copy and paste,<br />to and from any device.",
     "or": "or",
     "join": {
-      "inputsHeading": "Join a Clipboard"
+      "inputsHeading": "Join a clipboard"
     },
     "idle": {
-      "message": "Type or paste the <b>6-digit code</b> to join a clipboard."
+      "message": "Type or paste the <b>6-digit code</b> to join."
     },
     "valid": {
-      "message": "Press <span class='keyTip'><span class='keyTip-symbol'>⏎</span>Enter</span> or click the button to join."
+      "message": "<span class='keyTip'><span class='keyTip-symbol'>⏎</span>Enter</span> or click the button to join."
     },
     "invalid": {
       "message": "Clipboard <b>{code}</b> does not exist or is expired."
     },
     "history": {
       "title": "Last visited clipboards",
-      "empty": "No clipboards yet. Create a new one to get started!",
+      "empty": "No clipboards visited yet. Create a new or join a clipboard to get started!",
       "scrollLeft": "Scroll left",
       "scrollRight": "Scroll right"
     }

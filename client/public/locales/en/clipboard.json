@@ -37,5 +37,11 @@
   },
   "image": {
     "clipboardContent": "Clipboard content"
+  },
+  "shareDialog": {
+    "title": "Share session",
+    "description": "This session link has been copied to your clipboard.",
+    "description2": "The QR above also works.",
+    "close": "Close"
   }
 } 

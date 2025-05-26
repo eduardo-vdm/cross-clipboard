@@ -1,18 +1,18 @@
-import { SessionHeader } from './SessionHeader';
 import { AddItem } from './AddItem';
 import { ClipboardItems } from './ClipboardItems';
 import { ClipboardPermission } from './ClipboardPermission';
+import clsx from 'clsx';
 
 function SessionPage() {
   return (
     <>
-      <SessionHeader />
-      <main className="max-w-[24rem] sm:max-w-[36rem] md:max-w-[42rem] lg:max-w-[48rem] xl:max-w-[54rem] 2xl:max-w-[60rem] 4xl:max-w-[66rem] mx-auto px-4 py-8">
-        <div className="min-w-[24rem] sm:min-w-[36rem] md:min-w-[42rem] lg:min-w-[48rem] xl:min-w-[54rem] 2xl:min-w-[60rem] w-full transition-width duration-300">
+      <div className={clsx(
+        'max-w-[24rem] md:max-w-[42rem] 2xl:max-w-[60rem] mx-auto px-4 py-8 transition-width duration-300',
+        // 'outline outline-red-500 outline-2 border-4 border-dashed border-red-500', // debug
+      )}>
           <AddItem />
           <ClipboardItems />
-        </div>
-      </main>
+      </div>
       <ClipboardPermission />
     </>
   );

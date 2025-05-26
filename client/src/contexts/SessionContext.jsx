@@ -69,6 +69,23 @@ export const SessionProvider = ({ children }) => {
     navigate(`/${code}`, { replace });
   }
 
+  const setDeviceNameFromItems = (items) => {
+    for (const item of items) {
+      if (item?.deviceId === deviceId) {
+        setDeviceName(item.deviceName);
+        return;
+      }
+    }
+  };
+
+  useEffect(() => {
+    setDeviceNameFromItems(items);
+  }, [items]);
+
+  useEffect(() => {
+    console.log('deviceName', deviceName);
+  }, [deviceName]);
+
   // Handle URL updates when session changes
   useEffect(() => {
     if (sessionCode) {
@@ -589,6 +606,7 @@ export const SessionProvider = ({ children }) => {
   const value = {
     sessionCode,
     deviceId,
+    deviceName,
     items,
     loading,
     error,
