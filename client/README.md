@@ -1,32 +1,69 @@
 # Cross-Clipboard Client
 
-The client application for the Cross-Clipboard project, allowing users to share clipboard items across devices using session codes.
+The client application for the Cross-Clipboard project, allowing users to share clipboard items across devices using session codes. This project serves as both a practical tool and a technical showcase, demonstrating modern web development practices and learning experiences.
+
+## Overview
+
+Cross-Clipboard is a web application that enables real-time clipboard sharing across devices using simple 6-digit session codes. Built with a focus on user experience and technical versatility, it demonstrates the practical application of modern web technologies while showcasing the developer's ability to work with different technology stacks.
+
+## Features
+
+- Real-time text sharing between any device with clipboard support
+- Anonymous session creation with automatic device naming
+- Join existing sessions via 6-digit codes
+- Comprehensive keyboard shortcut support
+- One-click sharing options (6-digit code, direct URL, QR code)
+- Complete data wipe capability
+- Dark/light theme support
+- Accessibility features (ongoing enhancements)
+- Internationalization (English and Brazilian Portuguese)
+- Responsive design (390px minimum width)
+
+## Technology Stack
+
+- **Core Framework**: React.js 18.x
+- **Build Tool**: Vite 4.4.x
+- **Styling**: TailwindCSS 3.x
+- **UI Components**: HeadlessUI 2.x
+- **Testing**: Jest 16.x
+- **Language**: Vanilla JavaScript
 
 ## Development
 
-### Installing dependencies
+### Technical Decisions
 
-```bash
-npm install
-```
+This project deliberately uses different technology stacks for frontend and backend to reflect real-world scenarios where developers must adapt to varying code environments. The frontend uses Vanilla JavaScript while the backend uses TypeScript, creating an interesting development workflow that showcases technical adaptability.
 
-### Running the app in development mode
+### AI-Assisted Development
 
-```bash
-npm run dev
-```
+This project was developed with significant assistance from AI agents, providing a unique learning experience in:
+- Guiding AI agents to achieve desired results
+- Implementing best practices suggested by AI
+- Learning from both successes and setbacks in AI collaboration
+- Understanding the balance between AI assistance and human decision-making
 
-When the application starts, the environment configuration will be logged both in the terminal and in the browser console for debugging purposes.
+### Development Environment
 
-### Building for production
+The project uses a containerized development environment with Docker, providing:
+- Isolated development environments for frontend, backend, and MongoDB
+- Consistent development experience across different machines
+- Easy setup and teardown of development environments
 
-```bash
-npm run build
-```
+### Key Challenges
+
+1. **AI Agent Interaction**
+   - Learning to effectively guide AI agents
+   - Understanding AI limitations and capabilities
+   - Developing strategies for successful AI collaboration
+
+2. **React.js Modernization**
+   - Adapting to modern React features (Context, Hooks)
+   - Understanding and implementing current best practices
+   - Evaluating and addressing common React critiques
 
 ### Environment Configuration
 
-The application uses environment variables for configuration. These are managed through the `src/env.js` module, which provides type-safe access to the environment variables.
+The application uses environment variables for configuration, managed through the `src/env.js` module.
 
 #### Available Environment Variables
 
@@ -35,49 +72,69 @@ The application uses environment variables for configuration. These are managed 
 - `VITE_API_URL`: Base URL for the API when using the real API service (default: empty string)
 
 ##### Built-in Vite Environment Variables
-The application also uses some built-in Vite environment variables:
-- `import.meta.env.DEV`: Boolean flag indicating if the app is running in development mode (automatically set by Vite)
-- `import.meta.env.PROD`: Boolean flag indicating if the app is running in production mode (automatically set by Vite)
-- `import.meta.env.MODE`: The current mode (development, production, etc.) the app is running in (automatically set by Vite)
+- `import.meta.env.DEV`: Development mode flag
+- `import.meta.env.PROD`: Production mode flag
+- `import.meta.env.MODE`: Current mode
 
 #### Setting Environment Variables
 
-To set environment variables for local development:
-
-1. Create a `.env.local` file in the client directory with the desired configuration:
-
+1. Create a `.env.local` file in the client directory:
 ```
-# Custom environment variables you need to set
-# ============================================
-
 # To use mock API (default behavior)
 VITE_USE_MOCK_API=true
 
 # To use real API
 # VITE_USE_MOCK_API=false
 # VITE_API_URL=http://localhost:5000
-
-# Note: Built-in variables like DEV, PROD, and MODE are automatically 
-# set by Vite and don't need to be defined in this file.
 ```
 
-2. Restart the development server
-
+2. Restart the development server:
 ```bash
 npm run dev
 ```
 
-#### Using the Real API
+## Building
 
-To use the real API, set the environment variables as shown above and make sure the backend server is running on the specified port.
+> **Note**: Deployment strategy is currently under evaluation. The following options are being considered:
+> - AWS S3 for static file hosting
+> - Vercel for automated deployment
+> 
+> This section will be updated once the deployment strategy is finalized.
+
+### Building for Production
 
 ```bash
-npm run dev
+npm run build
 ```
 
-## Features
+## Testing
 
-- Share clipboard items (text and images) across devices
-- Automatic conflict detection and resolution
-- Easy-to-use interface
-- Internationalization support (English and Portuguese currently available)
+> **Note**: While the project includes a comprehensive test suite, tests became partially obsolete during the second half of development. A complete test suite update is planned for the next development phase.
+
+## Browser Support
+
+- Supports all modern browsers with graphical UI
+- Requires local storage and clipboard permissions
+- Known issues with clipboard permissions on some mobile browsers (to be addressed in future versions)
+
+## Known Limitations
+
+- Current polling mechanism for data synchronization
+- Mobile browser clipboard permission handling
+- Limited session TTL
+- No comprehensive user help/tour system
+- Image copy/paste support pending
+
+## Future Plans
+
+- Implement WebSocket-based real-time updates
+- Image copy/paste functionality
+- Comprehensive user help/tour system
+- Native mobile apps (Android/iOS) via Expo.js
+- Optional user authentication for persistent libraries
+- Enhanced accessibility features
+- Additional language support
+
+## Contributing
+
+This project is currently maintained as a portfolio piece and learning exercise. While not actively seeking contributions at this time, the project remains open to collaboration for interested developers. Please reach out if you'd like to contribute.

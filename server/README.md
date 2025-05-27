@@ -1,40 +1,83 @@
 # Cross-Clipboard Server
 
-Backend server for the Cross-Clipboard application, providing API endpoints for session management and clipboard item synchronization.
+Backend server for the Cross-Clipboard application, providing API endpoints for session management and clipboard item synchronization. Built with TypeScript and Node.js, this server demonstrates practical implementation of modern backend development practices while maintaining flexibility for future enhancements.
+
+## Overview
+
+The Cross-Clipboard server provides a robust backend for real-time clipboard synchronization across devices. It implements a token-based authentication system that balances anonymity with security, while maintaining the ability to track and control usage patterns. The server is designed with scalability and maintainability in mind, using TypeScript for type safety and a flexible data service architecture.
+
+## Features
+
+- Token-based authentication with request fingerprinting
+- CORS middleware for secure cross-origin requests
+- Rate limiting preparation for abuse prevention
+- MongoDB integration with TTL for automatic cleanup
+- Mock service for rapid development and testing
+- Comprehensive logging system with multiple verbosity levels
+- Optimistic concurrency control for data consistency
+
+## Technology Stack
+
+- **Runtime**: Node.js v18.20.x
+- **Language**: TypeScript 5
+- **Framework**: Express.js v4.17.x
+- **Database**: MongoDB v8.x (Atlas)
+- **ODM**: Mongoose v8.x
+- **Testing**: Jest v29.x
 
 ## Development
 
-### Installing Dependencies
+### Technical Decisions
 
-```bash
-npm install
-```
+This project uses TypeScript to demonstrate the benefits of static typing in a backend environment, while the frontend uses vanilla JavaScript. This deliberate choice showcases the ability to work with different technology stacks and adapt to varying code environments.
 
-### Running in Development Mode
+#### Data Service Architecture
 
-```bash
-npm run dev
-```
+The server implements a flexible data service architecture through TypeScript interfaces:
+- Common interface for both mock and MongoDB implementations
+- Mock service using local JSON files for rapid prototyping
+- MongoDB service for production use
+- Seamless switching between implementations
+- Type-safe data handling across services
 
-### Building for Production
+### Security
 
-```bash
-npm run build
-npm start
-```
+#### Token-Based Authentication
 
-### Running Tests
+The server implements a unique token-based authentication system that:
+- Generates tokens based on request fingerprints (IP, browser, OS, user agent)
+- Maintains session consistency without requiring user authentication
+- Enables usage tracking and abuse prevention
+- Prepares for future user authentication implementation
+- Returns tokens in response headers for client-side management
 
-```bash
-# Run all tests
-npm test
+#### CORS and Rate Limiting
 
-# Run tests with mock data service
-npm run test:mock
+- Custom CORS middleware for secure cross-origin requests
+- Rate limiting preparation for abuse prevention
+- Extensible security measures for future enhancements
 
-# Run tests with MongoDB service
-npm run test:mongo
-```
+### Performance
+
+#### Current Implementation
+- Polling-based data synchronization
+- Automatic token generation on first access
+- Token persistence for session consistency
+- Header-based token transmission
+- Usage monitoring capabilities
+- Anonymous but traceable user identification
+
+#### Planned Improvements
+- WebSocket implementation for real-time updates
+- Reduced server load through connection-based updates
+- Improved real-time performance
+
+#### MongoDB Integration
+
+- TTL indexes for automatic data cleanup
+- Optimistic concurrency control
+- Flexible schema design
+- Performance optimizations to be implemented based on usage patterns
 
 ## Architecture
 
@@ -104,4 +147,45 @@ The MongoDB connection uses the same log level as the request logger:
 - `NORMAL`: Connection status with database details
 - `VERBOSE`: Full debug mode with query logging
 
-When using the `VERBOSE` log level, all MongoDB queries will be logged to the console, which is helpful for debugging but can be very verbose. 
+When using the `VERBOSE` log level, all MongoDB queries will be logged to the console, which is helpful for debugging but can be very verbose.
+
+## Testing
+
+> **Note**: While the project includes a comprehensive test suite with approximately 70% coverage, tests became partially obsolete during the second half of development. A complete test suite update is planned for the next development phase.
+
+### Running Tests
+
+```bash
+# Run all tests
+npm test
+
+# Run tests with mock data service
+npm run test:mock
+
+# Run tests with MongoDB service
+npm run test:mongo
+```
+
+## Known Limitations
+
+- Current polling mechanism for data synchronization
+- Rate limiting not yet implemented
+- Error handling needs enhancement
+- Test coverage needs updating
+- MongoDB optimizations pending usage patterns
+- TTL parameters to be adjusted based on production usage
+
+## Future Plans
+
+- Implement WebSocket support for real-time updates
+- Implement rate limiting
+- Enhance error handling
+- Update test coverage
+- Optimize MongoDB performance based on usage patterns
+- Adjust TTL parameters
+- Implement user authentication system
+- Enhance logging system
+
+## Contributing
+
+This project is currently maintained as a portfolio piece and learning exercise. While not actively seeking contributions at this time, the project remains open to collaboration for interested developers. Please reach out if you'd like to contribute. 
