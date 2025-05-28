@@ -27,7 +27,7 @@ const varsToAdd = [
 ];
 
 // Load current .env.local or create it if it doesn't exist
-const envLocalPath = path.resolve(__dirname, '../.env.local');
+const envLocalPath = path.resolve(__dirname, '../.env');
 let envLocalContent = fs.readFileSync(envLocalPath, 'utf8');
 if (!envLocalContent) {
   envLocalContent = `# This file is auto-generated from package.json - DO NOT EDIT MANUALLY`;

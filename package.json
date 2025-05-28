@@ -1,0 +1,28 @@
+{
+  "name": "cross-clipboard",
+  "description": "Root package for the cross-clipboard project.",
+  "private": true,
+  "version": "1.0.0",
+  "author": {
+    "name": "Eduardo Nazareth",
+    "email": "eduardo.vaz.de.mello@gmail.com",
+    "url": "https://github.com/eduardo-vdm"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/eduardo-vdm/cross-clipboard.git"
+  },
+  "workspaces": [
+    "client",
+    "server"
+  ],
+  "scripts": {
+    "generate:mongo-init": "node scripts/generate-mongo-init.js",
+    "install:all": "npm install",
+    "start:client": "npm --workspace client start",
+    "start:server": "npm --workspace server start"
+  },
+  "devDependencies": {
+    "dotenv": "^16.4.5"
+  }
+}

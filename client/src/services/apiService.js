@@ -30,7 +30,6 @@ const updateTokenFromHeaders = (headers) => {
 const fetchWithAuth = async (url, options = {}) => {
   const token = getValidToken();
   const headers = new Headers(options.headers || {});
-  console.log('fetchWithAuth1', url, token);
 
   if (token) {
     headers.set('Authorization', `Bearer ${token}`);
@@ -41,10 +40,7 @@ const fetchWithAuth = async (url, options = {}) => {
     headers
   });
   
-  console.log('fetchWithAuth2', response);
-
   updateTokenFromHeaders(response.headers);
-  console.log('fetchWithAuth', getValidToken());
   return response;
 };
 //// -> End of auth helpers (to be refactored)

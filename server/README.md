@@ -103,7 +103,12 @@ Sessions have TTL indexes set to expire after 7 days by default, and use the `is
 
 ## Environment Variables
 
-Create a `.env` file in the server directory with the following variables:
+1. Copy the example environment file:
+```bash
+cp .env.example .env
+```
+
+2. Update the variables in `.env` as needed:
 
 ### Server Configuration
 

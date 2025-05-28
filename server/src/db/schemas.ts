@@ -68,8 +68,8 @@ const clipboardItemSchema = new Schema({
 
 // Session Schema
 const sessionSchema = new Schema({
-  id: { type: String, required: true, unique: true },
-  code: { type: String, required: true, unique: true, length: 6 },
+  id: { type: String, required: true },
+  code: { type: String, required: true, length: 6 },
   items: [clipboardItemSchema],
   version: { type: Number, required: true, default: 1 },
   createdAt: { type: Date, required: true, default: Date.now },
@@ -97,7 +97,7 @@ const tokenSchema = new Schema<ITokenDocument>({
 // Indexes
 sessionSchema.index({ createdAt: 1 }, { expireAfterSeconds: 7 * 24 * 60 * 60 }); // 7 days TTL
 sessionSchema.index({ id: 1 }, { unique: true });
-sessionSchema.index({ code: 1 }, { unique: true });  // Index for the session code
+sessionSchema.index({ code: 1 }, { unique: true });
 sessionSchema.index({ isArchived: 1 });
 tokenSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 0 });
 

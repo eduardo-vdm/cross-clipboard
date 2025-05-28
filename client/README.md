@@ -78,14 +78,19 @@ The application uses environment variables for configuration, managed through th
 
 #### Setting Environment Variables
 
-1. Create a `.env.local` file in the client directory:
+1. Copy the example environment file:
+```bash
+cp .env.example .env
+```
+
+2. Update the variables in `.env` as needed:
 ```
 # To use mock API (default behavior)
 VITE_USE_MOCK_API=true
 
-# To use real API
+# To use real API (use the actual api url if not using the default ones)
 # VITE_USE_MOCK_API=false
-# VITE_API_URL=http://localhost:5000
+# VITE_API_URL=http://localhost:3001
 ```
 
 2. Restart the development server:
