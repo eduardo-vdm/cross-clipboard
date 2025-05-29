@@ -145,7 +145,7 @@ export const SessionProvider = ({ children }) => {
     pollItems();
 
     // Setup polling interval
-    const interval = setInterval(pollItems, 2000);
+    const interval = setInterval(pollItems, 4000);
 
     return () => clearInterval(interval);
   }, [sessionCode, apiUrl, service]);
