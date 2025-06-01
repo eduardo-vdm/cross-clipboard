@@ -1,9 +1,10 @@
 import dotenv from 'dotenv';
 import express, { Request, Response, NextFunction } from 'express';
-import cors from 'cors';
+import { createServer } from 'http';
+import { Server } from 'socket.io';
 import { getConfig, getDataService } from './config';
 import { createSessionRouter } from './routes/session';
-import { createTokenRouter } from './routes/token';
+import { createAuthRouter } from './routes/auth';
 import { createAuthMiddleware } from './middleware/auth';
 import { requestLogger } from './middleware/requestLogger';
 import { errorHandler } from './middleware/errorHandler';
@@ -18,6 +19,20 @@ const config = getConfig();
 
 // Initialize the application
 const app = express();
+const server = createServer(app);
+const io = new Server(server);
+
+// debugging socket.io
+io.on('connection', (socket) => {
+  console.log('>> A user connected through socket.io');
+  // send the string to the client
+  socket.emit('welcome', { message: '>> You are connected through socket.io' });
+
+  socket.on('test:event', (data) => {
+    console.log('>> Received test event:', data);
+    socket.emit('test:response', { received: true, data });
+  });
+});
 
 // Middleware
 app.use(createCorsMiddleware());
@@ -48,7 +63,7 @@ async function initializeServer() {
   // Routes
   app.use('/api', createAuthMiddleware(dataService));
   app.use('/api', createSessionRouter(dataService));
-  app.use('/api', createTokenRouter(dataService));
+  app.use('/api', createAuthRouter(dataService));
 
   // Handle 404s
   app.use((req: Request, res: Response) => {
@@ -59,8 +74,8 @@ async function initializeServer() {
   app.use(errorHandler);
 
   // Start the server
-  app.listen(config.port, () => {
-    console.log(`🚀 Server running on port ${config.port}`);
+  server.listen(config.port, () => {
+    console.log(`🚀 Server running with socket.io at ${config.port}`);
     console.log(`Mode: ${config.serverMode}`);
     console.log(`Service: ${config.serviceMode}`);
   });

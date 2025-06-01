@@ -3,7 +3,7 @@ import { DataService, TokenMetadata } from '../types';
 import { getRequestFingerprint } from '../helpers/getRequestFingerprint';
 import { asyncHandler } from '../helpers/asyncHandler';
 
-export const createTokenRouter = (dataService: DataService) => {
+export const createAuthRouter = (dataService: DataService) => {
   const router = Router();
 
   router.post('/auth', asyncHandler(async (req, res) => {
