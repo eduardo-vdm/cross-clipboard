@@ -2,7 +2,7 @@
 
 A web application that allows users to share clipboard items across multiple devices using simple 6-digit session codes.
 
-![Cross Clipboard demo](./cross-clipboard-demo.gif)
+![Cross Clipboard demo](https://raw.githubusercontent.com/eduardo-vdm/cross-clipboard/refs/heads/main/crossclip-v1-demo.gif)
 
 ## Motivation
 
