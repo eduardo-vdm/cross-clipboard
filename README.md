@@ -4,6 +4,12 @@ A web application that allows users to share clipboard items across multiple dev
 
 ![Cross Clipboard demo](https://raw.githubusercontent.com/eduardo-vdm/cross-clipboard/refs/heads/main/crossclip-v1-demo.gif)
 
+## Live Working Demo
+
+- Currently at https://cross-clipboard.vercel.app (see note below)
+
+<small>Using free tiers from [Vercel](https://vercel.com) (frontend), [Render](https://render.com) (backend/api) and [MongoDB Atlas](https://cloud.mongodb.com) - there's a high chance the app hibernated and will cold start, being a bit unresponsive for 1-2 minutes, then working as expected.</small>
+
 ## Motivation
 
 This portfolio project demonstrates a practical use case while showcasing technical versatility through an intentional mix of technologies:
@@ -63,13 +69,13 @@ The application itself solves a common problem - sharing clipboard content betwe
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/yourusername/cross-clipboard.git
+git clone https://github.com/eduardo-vdm/cross-clipboard.git
 cd cross-clipboard
 ```
 
 2. Start the development environment using Docker:
 ```bash
-docker-compose up
+docker compose up
 ```
 
 Or set up manually:
@@ -86,17 +92,17 @@ npm install
 ```
 
 4. Configure environment variables:
-   ```bash
-   # In the client directory
-   cd client
-   cp .env.example .env
-   
-   # In the server directory
-   cd ../server
-   cp .env.example .env
-   ```
-   
-   Update the variables in each `.env` file as needed. See the respective README files in the [client](./client/README.md) and [server](./server/README.md) directories for detailed configuration options.
+```bash
+# In the client directory
+cd client
+cp .env.example .env
+
+# In the server directory
+cd ../server
+cp .env.example .env
+```
+
+Update the variables in each `.env` file as needed. See the respective README files in the [client](./client/README.md) and [server](./server/README.md) directories for detailed configuration options.
 
 5. Start the development servers:
 ```bash
