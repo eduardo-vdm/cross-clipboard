@@ -2,6 +2,8 @@
 
 A web application that allows users to share clipboard items across multiple devices using simple 6-digit session codes.
 
+![Cross Clipboard demo](./cross-clipboard-demo.gif)
+
 ## Motivation
 
 This portfolio project demonstrates a practical use case while showcasing technical versatility through an intentional mix of technologies:
