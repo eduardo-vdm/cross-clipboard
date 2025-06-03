@@ -1,4 +1,7 @@
 {
+  "app": {
+    "warmingUp": "Aquecendo..."
+  },
   "actions": {  
     "copy": "Copiar",
     "edit": "Editar",

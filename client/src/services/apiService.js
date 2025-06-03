@@ -102,6 +102,16 @@ const handleResponse = async (response) => {
 };
 
 export const apiService = {
+
+  /**
+   * Ping the backend to check if it's ready
+   * @returns {Promise<boolean>} True if backend is ready, false otherwise
+   */
+  ping: async () => {
+    const response = await fetch(`${API_URL}/ping`);
+    return response.ok;
+  },
+
   /**
    * Create a new session
    * @param {string} deviceId - The device ID

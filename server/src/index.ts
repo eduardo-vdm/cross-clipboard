@@ -9,6 +9,8 @@ import { requestLogger } from './middleware/requestLogger';
 import { errorHandler } from './middleware/errorHandler';
 import { mongoConnection } from './db/connection';
 import { createCorsMiddleware } from './middleware/cors';
+import { createDelayMiddleware } from './middleware/delay';
+import { createPingMiddleware } from './middleware/ping';
 
 // Load environment variables
 dotenv.config();
@@ -21,6 +23,7 @@ const app = express();
 
 // Middleware
 app.use(createCorsMiddleware());
+app.use(createDelayMiddleware());
 app.use(express.json()); // Needed to parse JSON body
 
 // Set up request logging
@@ -46,6 +49,7 @@ async function initializeServer() {
   const dataService = getDataService();
 
   // Routes
+  app.use('/ping', createPingMiddleware());
   app.use('/api', createAuthMiddleware(dataService));
   app.use('/api', createSessionRouter(dataService));
   app.use('/api', createTokenRouter(dataService));

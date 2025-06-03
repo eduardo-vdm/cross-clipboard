@@ -9,6 +9,11 @@ let currentSession = null;
 let itemVersions = new Map(); // Track item versions for conflict detection
 
 export const mockService = {
+  ping: async () => {
+    await delay();
+    return true;
+  },
+
   // Create a new session
   createSession: async (deviceId) => {
     await delay();

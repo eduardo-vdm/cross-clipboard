@@ -1,4 +1,7 @@
 {
+  "app": {
+    "warmingUp": "Warming up server..."
+  },
   "actions": {
     "copy": "Copy",
     "edit": "Edit",
