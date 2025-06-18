@@ -2,33 +2,43 @@
 
 The client application for the Cross-Clipboard project, allowing users to share clipboard items across devices using session codes. This project serves as both a practical tool and a technical showcase, demonstrating modern web development practices and learning experiences.
 
-## Overview
+## 🎯 Overview
 
 Cross-Clipboard is a web application that enables real-time clipboard sharing across devices using simple 6-digit session codes. Built with a focus on user experience and technical versatility, it demonstrates the practical application of modern web technologies while showcasing the developer's ability to work with different technology stacks.
 
-## Features
+## ✨ Features
 
-- Real-time text sharing between any device with clipboard support
-- Anonymous session creation with automatic device naming
-- Join existing sessions via 6-digit codes
-- Comprehensive keyboard shortcut support
-- One-click sharing options (6-digit code, direct URL, QR code)
-- Complete data wipe capability
-- Dark/light theme support
-- Accessibility features (ongoing enhancements)
-- Internationalization (English and Brazilian Portuguese)
-- Responsive design (390px minimum width)
+- 🔄 Real-time text sharing between any device with clipboard support
+- 📱 Anonymous session creation with automatic device naming and identification
+- 🔗 Join existing sessions via 6-digit codes
+- ⌨️ Comprehensive keyboard shortcut support with clipboard permission handling
+- 📤 One-click sharing options (6-digit code, direct URL, QR code)
+- ✏️ Advanced item management with edit functionality and conflict resolution
+- 🗑️ Device-specific item management (remove my items, individual item deletion)
+- 🧹 Complete data wipe capability with confirmation dialogs
+- 🌙 Dark/light theme support with theme switching
+- ♿ Accessibility features (ongoing enhancements)
+- 🌍 Internationalization (English and Brazilian Portuguese) with language switcher
+- 📱 Responsive design (390px minimum width)
+- ⚡ Backend warm-up handling with online status indicators
+- 📅 Items sorted by last modified timestamp for better organization
 
-## Technology Stack
+## 🛠️ Technology Stack
 
 - **Core Framework**: React.js 18.x
 - **Build Tool**: Vite 4.4.x
 - **Styling**: TailwindCSS 3.x
 - **UI Components**: HeadlessUI 2.x
-- **Testing**: Jest 16.x
+- **Testing**: Vitest 3.x (recently migrated from Jest)
 - **Language**: Vanilla JavaScript
+- **Additional Libraries**: 
+  - i18next for internationalization
+  - React Hot Toast for notifications
+  - Embla Carousel for UI components
+  - React Hotkeys Hook for keyboard shortcuts
+  - QR Code React for sharing functionality
 
-## Development
+## 🚀 Development
 
 ### Technical Decisions
 
@@ -98,7 +108,7 @@ VITE_USE_MOCK_API=true
 npm run dev
 ```
 
-## Building
+## 📦 Building
 
 > **Note**: Deployment strategy is currently under evaluation. The following options are being considered:
 > - AWS S3 for static file hosting
@@ -112,34 +122,34 @@ npm run dev
 npm run build
 ```
 
-## Testing
+## 🧪 Testing
 
-> **Note**: While the project includes a comprehensive test suite, tests became partially obsolete during the second half of development. A complete test suite update is planned for the next development phase.
+> **Note**: Testing framework recently migrated from Jest to Vitest and needs updates. A complete test suite update is planned for the next development phase.
 
-## Browser Support
+## 🌐 Browser Support
 
 - Supports all modern browsers with graphical UI
 - Requires local storage and clipboard permissions
-- Known issues with clipboard permissions on some mobile browsers (to be addressed in future versions)
+- Known issues with clipboard permissions on some mobile browsers (improved but ongoing)
 
-## Known Limitations
+## ⚠️ Known Limitations
 
 - Current polling mechanism for data synchronization
-- Mobile browser clipboard permission handling
+- Mobile browser clipboard permission handling (improved but ongoing)
 - Limited session TTL
 - No comprehensive user help/tour system
-- Image copy/paste support pending
+- Image copy/paste support removed for development speed (planned for future)
 
-## Future Plans
+## 🔮 Future Plans
 
 - Implement WebSocket-based real-time updates
-- Image copy/paste functionality
+- Image copy/paste functionality (re-implementation)
 - Comprehensive user help/tour system
 - Native mobile apps (Android/iOS) via Expo.js
 - Optional user authentication for persistent libraries
 - Enhanced accessibility features
 - Additional language support
 
-## Contributing
+## 🤝 Contributing
 
 This project is currently maintained as a portfolio piece and learning exercise. While not actively seeking contributions at this time, the project remains open to collaboration for interested developers. Please reach out if you'd like to contribute.

@@ -4,13 +4,13 @@ A web application that allows users to share clipboard items across multiple dev
 
 ![Cross Clipboard demo](https://raw.githubusercontent.com/eduardo-vdm/cross-clipboard/refs/heads/main/crossclip-v1-demo.gif)
 
-## Live Working Demo
+## 🌐 Live Working Demo
 
 - Currently at https://cross-clipboard.vercel.app (see note below)
 
-<small>Using free tiers from [Vercel](https://vercel.com) (frontend), [Render](https://render.com) (backend/api) and [MongoDB Atlas](https://cloud.mongodb.com) - there's a high chance the app hibernated and will cold start, being a bit unresponsive for 1-2 minutes, then working as expected.</small>
+<small>Using free tiers from [Vercel](https://vercel.com) (frontend), [Render](https://render.com) (backend/api) and [MongoDB Atlas](https://cloud.mongodb.com) - there's a high chance the app hibernated and will cold start, being a bit unresponsive for 1-2 minutes, then working as expected. The app now includes a warm-up indicator to handle this gracefully.</small>
 
-## Motivation
+## 🎯 Motivation
 
 This portfolio project demonstrates a practical use case while showcasing technical versatility through an intentional mix of technologies:
 
@@ -21,28 +21,38 @@ The deliberate combination of typed (backend) and untyped (frontend) code create
 
 The application itself solves a common problem - sharing clipboard content between devices - with a simple, accessible interface using 6-digit session codes.
 
-## Features
+## ✨ Features
 
-- Real-time text sharing between any device with clipboard support
-- Anonymous session creation with automatic device naming
-- Join existing sessions via 6-digit codes
-- Comprehensive keyboard shortcut support
-- One-click sharing options (6-digit code, direct URL, QR code)
-- Complete data wipe capability
-- Dark/light theme support
-- Accessibility features (ongoing enhancements)
-- Internationalization (English and Brazilian Portuguese)
-- Responsive design (390px minimum width)
+- 🔄 Real-time text sharing between any device with clipboard support
+- 📱 Anonymous session creation with automatic device naming and identification
+- 🔗 Join existing sessions via 6-digit codes
+- ⌨️ Comprehensive keyboard shortcut support with clipboard permission handling
+- 📤 One-click sharing options (6-digit code, direct URL, QR code)
+- ✏️ Advanced item management with edit functionality and conflict resolution
+- 🗑️ Device-specific item management (remove my items, individual item deletion)
+- 🧹 Complete data wipe capability with confirmation dialogs
+- 🌙 Dark/light theme support with theme switching
+- ♿ Accessibility features (ongoing enhancements)
+- 🌍 Internationalization (English and Brazilian Portuguese) with language switcher
+- 📱 Responsive design (390px minimum width)
+- ⚡ Backend warm-up handling with online status indicators
+- 📅 Items sorted by last modified timestamp for better organization
 
-## Technology Stack
+## 🛠️ Technology Stack
 
 ### Frontend
 - **Core Framework**: React.js 18.x
 - **Build Tool**: Vite 4.4.x
 - **Styling**: TailwindCSS 3.x
 - **UI Components**: HeadlessUI 2.x
-- **Testing**: Jest 16.x
+- **Testing**: Vitest 3.x (recently migrated from Jest)
 - **Language**: Vanilla JavaScript
+- **Additional Libraries**: 
+  - i18next for internationalization
+  - React Hot Toast for notifications
+  - Embla Carousel for UI components
+  - React Hotkeys Hook for keyboard shortcuts
+  - QR Code React for sharing functionality
 
 ### Backend
 - **Runtime**: Node.js v18.20.x
@@ -58,7 +68,7 @@ The application itself solves a common problem - sharing clipboard content betwe
 - ESLint for code quality
 - Prettier for code formatting
 
-## Getting Started
+## 🚀 Getting Started
 
 ### Prerequisites
 - Node.js 18.x or later
@@ -127,32 +137,33 @@ npm run build
 
 For more detailed information about development, building, and deployment, please refer to the README files in the [client](./client/README.md) and [server](./server/README.md) directories.
 
-## Current Status
+## 📊 Current Status
 
 The project is in active development with the following key points:
 - Core functionality is implemented and working
-- Testing coverage needs updating
+- Testing framework recently migrated and needs updates
 - WebSocket implementation planned to replace current polling mechanism
 - Deployment strategy under evaluation
+- Backend warm-up handling implemented for better user experience
 
-## Known Limitations
+## ⚠️ Known Limitations
 
 - Current polling mechanism for data synchronization
-- Mobile browser clipboard permission handling
+- Mobile browser clipboard permission handling (improved but ongoing)
 - Limited session TTL
 - No comprehensive user help/tour system
-- Image copy/paste support pending
+- Image copy/paste support removed for development speed (planned for future)
 
-## Future Plans
+## 🔮 Future Plans
 
 - Implement WebSocket-based real-time updates
-- Image copy/paste functionality
+- Image copy/paste functionality (re-implementation)
 - Comprehensive user help/tour system
 - Native mobile apps (Android/iOS) via Expo.js
 - Optional user authentication for persistent libraries
 - Enhanced accessibility features
 - Additional language support
 
-## License
+## 📄 License
 
 This project is licensed under the MIT License with Commons Clause - see the [LICENSE](LICENSE) file for details.

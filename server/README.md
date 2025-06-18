@@ -2,21 +2,24 @@
 
 Backend server for the Cross-Clipboard application, providing API endpoints for session management and clipboard item synchronization. Built with TypeScript and Node.js, this server demonstrates practical implementation of modern backend development practices while maintaining flexibility for future enhancements.
 
-## Overview
+## 🎯 Overview
 
 The Cross-Clipboard server provides a robust backend for real-time clipboard synchronization across devices. It implements a token-based authentication system that balances anonymity with security, while maintaining the ability to track and control usage patterns. The server is designed with scalability and maintainability in mind, using TypeScript for type safety and a flexible data service architecture.
 
-## Features
+## ✨ Features
 
-- Token-based authentication with request fingerprinting
-- CORS middleware for secure cross-origin requests
-- Rate limiting preparation for abuse prevention
-- MongoDB integration with TTL for automatic cleanup
-- Mock service for rapid development and testing
-- Comprehensive logging system with multiple verbosity levels
-- Optimistic concurrency control for data consistency
+- 🔐 Token-based authentication with request fingerprinting
+- 🌐 CORS middleware for secure cross-origin requests
+- 🛡️ Rate limiting preparation for abuse prevention
+- 🗄️ MongoDB integration with TTL for automatic cleanup
+- 🧪 Mock service for rapid development and testing
+- 📝 Comprehensive logging system with multiple verbosity levels
+- ⚡ Optimistic concurrency control for data consistency
+- ⏱️ Delay middleware for request handling
+- 🏓 Ping endpoint for backend readiness checks
+- 🔄 Backend warm-up handling for improved user experience
 
-## Technology Stack
+## 🛠️ Technology Stack
 
 - **Runtime**: Node.js v18.20.x
 - **Language**: TypeScript 5
@@ -25,7 +28,7 @@ The Cross-Clipboard server provides a robust backend for real-time clipboard syn
 - **ODM**: Mongoose v8.x
 - **Testing**: Jest v29.x
 
-## Development
+## 🚀 Development
 
 ### Technical Decisions
 
@@ -40,7 +43,7 @@ The server implements a flexible data service architecture through TypeScript in
 - Seamless switching between implementations
 - Type-safe data handling across services
 
-### Security
+### 🔒 Security
 
 #### Token-Based Authentication
 
@@ -57,7 +60,7 @@ The server implements a unique token-based authentication system that:
 - Rate limiting preparation for abuse prevention
 - Extensible security measures for future enhancements
 
-### Performance
+### ⚡ Performance
 
 #### Current Implementation
 - Polling-based data synchronization
@@ -66,6 +69,8 @@ The server implements a unique token-based authentication system that:
 - Header-based token transmission
 - Usage monitoring capabilities
 - Anonymous but traceable user identification
+- Delay middleware for controlled request handling
+- Ping endpoint for backend readiness monitoring
 
 #### Planned Improvements
 - WebSocket implementation for real-time updates
@@ -79,14 +84,14 @@ The server implements a unique token-based authentication system that:
 - Flexible schema design
 - Performance optimizations to be implemented based on usage patterns
 
-## Architecture
+## 🏗️ Architecture
 
 The server follows a dependency injection pattern that allows for swappable data service implementations:
 
 - `MockDataService`: Uses in-memory data structures with JSON file persistence for development
 - `MongoDataService`: Uses MongoDB for data storage in production environments
 
-## MongoDB Schema
+## 🗄️ MongoDB Schema
 
 When using MongoDB, the following data schema is implemented:
 
@@ -101,7 +106,7 @@ When using MongoDB, the following data schema is implemented:
 
 Sessions have TTL indexes set to expire after 7 days by default, and use the `isArchived` flag for soft deletion.
 
-## Environment Variables
+## ⚙️ Environment Variables
 
 1. Copy the example environment file:
 ```bash
@@ -122,6 +127,9 @@ SERVICE_MODE=mock  # mock or mongo
 
 # For test environment only
 TEST_MODE=mock  # mock or mongo
+
+# Request delay (in milliseconds) for backend warm-up handling
+DELAY_MS=0  # Set to add artificial delay to requests
 
 # MongoDB connection (only used when SERVICE_MODE=mongo)
 # Note: Both variable names are supported for backward compatibility
@@ -154,7 +162,7 @@ The MongoDB connection uses the same log level as the request logger:
 
 When using the `VERBOSE` log level, all MongoDB queries will be logged to the console, which is helpful for debugging but can be very verbose.
 
-## Testing
+## 🧪 Testing
 
 > **Note**: While the project includes a comprehensive test suite with approximately 70% coverage, tests became partially obsolete during the second half of development. A complete test suite update is planned for the next development phase.
 
@@ -171,7 +179,7 @@ npm run test:mock
 npm run test:mongo
 ```
 
-## Known Limitations
+## ⚠️ Known Limitations
 
 - Current polling mechanism for data synchronization
 - Rate limiting not yet implemented
@@ -180,7 +188,7 @@ npm run test:mongo
 - MongoDB optimizations pending usage patterns
 - TTL parameters to be adjusted based on production usage
 
-## Future Plans
+## 🔮 Future Plans
 
 - Implement WebSocket support for real-time updates
 - Implement rate limiting
@@ -191,6 +199,6 @@ npm run test:mongo
 - Implement user authentication system
 - Enhance logging system
 
-## Contributing
+## 🤝 Contributing
 
 This project is currently maintained as a portfolio piece and learning exercise. While not actively seeking contributions at this time, the project remains open to collaboration for interested developers. Please reach out if you'd like to contribute. 
